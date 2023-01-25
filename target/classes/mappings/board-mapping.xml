@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="boardDao">
+
+	<resultMap type="board" id="boardResult">
+	<id property="board_seq" column="BOARD_SEQ" />
+	<result property="user_id" column="USER_ID" />
+	<result property="board_date" column="BOARD_DATE" />
+	<result property="board_cnt" column="BOARD_CNT" />
+	<result property="board_title" column="BOARD_TITLE" />
+	<result property="board_content" column="BOARD_CONTENT" />
+	<result property="board_anonymous" column="BOARD_ANONYMOUS" />
+</resultMap>
+
+	<!-- 재사용 가능한 SQL 정의, include 로 불러오기 가능 -->
+	<!-- 검색 조건문 -->
+	<sql id="boardSearch">
+		<trim prefix="where (" suffix=")" prefixOverrides="OR">
+			<trim prefix="OR">
+				<choose>
+					<when test="type == 'T'.toString()">
+						board_title LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="type == 'U'.toString()">
+						user_id LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+					<when test="type == 'C'.toString()">
+						board_content LIKE CONCAT('%', #{searchKeyword}, '%')
+					</when>
+				</choose>
+			</trim>
+		</trim>
+	</sql>
+
+	<!-- 게시판 목록 -->
+	<!-- if : 검색 조건 없이 화면 이동함으로써 값이 없는 typeArr 변수 생성되면서 발생하는 에러 방지를 위해 작성 -->
+	<select id="getBoardList" resultType="board">
+		<![CDATA[SELECT
+			board_seq,
+			user_id,
+			board_date,
+			board_cnt,
+			board_title,
+			board_content,
+			board_anonymous
+		FROM BOARD
+		]]>
+
+		<![CDATA[
+			ORDER BY board_seq DESC
+		]]>
+	</select>
+
+	<!-- 전체 게시글 수 -->
+	<select id="getBoardListCnt" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM BOARD
+
+	</select>
+	
+	<!-- 등록 -->
+	<insert id="boardInsert">
+		INSERT INTO BOARD
+		(user_id,
+		board_cnt,
+		board_title,
+		board_content,
+		board_anonymous)
+		VALUES
+		(#{user_id},
+		#{board_cnt},
+		#{board_title},
+		#{board_content},
+		#{board_anonymous}
+		)
+	</insert>
+
+	<!-- 상세 화면 -->
+	<!-- 파라미터 int, 반환 BoardVO -->
+	<select id="getBoard" parameterType="int" resultType="board">
+		SELECT
+		board_seq,
+		user_id,
+		board_date,
+		board_cnt,
+		board_title,
+		board_content,
+		board_anonymous
+		FROM BOARD
+		WHERE board_seq = #{board_seq}
+	</select>
+
+	<!-- 조회수 -->
+	<update id="getBoardCnt" parameterType="int">
+		UPDATE BOARD SET board_cnt = board_cnt + 1 WHERE board_seq = #{board_seq}
+	</update>
+
+	<!-- 수정 -->
+	<update id="boardUpdate" parameterType="board">
+		UPDATE BOARD SET
+		board_title = #{board_title},
+		board_content = #{board_content},
+		user_id = #{user_id}
+		WHERE board_seq = #{board_seq}
+	</update>
+
+	<!-- 삭제 -->
+	<delete id="boardDelete" parameterType="int">
+		DELETE FROM BOARD
+		WHERE board_seq = #{board_seq}
+	</delete>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>
