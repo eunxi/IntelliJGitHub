@@ -46,6 +46,8 @@
 </head>
 
 <div class="row" id="inner_box">
+	<form id="detailForm" method="get">
+
 	<div class="col-2"></div>
 	<div class="col-8">
 		<h3>자유게시판 상세 화면</h3>
@@ -66,34 +68,73 @@
 		<hr>
 
 		<div class="detailFile">
-			첨부된 파일명 클릭시 다운로드 가능하게 진행
+			파일 목록
 		</div>
 		<hr>
 
 		<div style="float: right; margin-bottom: 5%;">
-			<a href="/board/board_update?board_seq=${board.board_seq}"><button class="update_btn" type="button">수정</button></a>
-			<a href="javascript:void(0)" onclick="delBoard();"><button class="del_btn" type="button">삭제</button></a>
-			<a href="/board/board_list.do"><button class="list_btn" type="button">목록</button></a>
+			<a href="javascript:void(0)"><button class="update_btn" type="button">수정</button></a>
+<%--			<a href="/board/board_update?board_seq=${board.board_seq}"><button class="update_btn" type="button">수정</button></a>--%>
+			<a href="javascript:void(0)"><button class="del_btn" type="button">삭제</button></a>
+<%--			<a href="javascript:void(0)" onclick="delBoard();"><button class="del_btn" type="button">삭제</button></a>--%>
+			<a href="javascript:void(0)"><button class="list_btn" type="button">목록</button></a>
+<%--			<a href="/board/board_list.do"><button class="list_btn" type="button">목록</button></a>--%>
+<%--			<a href="javascript:history.back();"><button class="list_btn" type="button">목록</button></a>--%>
 		</div>
 
 	</div>
 	<div class="col-2"></div>
-
+		<!-- 페이지 유지하는데 필요한 데이터 값들 -->
+		<input type="hidden" value="${searchVO.board_seq}" name="board_seq" id="board_seq"/>
+		<input type="hidden" value="${searchVO.page}" name="page" id="page"/>
+		<input type="hidden" value="${searchVO.listSize}" name="listSize" id="listSize"/>
+		<input type="hidden" value="${searchVO.type}" name="type" id="type"/>
+		<input type="hidden" value="${searchVO.searchKeyword}" name="searchKeyword" id="searchKeyword"/>
+	</form>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
 
-	function delBoard(){
+	// 수정
+	$(".update_btn").click(function(){
+		let url = "/board/board_update?board_seq=${searchVO.board_seq}&page=${searchVO.page}" +
+		"&listSize=${searchVO.listSize}" +
+		"&type=${searchVO.type}" +
+		"&searchKeyword=${searchVO.searchKeyword}";
+
+		location.href = url;
+	})
+
+	// 삭제
+	$(".del_btn").click(function(){
 		if(!confirm("삭제하시겠습니까?")){
 			// 취소(아니오) 버튼 클릭 시 이벤트 발생
 			return false;
 		}else{
 			// 확인(예) 버튼 클릭 시 이벤트 발생
 			alert("삭제 성공!");
-			location.href="${pageContext.request.contextPath}/board/board_delete.do?board_seq=${board.board_seq}";
+
+			let url = "/board/board_delete?board_seq=${searchVO.board_seq}&page=${searchVO.page}" +
+					"&listSize=${searchVO.listSize}" +
+					"&type=${searchVO.type}" +
+					"&searchKeyword=${searchVO.searchKeyword}";
+
+			location.href = url;
 		}
-	}
+	})
+
+	// 목록
+	$(".list_btn").click(function(){
+		// let url = "/board/board_list";
+
+		let url = "/board/board_list?board_seq=${searchVO.board_seq}&page=${searchVO.page}" +
+					"&listSize=${searchVO.listSize}" +
+					"&type=${searchVO.type}" +
+					"&searchKeyword=${searchVO.searchKeyword}";
+
+		location.href = url;
+	})
 
 </script>
 

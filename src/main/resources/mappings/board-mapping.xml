@@ -3,7 +3,7 @@
  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="boardDao">
 
-	<resultMap type="board" id="boardResult">
+<resultMap type="board" id="boardResult">
 	<id property="board_seq" column="BOARD_SEQ" />
 	<result property="user_id" column="USER_ID" />
 	<result property="board_date" column="BOARD_DATE" />
@@ -11,6 +11,17 @@
 	<result property="board_title" column="BOARD_TITLE" />
 	<result property="board_content" column="BOARD_CONTENT" />
 	<result property="board_anonymous" column="BOARD_ANONYMOUS" />
+</resultMap>
+
+<resultMap type="file" id="fileResult">
+    <result property="file_seq" column="FILE_SEQ" />
+    <result property="type" column="TYPE" />
+    <result property="seq" column="SEQ" />
+    <result property="order_seq" column="ORDER_SEQ" />
+    <result property="file_path" column="FILE_PATH" />
+    <result property="file_name" column="FILE_NAME" />
+    <result property="file_date" column="FILE_DATE" />
+    <result property="file_downCnt" column="FILE_CNT" />
 </resultMap>
 
 	<!-- 재사용 가능한 SQL 정의, include 로 불러오기 가능 -->
@@ -34,9 +45,12 @@
 	</sql>
 
 	<!-- 게시판 목록 -->
-	<!-- if : 검색 조건 없이 화면 이동함으로써 값이 없는 typeArr 변수 생성되면서 발생하는 에러 방지를 위해 작성 -->
+	<!-- if : 검색 조건 없이 화면 이동함으로써 값이 없는 에러 방지를 위해 작성 -->
+	<!-- @rownum 사용해서 리스트 출력 -->
 	<select id="getBoardList" resultType="board">
-		<![CDATA[SELECT
+		<![CDATA[
+		SELECT A.* FROM
+			(SELECT @rownum := @rownum + 1 AS no,
 			board_seq,
 			user_id,
 			board_date,
@@ -44,9 +58,12 @@
 			board_title,
 			board_content,
 			board_anonymous
-		FROM BOARD
+			FROM BOARD,
+			(SELECT @rownum := 0) rnum ) A
 		]]>
-
+        <if test="searchKeyword != null and searchKeyword != ''">
+			<include refid="boardSearch"></include>
+        </if>
 		<![CDATA[
 			ORDER BY board_seq DESC
 		]]>
@@ -57,19 +74,32 @@
 		SELECT
 			COUNT(*)
 		FROM BOARD
-
+		<if test="searchKeyword != null and searchKeyword != ''">
+			<include refid="boardSearch"></include>
+		</if>
 	</select>
 	
 	<!-- 등록 -->
-	<insert id="boardInsert">
+	<insert id="boardInsert" parameterType="board">
+		<selectKey resultType="int" keyProperty="board_seq" order="BEFORE">
+			SELECT MAX(board_seq) + 1 FROM BOARD
+		</selectKey>
 		INSERT INTO BOARD
-		(user_id,
+		(
+		user_id,
 		board_cnt,
 		board_title,
 		board_content,
-		board_anonymous)
+		board_anonymous
+		)
 		VALUES
-		(#{user_id},
+		(
+		<if test="board_anonymous == 1">
+		"익명",
+		</if>
+		<if test="board_anonymous == 0">
+		#{user_id},
+		</if>
 		#{board_cnt},
 		#{board_title},
 		#{board_content},
@@ -111,6 +141,11 @@
 		DELETE FROM BOARD
 		WHERE board_seq = #{board_seq}
 	</delete>
+
+	<!-- 게시글 번호만 가져오기 -->
+	<select id="getBoardSeq" parameterType="board" resultType="int">
+		SELECT board_seq FROM BOARD WHERE board_seq = #{board_seq}
+	</select>
 
 
 

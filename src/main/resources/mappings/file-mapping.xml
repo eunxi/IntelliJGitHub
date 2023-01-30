@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="fileDao">
+
+	<resultMap type="file" id="fileResult">
+		<result property="file_seq" column="FILE_SEQ" />
+		<result property="type" column="TYPE" />
+		<result property="seq" column="SEQ" />
+		<result property="order_seq" column="ORDER_SEQ" />
+		<result property="file_path" column="FILE_PATH" />
+		<result property="file_name" column="FILE_NAME" />
+		<result property="file_date" column="FILE_DATE" />
+		<result property="file_downCnt" column="FILE_CNT" />
+	</resultMap>
+
+	<resultMap type="board" id="boardResult">
+		<id property="board_seq" column="BOARD_SEQ" />
+		<result property="user_id" column="USER_ID" />
+		<result property="board_date" column="BOARD_DATE" />
+		<result property="board_cnt" column="BOARD_CNT" />
+		<result property="board_title" column="BOARD_TITLE" />
+		<result property="board_content" column="BOARD_CONTENT" />
+		<result property="board_anonymous" column="BOARD_ANONYMOUS" />
+	</resultMap>
+
+	<!-- 파일 등록 -->
+	<insert id="fileListInsert" parameterType="java.util.List">
+		INSERT INTO file
+		(
+		tbl_type,
+		seq,
+		order_seq,
+		file_path,
+		file_name,
+		file_downCnt
+		)
+		VALUES
+		<foreach collection="list" item="item" separator=",">
+		(
+		#{item.tbl_type},
+		#{item.seq},
+		#{item.order_seq},
+		#{item.file_path},
+		#{item.file_name},
+		#{item.file_downCnt}
+		)
+		</foreach>
+	</insert>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

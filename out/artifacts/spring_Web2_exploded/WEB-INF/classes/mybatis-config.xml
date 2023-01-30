@@ -5,7 +5,8 @@
 <configuration>
 	<typeAliases>
 		<!-- <typeAlias alias="myboard" type="tommy.spring.web.board.BoardVO" /> -->
-		 <typeAlias alias="board" type="com.eunxi.board.service.BoardVO" />
+		 <typeAlias alias="board" type="com.eunxi.spring.board.service.BoardVO" />
+		 <typeAlias alias="file" type="com.eunxi.spring.file.service.FileVO" />
 
 	</typeAliases>
 
@@ -14,6 +15,7 @@
 	<mappers>
 		<!-- <mapper resource="mappings/board-mapping.xml" /> -->
 		 <mapper resource="mappings/board-mapping.xml" />
+		 <mapper resource="mappings/file-mapping.xml" />
 
 	
 	</mappers>
