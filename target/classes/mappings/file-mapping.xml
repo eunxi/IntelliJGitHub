@@ -47,6 +47,23 @@
 		)
 		</foreach>
 	</insert>
+	
+	<!-- 파일 상세보기 -->
+	<select id="fileDetail" parameterType="int" resultType="file">
+		<![CDATA[
+			SELECT
+			seq,
+			tbl_type,
+			order_seq,
+			file_path,
+			file_name,
+			file_date,
+			file_downCnt
+			FROM file
+			WHERE seq = #{seq}
+			ORDER BY order_seq ASC
+		]]>
+	</select>
 
 
 

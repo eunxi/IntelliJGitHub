@@ -162,7 +162,7 @@
         for(let i = 0 ; i < fileArr.length ; i++){
             let file_size = fileArr[i].size;
             let file_list_size = getByteSize(file_size); // 파일 사이즈
-            file_html += '<p id="file_result_'+i+'" style="font-size: small; margin-left: 13%;">' + fileArr[i].name +'<b id="file_'+i+'">' + i + '</b> <span>(' + file_list_size + ')</span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(\''+i+'\')">삭제</a></p>';
+            file_html += '<p id="file_result_'+i+'" style="font-size: small; margin-left: 13%;">' + fileArr[i].name +'<b id="file_'+i+'" style="display: none">' + i + '</b> <span>(' + file_list_size + ')</span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(\''+i+'\')">삭제</a></p>';
         }
 
         fileList = new Array(); // 초기화
@@ -174,20 +174,15 @@
         $("#file_select").val('');
     });
 
+    // 삭제할 경우, 반복하면서 keyNum 알맞게 갱신
     function file_delete(keynum){
-        console.log("keynum :" +  keynum );
         $('#file_result_'+keynum).remove();
 
         // 삭제할 파일의 아이디
         let delete_id =keynum;
-        console.log("delete_id = " + delete_id);
-
-        // 배열에서 삭제를 위한 번호
-        let delete_arrNum = delete_id;
-        console.log("delete_arrNum = " + delete_arrNum);
 
         let fileArr = fileList;
-        fileArr.splice(delete_arrNum , 1); // 파일 제거
+        fileArr.splice(delete_id , 1); // 파일 제거
 
         let keyNum = 0;
 
@@ -198,7 +193,7 @@
         for(let i = 0; i < fileArr.length; i++){
             let file_size = fileArr[i].size;
             let file_list_size = getByteSize(file_size); // 파일 사이즈
-            file_html += '<p id="file_result_'+keyNum+'" style="font-size: small; margin-left: 13%;">' + fileArr[i].name +'<b id="file_'+keyNum+'">' + keyNum + '</b> <span>(' + file_list_size + ')</span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(\''+keyNum+'\')">삭제</a></p>';
+            file_html += '<p id="file_result_'+keyNum+'" style="font-size: small; margin-left: 13%;">' + fileArr[i].name +'<b id="file_'+keyNum+'" style="display: none">' + keyNum + '</b> <span>(' + file_list_size + ')</span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(\''+keyNum+'\')">삭제</a></p>';
 
             keyNum++;
             fileList.push(fileArr[i]);
@@ -206,13 +201,6 @@
         }
 
         $("#file_upload_list").append(file_html);
-
-        console.log("fileList---");
-        console.log(fileList);
-
-        // deleteFile($(this));
-
-
     }
 
     // 글 등록 버튼 클릭 시
@@ -220,31 +208,9 @@
         // FormData 새로운 객체 생성
         let formData = new FormData();
 
-        console.log(fileList);
-
         for(let i = 0; i < fileList.length; i++){
             formData.append("file", fileList[i]);
         }
-
-        // form 생성
-        // let newForm = $('<form></form>');
-        // newForm.attr("name", "newForm");
-        // newForm.attr("method", "post");
-        // newForm.attr("action", "/board/board_insertAction.do");
-        // newForm.attr("target", "_blank");
-        //
-        // newForm.append($('<input/>', {type: 'hidden', name: 'file', value: fileList}));
-        // newForm.append($('<input/>', {type: 'hidden', name: 'board_title', value: $("#board_title").val()}));
-        // newForm.append($('<input/>', {type: 'hidden', name: 'user_id', value: $("#user_id").val()}));
-        // newForm.append($('<input/>', {type: 'hidden', name: 'board_content', value: $("#board_content").val()}));
-        //
-        // newForm.appendTo("body");
-        // newForm.submit();
-
-        console.log($("#board_title").val());
-        console.log($("#user_id").val());
-        console.log($("input[type=checkbox]:checked").val());
-        console.log($("#board_content").val());
 
         // 익명 여부 확인
         let anonymous = $("input[type=checkbox]:checked").val();
@@ -254,7 +220,6 @@
         }else if(anonymous != 1){
             anonymous = 0;
         }
-        // let anonymous = $("#board_anonymous").val();
 
         // formData 에 데이터 추가
         formData.append("board_title" , $("#board_title").val());
@@ -267,33 +232,7 @@
             console.log(value);
         }
 
-        checkInsert();
-
-        $.ajax({
-            url: "/board/board_insertAction",
-            processData: false,
-            contentType: false,
-            enctype: 'multipart/form-data',
-            data: formData,
-            type: 'POST',
-            success: function(result){
-                location.href = "/board/board_list";
-            },
-            error: function (error) {
-                // alert("실패");
-                return false;
-            }
-        });
-        return false;
-    })
-
-    // 파일 삭제 함수
-    // function deleteFile(obj){
-    //     obj.parent().remove();
-    // }
-
-    // 게시글 유효성 검사
-    function checkInsert() {
+        // 유효성 검사
         let blank_pattern = /^\s+|\s+$/g; // 공백 검사
 
         if ($("#board_title").val() == "") {
@@ -320,8 +259,24 @@
         } else {
             alert("등록 성공!");
         }
-    };
 
+        $.ajax({
+            url: "/board/board_insertAction",
+            processData: false,
+            contentType: false,
+            enctype: 'multipart/form-data',
+            data: formData,
+            type: 'POST',
+            success: function(result){
+                location.href = "/board/board_list";
+            },
+            error: function (error) {
+                alert("실패");
+                return false;
+            }
+        });
+        return false;
+    })
 
 </script>
 

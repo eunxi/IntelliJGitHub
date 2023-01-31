@@ -13,8 +13,12 @@ public class FileDAO {
 
     // 파일[] 등록
     public void fileListInsert(List<FileVO> fileList){
-        System.out.println(">>>>>>>>>>>>> FileDAO --- fileListInsert -- fileList : " + fileList.toString());
         session.insert("fileDao.fileListInsert", fileList);
+    }
+
+    // 파일 상세보기
+    public List<FileVO> fileDetail(int seq){
+        return session.selectList("fileDao.fileDetail", seq);
     }
 
 }

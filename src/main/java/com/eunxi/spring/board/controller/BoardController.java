@@ -5,6 +5,7 @@ import com.eunxi.spring.board.service.BoardVO;
 import com.eunxi.spring.file.service.FileService;
 import com.eunxi.spring.file.service.FileUtils;
 import com.eunxi.spring.file.service.FileVO;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,10 +18,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-// vo.setQuery(); 는 리스트, 조회, 수정, 삭제 모두 선언해야 조회, 수정, 삭제 시에도 파라미터 값 유지될 수 있음
-// 수정 및 삭제 액션에서 리다이렉트에 이 값을 뒤에 넣어주야 값을 가지고 원래 페이지로 이동할 수 있으므로, 값 뒤에 설정
 @Controller
 @RequestMapping("/board")
 public class BoardController {
@@ -31,6 +31,7 @@ public class BoardController {
     @Autowired
     FileService fileService;
 
+    // @RequestParam(전달인자 이름으로, 실제 값을 표시) : 파라미터의 값과 이름을 함께 전달하는 방식
     @GetMapping("/board_list")
     public String getBoardList(BoardVO vo, Model model, String type, @RequestParam(value = "listSize", defaultValue = "10") int listSize) {
         System.out.println("Board List Controller");
@@ -137,33 +138,35 @@ public class BoardController {
     // 등록 부분 처리
     // RedirectAttributes: 리다이렉트 이후 저장된 플래시 속성 모델로 이동 - URL 노출 X
     // 새롭게 등록된 게시물의 번호를 위해 RedirectAttributes 사용, 리턴할 때 redirect 사용
+    // 실제 file 은 List<MultipartFile> 로 받고, 나머지는 Map<String, Object> 로 받음
     @PostMapping("/board_insertAction")
-    public String boardInsert_action(@ModelAttribute("searchVO") BoardVO vo, MultipartHttpServletRequest files, RedirectAttributes redirect) throws IOException {
+    @ResponseBody
+    public String boardInsert_action(BoardVO vo, MultipartHttpServletRequest files, @RequestParam("file") List<MultipartFile> file, @RequestParam Map<String, Object> map, @RequestParam("board_anonymous") boolean board_anonymous, RedirectAttributes redirect) throws IOException {
         System.out.println("Board Insert Post Controller");
 
-        String filePath = "C:\\SAVE\\upload\\board";
-        List<MultipartFile> list = files.getFiles("file");
-
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>> file size : " + list.size());
-
-        // 파일 업로드
-//        for(int i = 0; i < list.size(); i++){
-//            String fileOriginalName = list.get(i).getOriginalFilename(); // 원래 파일명
-//
-//            UUID uuid = UUID.randomUUID(); // UUID
-//            String[] uuids = uuid.toString().split("-");
-//            String uniqueName = uuids[0]; // 생성된 고유 문자열
-//
-//            File saveFile = new File(filePath + "\\" + uniqueName + fileOriginalName);
-//
-//            try{
-//                list.get(i).transferTo(saveFile);
-//            }catch (IllegalStateException e){
-//                e.printStackTrace();
-//            }catch (IOException e){
-//                e.printStackTrace();
-//            }
+        // ajax 에서 파일과 데이터들이 넘어오는지 확인
+//        System.out.println(file);
+//        for(int i = 0 ; i < file.size() ; i++){
+//            System.out.println(file.get(i).getOriginalFilename());
 //        }
+//
+//        System.out.println(">>>> MAP 형태 불러오기");
+//        for(String key : map.keySet()){
+//            System.out.println("key: " + key + ", value: " + map.get(key));
+//        }
+
+        String title = map.get("board_title").toString(); // map Object를 toString()을 통해 String 타입으로 변경
+        String id = map.get("user_id").toString();
+        String content = map.get("board_content").toString();
+
+        // BoardVO 새로 만들어서 jsp 에서 받아온 데이터 값 넣어주기
+        vo.setBoard_title(title);
+        vo.setUser_id(id);
+        vo.setBoard_anonymous(board_anonymous);
+        vo.setBoard_content(content);
+
+        String filePath = "C:\\SAVE\\upload\\board";
+//        List<MultipartFile> list = files.getFiles("file"); // 웹에서 파일 받는 코드
 
         // 게시글 등록
         boardService.boardInsert(vo);
@@ -172,13 +175,10 @@ public class BoardController {
         FileUtils fileUtils = new FileUtils();
         List<FileVO> fileList = fileUtils.parseFileInfo(seq, "B", filePath, files);
 
-        System.out.println("fileList Size : " + fileList.size());
-        for(int i = 0 ; i < fileList.size() ; i++){
-            System.out.println(fileList.get(i));
+        // 파일 존재할 때만 파일 넣ㅇ주기
+        if(!fileList.isEmpty()){
+            fileService.fileListInsert(fileList);
         }
-
-        // 파일 등록
-        fileService.fileListInsert(fileList);
 
         redirect.addFlashAttribute("redirect", vo.getBoard_seq());
 
@@ -188,25 +188,27 @@ public class BoardController {
     // 상세 화면
     // 번호를 받을 수 있도록 @requestParam 이용하여 board_seq 값 넣어주기 - 게시글 내용을 인덱스 값 반영해서 가져오기 - 값 꺼내기 위해 addAttribute 사용
     @GetMapping("/board_detail")
-    public String getBoard(@RequestParam("board_seq") int board_seq, Model model, @ModelAttribute("searchVO") BoardVO vo, FileVO fileVO) throws UnsupportedEncodingException {
+    public String getBoard(@RequestParam("board_seq") int board_seq, Model model, BoardVO vo, FileVO fileVO) throws UnsupportedEncodingException {
         System.out.println("Board Detail Controller");
 
         int cnt = boardService.getBoardListCnt(vo); // 전체 개수
         int total_cnt = cnt - (vo.getPage() - 1) * vo.getListSize(); // 출력하는 개수
+        int seq = vo.getBoard_seq();
 
         BoardVO getBoard = boardService.getBoard(board_seq);
 
         boardService.getBoardCnt(board_seq); // 조회수 + 1
+        List<FileVO> file = fileService.fileDetail(seq);
 
         model.addAttribute("board", getBoard);
         model.addAttribute("searchVO", vo);
         model.addAttribute("cnt", total_cnt); // 보여질 내용 수
         model.addAttribute("allCount", cnt); // 전체 게시글 수
 
+        model.addAttribute("file", file);
 
-        System.out.println("=================>>>>>>>> board_detail getBoard : " + getBoard);
-        System.out.println("=================>>>>>>>> board_detail fileVO : " + fileVO);
-        System.out.println("=================>>>>>>>> board_detail vo : " + vo);
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>> SEQ: " + seq);
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>> file : " + file);
 
         return "/board/board_detail";
     }

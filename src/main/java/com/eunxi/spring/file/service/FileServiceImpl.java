@@ -13,7 +13,11 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void fileListInsert(List<FileVO> fileList) {
-        System.out.println(">>>>>>>>>>>>> FileServiceImpl --- fileListInsert -- fileList : " + fileList.toString());
         fileDao.fileListInsert(fileList);
+    }
+
+    @Override
+    public List<FileVO> fileDetail(int seq) {
+        return fileDao.fileDetail(seq);
     }
 }

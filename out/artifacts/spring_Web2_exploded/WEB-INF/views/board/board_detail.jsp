@@ -53,7 +53,7 @@
 		<h3>자유게시판 상세 화면</h3>
 
 		<hr>
-		<div class="detailTile" style="font-size: x-large; margin-bottom: 1%;">
+		<div class="detailTitle" style="font-size: x-large; margin-bottom: 1%;">
 			${board.board_title}
 		</div>
 
@@ -68,18 +68,16 @@
 		<hr>
 
 		<div class="detailFile">
-			파일 목록
+			<c:forEach var="file" items="${file}">
+				<p><a href='/file_download.do' style="margin-left: 1%;">${file.file_name }</a></p>
+			</c:forEach>
 		</div>
 		<hr>
 
 		<div style="float: right; margin-bottom: 5%;">
 			<a href="javascript:void(0)"><button class="update_btn" type="button">수정</button></a>
-<%--			<a href="/board/board_update?board_seq=${board.board_seq}"><button class="update_btn" type="button">수정</button></a>--%>
 			<a href="javascript:void(0)"><button class="del_btn" type="button">삭제</button></a>
-<%--			<a href="javascript:void(0)" onclick="delBoard();"><button class="del_btn" type="button">삭제</button></a>--%>
 			<a href="javascript:void(0)"><button class="list_btn" type="button">목록</button></a>
-<%--			<a href="/board/board_list.do"><button class="list_btn" type="button">목록</button></a>--%>
-<%--			<a href="javascript:history.back();"><button class="list_btn" type="button">목록</button></a>--%>
 		</div>
 
 	</div>
@@ -126,8 +124,6 @@
 
 	// 목록
 	$(".list_btn").click(function(){
-		// let url = "/board/board_list";
-
 		let url = "/board/board_list?board_seq=${searchVO.board_seq}&page=${searchVO.page}" +
 					"&listSize=${searchVO.listSize}" +
 					"&type=${searchVO.type}" +

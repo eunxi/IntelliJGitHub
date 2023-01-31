@@ -26,8 +26,4 @@ public class FileVO {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date file_date; // 파일 업로드 날짜
     private int file_downCnt; // 파일 다운로드 횟수
-
-//    @XmlTransient // xml 변환 시 특정 값 제외 == JSON 변환에서 @JsonIgnore 같은 개념
-//    private MultipartFile file; // 파일
-//    private List<FileVO> file_list; // 다중 파일을 위한 List<>
 }
