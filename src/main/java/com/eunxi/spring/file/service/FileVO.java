@@ -21,6 +21,7 @@ public class FileVO {
     private int order_seq; // 순번 - 게시글 번호에 따라 다르게 증가해야하는 값
     private String file_path; // 파일 경로
     private String file_name; // 파일 이름
+    private String file_saveName; // 파일 저장 이름
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")

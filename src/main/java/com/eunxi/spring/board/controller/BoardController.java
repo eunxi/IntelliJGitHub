@@ -141,7 +141,7 @@ public class BoardController {
     // 실제 file 은 List<MultipartFile> 로 받고, 나머지는 Map<String, Object> 로 받음
     @PostMapping("/board_insertAction")
     @ResponseBody
-    public String boardInsert_action(BoardVO vo, MultipartHttpServletRequest files, @RequestParam("file") List<MultipartFile> file, @RequestParam Map<String, Object> map, @RequestParam("board_anonymous") boolean board_anonymous, RedirectAttributes redirect) throws IOException {
+    public String boardInsert_action(Model model, BoardVO vo, MultipartHttpServletRequest files, @RequestParam("file") List<MultipartFile> file, @RequestParam Map<String, Object> map, @RequestParam("board_anonymous") boolean board_anonymous, RedirectAttributes redirect) throws IOException {
         System.out.println("Board Insert Post Controller");
 
         // ajax 에서 파일과 데이터들이 넘어오는지 확인
@@ -198,17 +198,14 @@ public class BoardController {
         BoardVO getBoard = boardService.getBoard(board_seq);
 
         boardService.getBoardCnt(board_seq); // 조회수 + 1
-        List<FileVO> file = fileService.fileDetail(seq);
+        List<FileVO> fileList = fileService.fileDetail(seq);
 
         model.addAttribute("board", getBoard);
         model.addAttribute("searchVO", vo);
         model.addAttribute("cnt", total_cnt); // 보여질 내용 수
         model.addAttribute("allCount", cnt); // 전체 게시글 수
 
-        model.addAttribute("file", file);
-
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>> SEQ: " + seq);
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>> file : " + file);
+        model.addAttribute("fileList", fileList);
 
         return "/board/board_detail";
     }
@@ -219,6 +216,12 @@ public class BoardController {
     public String boardUpdate(@ModelAttribute("searchVO") BoardVO vo, @RequestParam("board_seq") int board_seq, Model model){
         System.out.println("Board Update Get Controller");
 
+        List<FileVO> fileList = fileService.fileDetail(board_seq);
+
+        for(int i = 0; i < fileList.size(); i++){
+            System.out.println(fileList.get(i));
+        }
+
         int cnt = boardService.getBoardListCnt(vo); // 전체 개수
 
         BoardVO getBoard = boardService.getBoard(board_seq);
@@ -226,15 +229,23 @@ public class BoardController {
         model.addAttribute("searchVO", vo);
         model.addAttribute("allCount", cnt); // 전체 게시글 수
 
-        System.out.println("============> board_update vo : " + vo);
+        model.addAttribute("fileList", fileList); // fileList 보내주기
+
+        System.out.println(">>>> fileList: " + fileList);
 
         return "/board/board_update";
     }
 
     // 수정 부분 처리
     @PostMapping("/board_updateAction")
-    public String boardUpdate_action(@ModelAttribute("searchVO") BoardVO vo, RedirectAttributes redirect) throws UnsupportedEncodingException {
+    @ResponseBody
+    public String boardUpdate_action(@ModelAttribute("searchVO") BoardVO vo, @RequestParam("file") List<MultipartFile> file,  MultipartHttpServletRequest files, RedirectAttributes redirect) throws UnsupportedEncodingException {
         System.out.println("Board Update Post Controller");
+
+        System.out.println(">>>>>>>>>>>> AJAX 연동 확인 시작");
+        System.out.println(file);
+        System.out.println(">>>>>>>>>>>> AJAX 연동 확인 끝");
+
         boardService.boardUpdate(vo);
 
         redirect.addFlashAttribute("redirect", vo.getBoard_seq());
@@ -243,10 +254,6 @@ public class BoardController {
         redirect.addFlashAttribute("listSize", vo.getListSize());
         redirect.addFlashAttribute("type", vo.getType());
         redirect.addFlashAttribute("searchKeyword", vo.getSearchKeyword());
-
-        System.out.println("=====>>>>>> board_updateAction vo : " + vo);
-        System.out.println("=====>>>>>> board_updateAction page : " + vo.getPage());
-        System.out.println("=====>>>>>> board_updateAction listSize : " + vo.getListSize());
 
         // 상세 페이지로 가기 위해 seq 값 붙여주기
         return "redirect:/board/board_detail?board_seq=" + vo.getBoard_seq() + "&page=" + vo.getPage() + "&listSize=" + vo.getListSize() + "&type" + vo.getType() + "&searchKeyword=" + vo.getSearchKeyword();

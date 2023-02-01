@@ -45,21 +45,25 @@ public class FileUtils {
 
             //파일 리스트 개수 만큼 리턴할 파일 리스트에 담아주고 생성 - DB 저장
             for(MultipartFile mf : list) {
+                String fileOriginalName = mf.getOriginalFilename();
+                UUID uuid = UUID.randomUUID(); // UUID
+                String[] uuids = uuid.toString().split("-");
+                String uniqueName = uuids[0]; // 생성된 고유 문자열
+                String save_name = uniqueName + mf.getOriginalFilename();
+                System.out.println("SAVE_NAME : " + save_name);
+
                 FileVO boardFile = new FileVO();
                 boardFile.setSeq(seq);
                 boardFile.setOrder_seq(order_seq);
                 boardFile.setTbl_type(tbl_type);
                 boardFile.setFile_name(mf.getOriginalFilename());
-                boardFile.setFile_path(filePath );
+                boardFile.setFile_saveName(save_name);
+//                boardFile.setFile_path(filePath);
+                boardFile.setFile_path(filePath + "\\" + save_name);
                 fileList.add(boardFile);
 
-                String fileOriginalName = mf.getOriginalFilename();
-                UUID uuid = UUID.randomUUID(); // UUID
-                String[] uuids = uuid.toString().split("-");
-                String uniqueName = uuids[0]; // 생성된 고유 문자열
-
 //                file = new File(filePath + mf.getOriginalFilename());
-                file = new File(filePath + "\\" + tbl_type + uniqueName + mf.getOriginalFilename());
+                file = new File(filePath + "\\" + save_name);
                 mf.transferTo(file);
 
                 order_seq++;
