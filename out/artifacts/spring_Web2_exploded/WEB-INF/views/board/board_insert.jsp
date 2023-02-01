@@ -89,7 +89,7 @@
                 <hr>
                 <div>
                     작성자
-                    <input type="text" id="user_id" name="user_id" style="width: 20%; margin-left: 9%;">
+                    <input type="text" id="user_id" name="user_id" disabled style="width: 20%; margin-left: 9%;">
                 </div>
                 <hr>
 
@@ -241,11 +241,11 @@
             return false;
         }
 
-        if ($("#board_anonymous").val() == 0 || $("#user_id").val() == "" || blank_pattern.test($("#user_id").val()) == true) {
-            alert("작성자를 입력해주세요");
-            $("#user_id").focus();
-            return false;
-        }
+        // if ($("#board_anonymous").val() == 0 || $("#user_id").val() == "" || blank_pattern.test($("#user_id").val()) == true) {
+        //     alert("작성자를 입력해주세요");
+        //     $("#user_id").focus();
+        //     return false;
+        // }
 
         if ($("#board_content").val() == "") {
             alert("내용을 입력해주세요");

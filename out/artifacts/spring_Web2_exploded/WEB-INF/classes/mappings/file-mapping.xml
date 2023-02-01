@@ -33,6 +33,7 @@
 		order_seq,
 		file_path,
 		file_name,
+		file_saveName,
 		file_downCnt
 		)
 		VALUES
@@ -43,6 +44,7 @@
 		#{item.order_seq},
 		#{item.file_path},
 		#{item.file_name},
+        #{item.file_saveName},
 		#{item.file_downCnt}
 		)
 		</foreach>
@@ -52,11 +54,13 @@
 	<select id="fileDetail" parameterType="int" resultType="file">
 		<![CDATA[
 			SELECT
+			file_seq,
 			seq,
 			tbl_type,
 			order_seq,
 			file_path,
 			file_name,
+			file_saveName,
 			file_date,
 			file_downCnt
 			FROM file
@@ -64,6 +68,19 @@
 			ORDER BY order_seq ASC
 		]]>
 	</select>
+
+	<!-- 파일 수정 -->
+	<update id="fileUpdate" parameterType="file">
+		UPDATE file SET
+		seq = #{seq},
+		tbl_type = #{tbl_type},
+		order_seq = #{order_seq},
+		file_path = #{file_path},
+		file_name = #{file_name},
+		file_saveName = #{file_saveName},
+		file_downCnt = #{file_downCnt}
+		WHERE seq = #{seq} and order_seq = #{order_seq}
+	</update>
 
 
 

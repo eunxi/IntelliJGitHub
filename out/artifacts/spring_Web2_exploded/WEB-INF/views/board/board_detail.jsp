@@ -9,6 +9,26 @@
 			margin : 50px 80px 50px 80px;
 		}
 
+		a {
+			text-decoration: none;
+		}
+
+		a:link {
+			color: darkgray;
+		}
+
+		a:visited {
+			color: darkgray;
+		}
+
+		a:hover {
+			color: black;
+		}
+
+		a:active {
+			color: black;
+		}
+
 		.update_btn {
 			font-size: 18px;
 			border: none;
@@ -46,7 +66,7 @@
 </head>
 
 <div class="row" id="inner_box">
-	<form id="detailForm" method="get">
+<%--	<form method="get" id="file_downloadForm">--%>
 
 	<div class="col-2"></div>
 	<div class="col-8">
@@ -68,9 +88,16 @@
 		<hr>
 
 		<div class="detailFile">
-			<c:forEach var="file" items="${file}">
-				<p><a href='/file_download.do' style="margin-left: 1%;">${file.file_name }</a></p>
-			</c:forEach>
+			<c:if test="${not empty fileList}">
+				<p>첨부 파일</p>
+				<c:forEach var="file" items="${fileList}">
+					<p><a href='/file_download.do/${file.seq}/${file.order_seq}' style="margin-left: 1%; font-size: small;" id="file_btn">${file.file_name }</a></p>
+				</c:forEach>
+			</c:if>
+
+			<c:if test="${empty fileList}">
+				<p style="margin-left: 1%; font-size: small; color: darkgray;">등록된 첨부 파일이 없습니다.</p>
+			</c:if>
 		</div>
 		<hr>
 
@@ -88,7 +115,7 @@
 		<input type="hidden" value="${searchVO.listSize}" name="listSize" id="listSize"/>
 		<input type="hidden" value="${searchVO.type}" name="type" id="type"/>
 		<input type="hidden" value="${searchVO.searchKeyword}" name="searchKeyword" id="searchKeyword"/>
-	</form>
+<%--	</form>--%>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
