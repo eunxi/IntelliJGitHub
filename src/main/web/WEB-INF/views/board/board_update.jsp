@@ -66,10 +66,8 @@
 <body onload="javascript:test();">
 <div class="row" id="inner_box">
     <form action="/board/board_updateAction" method="post" enctype="multipart/form-data">
-        <!-- form 제출(submit) 시 사용자는 변경 못하는 데이터 값을 서버에 함께 보내기 위해 hidden 사용 & board_seq 로 전달 -->
         <input type="hidden" id="board_seq" name="board_seq" value="${board.board_seq}"/>
 
-        <!-- submit 할 때 값을 가져가기 위해 form 아래 hidden 설정해주고, 취소 버튼 눌러 상세 페이지로 갈 때 쿼리값 설정 -->
         <div class="col-2"></div>
 
         <div class="col-8" style="height: 50%;">
@@ -77,10 +75,7 @@
                 <h3>자유게시판 수정</h3>
             </div>
 
-            <!-- 게시글 등록/수정 -->
-            <!-- name 값은 DB의 각각의 컬럼값을 넣어야 값이 들어감 -->
-            <!-- input 태그는 value에 값을 넣어주고 textarea는 태그 사이에 값을 넣어줘야함, 취소의 경우 해당 게시물 상세 페이지로 돌아갈 수 있도록 주소 뒤에 인덱스 값 넣어주기 -->
-            <!-- form 태그 밑에 hidden 으로 board_seq 값 넣어서 컨트롤러에 가지고 갈 수 있도록 진행 -->
+            <!-- 게시글 등록/수정 S -->
             <div>
                 <hr>
                 <div>
@@ -129,14 +124,16 @@
                 </div>
                 <hr>
             </div>
+            <!-- 게시글 등록/수정 E -->
 
-            <!-- 버튼 -->
+            <!-- 버튼 S -->
             <div style="float: right; margin-bottom: 5%;">
                 <button class="update_btn" id="btn" type="submit">수정</button>
                 <a href="/board/board_detail?board_seq=${searchVO.board_seq}&seq=${allCount}&page=${searchVO.page}&listSize=${searchVO.listSize}&type=${searchVO.type}&searchKeyword=${searchVO.searchKeyword}">
                     <button class="rollback_btn" type="button">취소</button>
                 </a>
             </div>
+            <!-- 버튼 E -->
 
         </div>
 

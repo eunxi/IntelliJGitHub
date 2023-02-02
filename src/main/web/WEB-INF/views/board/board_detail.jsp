@@ -62,13 +62,20 @@
 			cursor: pointer;
 		}
 
+		textarea{
+			width: 50%;
+			height: 6.25em;
+			resize: none;
+		}
+
 	</style>
 </head>
 
 <div class="row" id="inner_box">
-<%--	<form method="get" id="file_downloadForm">--%>
 
 	<div class="col-2"></div>
+
+	<!-- 상세 화면 S -->
 	<div class="col-8">
 		<h3>자유게시판 상세 화면</h3>
 
@@ -101,13 +108,46 @@
 		</div>
 		<hr>
 
-		<div style="float: right; margin-bottom: 5%;">
+		<!-- 버튼 S -->
+		<div style="float: right; margin-bottom: 1%;">
 			<a href="javascript:void(0)"><button class="update_btn" type="button">수정</button></a>
 			<a href="javascript:void(0)"><button class="del_btn" type="button">삭제</button></a>
 			<a href="javascript:void(0)"><button class="list_btn" type="button">목록</button></a>
 		</div>
+		<!-- 버튼 E -->
 
 	</div>
+	<!-- 상세 화면 E -->
+
+	<!-- 댓글 S -->
+	<hr style="margin-top: 5%;">
+	<div class="col-8 reply-form">
+		<!-- 댓글 리스트 -->
+		<div>
+			<p>▶ 첫번째 댓글 | 작성자</p>
+		</div>
+		<div>
+			<p>▶ 두번째 댓글 | 작성자</p>
+		</div>
+		<div>
+			<p>▶ 세번째 댓글 | 작성자</p>
+		</div>
+
+		<!-- 댓글 작성 구간 -->
+		<div>
+			<p>
+				<label>댓글 작성자</label> <input type="text">
+			</p>
+			<p>
+				<textarea></textarea>
+			</p>
+			<p>
+				<button type="button">댓글 작성</button>
+			</p>
+		</div>
+	</div>
+	<!-- 댓글 E -->
+
 	<div class="col-2"></div>
 		<!-- 페이지 유지하는데 필요한 데이터 값들 -->
 		<input type="hidden" value="${searchVO.board_seq}" name="board_seq" id="board_seq"/>
@@ -115,7 +155,6 @@
 		<input type="hidden" value="${searchVO.listSize}" name="listSize" id="listSize"/>
 		<input type="hidden" value="${searchVO.type}" name="type" id="type"/>
 		<input type="hidden" value="${searchVO.searchKeyword}" name="searchKeyword" id="searchKeyword"/>
-<%--	</form>--%>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

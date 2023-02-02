@@ -77,8 +77,7 @@
                 <h3>자유게시판 등록</h3>
             </div>
 
-            <!-- 게시글 등록/수정 -->
-            <!-- name 값은 DB의 각각의 컬럼값을 넣어야 값이 들어감 -->
+            <!-- 게시글 등록 S -->
             <div>
                 <hr>
                 <div>
@@ -117,14 +116,16 @@
                 </div>
                 <hr>
             </div>
+            <!-- 게시글 등록 S -->
 
-            <!-- 버튼 -->
+            <!-- 버튼 S -->
             <div style="float: right; margin-bottom: 5%;">
                 <button class="insert_btn" id="btn" type="submit">등록</button>
                 <a href="/board/board_list.do">
                     <button class="list_btn" type="button">목록</button>
                 </a>
             </div>
+            <!-- 버튼 E -->
 
         </div>
     </form>

@@ -69,7 +69,7 @@
 </head>
 <body>
 <div class="row" id="inner_box">
-    <form action="/board/board_insertAction" id="insert_form" method="post" <%--onsubmit="return checkInsert();"--%> enctype="multipart/form-data">
+    <form action="/board/board_insertAction" id="insert_form" method="post" enctype="multipart/form-data">
         <div class="col-2"></div>
 
         <div class="col-8" style="height: 50%;">
@@ -77,8 +77,7 @@
                 <h3>자유게시판 등록</h3>
             </div>
 
-            <!-- 게시글 등록/수정 -->
-            <!-- name 값은 DB의 각각의 컬럼값을 넣어야 값이 들어감 -->
+            <!-- 게시글 등록 S -->
             <div>
                 <hr>
                 <div>
@@ -117,14 +116,16 @@
                 </div>
                 <hr>
             </div>
+            <!-- 게시글 등록 S -->
 
-            <!-- 버튼 -->
+            <!-- 버튼 S -->
             <div style="float: right; margin-bottom: 5%;">
                 <button class="insert_btn" id="btn" type="submit">등록</button>
                 <a href="/board/board_list.do">
                     <button class="list_btn" type="button">목록</button>
                 </a>
             </div>
+            <!-- 버튼 E -->
 
         </div>
     </form>
@@ -137,13 +138,10 @@
 
     // 사이즈 변경
     const getByteSize = (size) => {
-        const byteUnits = ["KB", "MB", "GB", "TB"];
+        const byteUnits = "MB";
 
-        for(let i = 0; i < byteUnits.length; i++){
-            size = Math.floor(size / 1024);
-
-            if (size < 1024) return size.toFixed() + byteUnits[i];
-        }
+        size = Math.floor((size / 1024) / 1024);
+        return size + byteUnits;
     };
 
     // 파일 추가 - file_select 가 바뀔 때마다 진행
@@ -251,13 +249,6 @@
             alert("내용을 입력해주세요");
             $("#board_content").focus();
             return false;
-        }
-
-        if (!confirm("등록하시겠습니까?")) {
-            // 취소(아니오) 버튼 클릭 시 이벤트 발생
-            return false;
-        } else {
-            alert("등록 성공!");
         }
 
         $.ajax({

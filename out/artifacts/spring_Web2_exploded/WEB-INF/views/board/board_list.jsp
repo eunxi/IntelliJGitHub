@@ -127,7 +127,6 @@
 </head>
 <body>
 <div class="table-wrap">
-    <!-- 검색 가능하도록 form 태그, id  값 생성하여 검색 함수 호출 시 id 값을 불러 submit 가능하도록 설정 -->
     <form method="get" id="listForm" action="/board/board_list">
 
         <h3><a href="/board/board_list">자유게시판</a></h3>
@@ -152,6 +151,7 @@
         </div>
         <!-- 검색E -->
 
+        <!-- 게시글 리스트 S -->
         <table id="sort_table">
             <thead>
             <tr>
@@ -183,7 +183,9 @@
             </tbody>
 
         </table>
+        <!-- 게시글 리스트 E -->
 
+        <!-- 페이지 Inform S -->
         <div id="page_bottom" style="margin-top: 1%; margin-bottom: 3%;">
             <span id="page_total">총 ${all_count} 건 | 페이지 (${allPage} / ${page})</span>
              &nbsp;&nbsp;
@@ -196,6 +198,7 @@
 
             <a href="/board/board_insert.do" class="top-btn">글 등록</a>
         </div>
+        <!-- 페이지 Inform E -->
 
         <!-- pagination{s} -->
         <div id="paginationBox" style="margin-left: 30%;">
@@ -227,7 +230,6 @@
         <input type="hidden" value="${page}" id="total_page"/> <!-- listSize에 따라 바뀌는 전체 페이지 값 -->
         <input type="hidden" value="${all_count}" id="total_cnt"/> <!-- 전체 글 개수 값 -->
         <input type="hidden" value="${type}" name="type" id="type"/> <!-- 검색 type -->
-
     </form>
 </div>
 
@@ -267,39 +269,6 @@
 
         make();
     }
-
-    // 검색버튼 클릭할 경우
-   /* $(document).on('click', '#search_btn', function(){
-
-        history.replaceState({}, null, location.pathname);
-
-        let searchType = $("#select_box").val();
-        let searchKeyword = $("#searchKeyword").val();
-
-        let realType = $("#type").val(searchType);
-
-        console.log($("#type").val());
-
-        if(!searchType){
-            alert("검색 분류를 선택해주세요.");
-            return false;
-        }
-
-        if(!searchKeyword){
-            alert("검색 단어를 입력해주세요.");
-            return false;
-        }
-
-        // 변경된 selected 값 찾기
-        $("select[name=searchType]").change(function(){
-
-        })
-
-        let url = "/board/board_list?type=" + $("#type").val() + "&searchKeyword=" + $("#searchKeyword").val();
-        location.href = url;
-
-        make();
-    });*/
 
     // 정렬
     // <thead> 와 <tbody> 로 구분을 지어야 오름, 내림차순 가능
@@ -352,10 +321,7 @@
         make();
     }
 
-    <%--<span id="page_total">총 ${cnt} 건 | 페이지 (${allPage} / ${page}) </span>--%>
-
-    // 페이지 개수 출력 - 총 페이지, 목록 개수 지정 필요
-    // 페이지 목록 개수 선택
+    // 페이지 목록 개수 출력 - 총 페이지, 목록 개수 지정 필요
     $("select[name=dataPerPage]").change(function(){
         let dataPerPage = $("#dataPerPage").val ();
 
@@ -363,15 +329,9 @@
 
         let now_page = $("#search_page").val(); // 현재 페이지 수
         let real_page_end = Math.ceil(Number($("#total_cnt").val()) / Number($("#listSize").val())); // 진짜 총 페이지 - 정수 맞음
-        // console.log("total_cnt : " + Number($("#total_cnt").val()));
-        // console.log("listSize : " + Number($("#listSize").val()));
-        // console.log();
-        // console.log("real_page_end : " + real_page_end);
 
-        // console.log("---------시작------------");
         $("#total_page").val(real_page_end);
         let total_page = Number($("#total_page").val()); // 전체 페이지(total_page)에 listSize에 따라 변동되는 real_page_end 값 넣어주기 - 정수 아님
-        // console.log("---------끝 ------------");
 
         make();
     });
@@ -382,7 +342,6 @@
         let all_count = 0;
         let dataPerPage = $("#dataPerPage").val(); // option selected 값
         let listSize = Number($("#listSize").val()); // 출력 개수 (VO)
-        // let perPageSize = $("#listSize").val(dataPerPage); // 목록 개수 넣기 -> 진짜 한 페이지당 게시되는 게시물 수 -> 없어도 되는 코드
 
         let all_total = Number($("#total_cnt").val()); // 전체 개수
         let now_page = Number($("#search_page").val()); // 현재 페이지
@@ -506,31 +465,11 @@
                         '<td>' + result[i].board_date + '</td>' +
                         '<td>' + result[i].board_cnt + '</td>'
                     ;
-                    // count--;
                 }
-
-                <%--result.map((list) => { // result를 map--%>
-                <%--    content +=--%>
-                <%--        `<tr>--%>
-                <%--            <td>${count}--%>
-                <%--                <input type="hidden" name="board_seq" id="board_seq" value="${list.board_seq}"/>--%>
-                <%--            </td>--%>
-                <%--            <td>--%>
-                <%--                <a href="/board/board_detail?board_seq=${list.board_seq}&seq=${count}">${list.board_title}</a>--%>
-                <%--            </td>--%>
-                <%--            <td>${list.user_id}</td>--%>
-                <%--            <td>--%>
-                <%--                ${list.board_date}--%>
-                <%--            </td>--%>
-                <%--            <td>${list.board_cnt}</td>--%>
-                <%--        </tr>`;--%>
-                <%--    count--;--%>
-                <%--})--%>
 
                 $("#sort_table tbody").empty();
                 $("#sort_table tbody").append(content);
 
-                // $("#sort_table tbody").html(content);
             },
             error: function(error){
                 alert("error!!");
