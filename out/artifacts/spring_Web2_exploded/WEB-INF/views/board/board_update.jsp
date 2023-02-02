@@ -65,7 +65,7 @@
 </head>
 <body onload="javascript:test();">
 <div class="row" id="inner_box">
-    <form action="/board/board_updateAction" method="post" onsubmit="return checkUpdate();">
+    <form action="/board/board_updateAction" method="post" enctype="multipart/form-data">
         <!-- form 제출(submit) 시 사용자는 변경 못하는 데이터 값을 서버에 함께 보내기 위해 hidden 사용 & board_seq 로 전달 -->
         <input type="hidden" id="board_seq" name="board_seq" value="${board.board_seq}"/>
 
@@ -116,19 +116,15 @@
                     파일
                     <input type="file" id="bd_file" name="bd_file" multiple style="margin-left: 10%">
 
-                    <div id="original_file">
-                        <c:if test="${not empty fileList}">
+                    <div id="file_upload_list">
+                        <!-- 첨부 파일 있을 경우 출력 -->
                             <c:forEach var="file" items="${fileList}">
-                                <p id="file_list_${file.order_seq}" style="font-size: small; margin-left: 13%;">${file.file_name}
-                                    <b id="file_${file.order_seq}">${file.order_seq -1}</b>
-                                    <span> (size)</span>
-                                    <a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(${file.order_seq})">삭제</a>
+                                <p id="ori_file_list_${file.file_seq}" style="font-size: small; margin-left: 13%;">${file.file_name}
+                                    <b style="display: none" id="file_${file.file_seq}">${file.file_seq}</b>
+                                    <span> (${file.file_size}MB)</span>
+                                    <a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(${file.file_seq})">삭제</a>
                                 </p>
                             </c:forEach>
-                        </c:if>
-                    </div>
-                    <div id="file_upload_list">
-
                     </div>
                 </div>
                 <hr>
@@ -148,23 +144,24 @@
         <input type="hidden" value="${searchVO.listSize}" name="listSize" id="listSize"/>
         <input type="hidden" value="${searchVO.type}" name="type" id="type"/>
         <input type="hidden" value="${searchVO.searchKeyword}" name="searchKeyword" id="searchKeyword"/>
+        <input type="hidden" value="${file_num}" id="file_num"/>
+
     </form>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
-    // 파일[] 배열
-    let file_list = new Array();
+    let file_list = new Array(); // 파일[]
+    let delete_file_seq = new Array();
+
+    let file_num =  $("#file_num").val(); // 파일 개수
 
     // 사이즈 변경
     const getByteSize = (size) => {
-        const byteUnits = ["KB", "MB", "GB", "TB"];
+        const byteUnits = "MB";
 
-        for (let i = 0; i < byteUnits.length; i++) {
-            size = Math.floor(size / 1024);
-
-            if (size < 1024) return size.toFixed() + byteUnits[i];
-        }
+        size = Math.floor((size / 1024) / 1024);
+        return size + byteUnits;
     };
 
     // 파일 추가
@@ -179,14 +176,15 @@
             file_arr.push(files[i]);
         }
 
-        $('#file_upload_list').empty();
+        // $('#file_upload_list').empty(); // 기존 파일까지 전부다 삭제되기 때문에
+        $('.insert_file').remove(); // 새로 파일이 추가될 때 해당 class 를 이용해서 추가된 파일에서 삭제가 가능하도록
 
         for (let i = 0; i < file_arr.length; i++) {
             let file_size = getByteSize(file_arr[i].size);
             <%--html += '<c:if test="${not empty fileList}"><c:forEach var="file" items="${fileList}">' + file_arr[i].name + '</c:forEach></c:if>';--%>
-            html += '<p id="file_list_' + i + '" style="font-size: small; margin-left: 13%;">' + file_arr[i].name +
-                '<b id="file_' + i + '">' + i +
-                '</b><span> (' + file_size + ') </span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(\'' + i + '\')">삭제</a></p>';
+            html += '<p id="file_list_' + i + '" class="insert_file" style="font-size: small; margin-left: 13%;">' + file_arr[i].name +
+                '<b style="display: none" id="file_' + i + '"> ' + i +
+                ' </b><span> (' + file_size + ') </span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="new_file_delete(\'' + i + '\')">삭제</a></p>';
         }
 
         file_list = new Array();
@@ -197,30 +195,38 @@
         $("#bd_file").val(''); // 얘를 해줘야 똑같은 파일을 넣어도 들어감
     });
 
-    // 파일 삭제
+    // 기존 파일 삭제
     function file_delete(num) {
+        console.log("file_delete num ? " + num);
+        $("#ori_file_list_" + num).remove();
+
+        delete_file_seq.push(num);
+        console.log(delete_file_seq);
+    }
+
+    // 새로운 파일 삭제
+    function new_file_delete(num){
+        console.log("new_file_delete num ? " + num);
         $("#file_list_" + num).remove();
 
         let file_arr = file_list;
-        console.log("여기에서 뜨나용??");
-        console.log(file_arr);
         file_arr.splice(num, 1);
 
-        let key_num = 0; // 리스트 개수 다시 세기
+        let key_num = 0;
+
         let html = '';
         file_list = new Array();
 
-        $("#file_upload_list").empty();
+        $('.insert_file').remove();
 
         for (let i = 0; i < file_arr.length; i++) {
             let file_size = getByteSize(file_arr[i].size);
-            html += '<p id="file_list_' + key_num + '" style="font-size: small; margin-left: 13%;">' + file_arr[i].name +
-                '<b id="file_' + key_num + '" >' + key_num +
-                '</b><span> (' + file_size + ') </span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(\'' + key_num + '\')">삭제</a></p>';
+            html += '<p id="file_list_' + key_num + '"class="insert_file" style="font-size: small; margin-left: 13%;">' + file_arr[i].name +
+                '<b style="display: none" id="file_' + key_num + '" > ' + key_num +
+                ' </b><span> (' + file_size + ') </span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="new_file_delete(\'' + key_num + '\')">삭제</a></p>';
 
             key_num++;
             file_list.push(file_arr[i]);
-            console.log("key_num : " + key_num);
         }
 
         $("#file_upload_list").append(html);
@@ -242,7 +248,8 @@
         // 익명 여부 확인
         let anonymous = $("input[type=checkbox]:checked").val();
 
-        if (anonymous == "on") {
+        // 익명 체크했을 때
+        if (anonymous == "false") {
             anonymous = 1;
         } else {
             anonymous = 0;
@@ -251,14 +258,34 @@
         // FormData
         let formData = new FormData();
 
+        formData.append("board_seq", $("#board_seq").val());
+        formData.append("board_title", $("#board_title").val());
+        formData.append("user_id", $("#user_id").val());
+        formData.append("board_content", $("#board_content").val());
+        formData.append("board_anonymous", anonymous);
+        formData.append("page", $("#page").val());
+        formData.append("listSize", $("#listSize").val());
+        formData.append("type", $("#type").val());
+        formData.append("searchKeyword", $("#searchKeyword").val());
+
         for(let i = 0; i < file_list.length; i++){
             formData.append("file", file_list[i]);
         }
 
+        if(delete_file_seq.length == 0){ // 삭제할 파일의 길이가 0일 때 (없을 때)
+            formData.append("delete_file", 0);
+        }else{
+            for(let i = 0; i < delete_file_seq.length; i++){ // 삭제할 파일 있을 때
+                formData.append("delete_file", delete_file_seq[i]);
+            }
+        }
+
         // formData - value 확인
+        console.log("formData 확인");
         for(let value of formData.values()){
             console.log(value);
         }
+        console.log("formData 끝");
 
         // 유효성 검사
         let blank_pattern = /^\s+|\s+$/g; // 공백 검사
@@ -283,7 +310,11 @@
             data: formData,
             type: "post",
             success: function(result) {
-                alert("성공!!");
+                // alert("성공!!");
+                location.href ="/board/board_detail?board_seq=${searchVO.board_seq}&page=${searchVO.page}" +
+                    "&listSize=${searchVO.listSize}" +
+                    "&type=${searchVO.type}" +
+                    "&searchKeyword=${searchVO.searchKeyword}";
             },
             error: function(error) {
                 alert("실패!!");
@@ -293,15 +324,6 @@
         return false;
 
     });
-
-    function checkUpdate() {
-        if (!confirm("수정하시겠습니까?")) {
-            // 취소(아니오) 버튼 클릭 시 이벤트 발생
-            return false;
-        } else {
-            alert("수정 성공!");
-        }
-    }
 
 </script>
 

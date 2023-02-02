@@ -69,7 +69,7 @@
 </head>
 <body>
 <div class="row" id="inner_box">
-    <form action="/board/board_insertAction" id="insert_form" method="post" <%--onsubmit="return checkInsert();"--%> enctype="multipart/form-data">
+    <form action="/board/board_insertAction" id="insert_form" method="post" enctype="multipart/form-data">
         <div class="col-2"></div>
 
         <div class="col-8" style="height: 50%;">
@@ -137,13 +137,10 @@
 
     // 사이즈 변경
     const getByteSize = (size) => {
-        const byteUnits = ["KB", "MB", "GB", "TB"];
+        const byteUnits = "MB";
 
-        for(let i = 0; i < byteUnits.length; i++){
-            size = Math.floor(size / 1024);
-
-            if (size < 1024) return size.toFixed() + byteUnits[i];
-        }
+        size = Math.floor((size / 1024) / 1024);
+        return size + byteUnits;
     };
 
     // 파일 추가 - file_select 가 바뀔 때마다 진행
@@ -251,13 +248,6 @@
             alert("내용을 입력해주세요");
             $("#board_content").focus();
             return false;
-        }
-
-        if (!confirm("등록하시겠습니까?")) {
-            // 취소(아니오) 버튼 클릭 시 이벤트 발생
-            return false;
-        } else {
-            alert("등록 성공!");
         }
 
         $.ajax({

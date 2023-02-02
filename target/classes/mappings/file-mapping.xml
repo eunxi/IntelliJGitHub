@@ -24,28 +24,30 @@
 		<result property="board_anonymous" column="BOARD_ANONYMOUS" />
 	</resultMap>
 
-	<!-- 파일 등록 -->
+	<!-- 게시글 파일[] 등록 & 파일 수정 -->
 	<insert id="fileListInsert" parameterType="java.util.List">
 		INSERT INTO file
 		(
 		tbl_type,
-		seq,
-		order_seq,
+		b_num,
+        division_num,
 		file_path,
 		file_name,
 		file_saveName,
-		file_downCnt
+		file_downCnt,
+		file_size
 		)
 		VALUES
 		<foreach collection="list" item="item" separator=",">
 		(
 		#{item.tbl_type},
-		#{item.seq},
-		#{item.order_seq},
+		#{item.b_num},
+		#{item.division_num},
 		#{item.file_path},
 		#{item.file_name},
         #{item.file_saveName},
-		#{item.file_downCnt}
+		#{item.file_downCnt},
+		#{item.file_size}
 		)
 		</foreach>
 	</insert>
@@ -55,33 +57,45 @@
 		<![CDATA[
 			SELECT
 			file_seq,
-			seq,
+			b_num,
 			tbl_type,
-			order_seq,
+			division_num,
 			file_path,
 			file_name,
 			file_saveName,
 			file_date,
-			file_downCnt
+			file_downCnt,
+			file_size
 			FROM file
-			WHERE seq = #{seq}
-			ORDER BY order_seq ASC
+			WHERE b_num = #{b_num}
+			ORDER BY file_seq ASC
 		]]>
 	</select>
 
-	<!-- 파일 수정 -->
-	<update id="fileUpdate" parameterType="file">
-		UPDATE file SET
-		seq = #{seq},
-		tbl_type = #{tbl_type},
-		order_seq = #{order_seq},
-		file_path = #{file_path},
-		file_name = #{file_name},
-		file_saveName = #{file_saveName},
-		file_downCnt = #{file_downCnt}
-		WHERE seq = #{seq} and order_seq = #{order_seq}
-	</update>
+	<!-- 게시글 파일[] 수정 - 삭제 -->
+	<delete id="fileListDelete" parameterType="int">
+		DELETE FROM file
+		WHERE file_seq = #{file_seq}
+	</delete>
 
+    <!-- 파일 하나만 상세보기 (다운로드 사용) -->
+    <select id="file_downDetail" parameterType="int" resultType="file">
+        <![CDATA[
+			SELECT
+			file_seq,
+			b_num,
+			tbl_type,
+			division_num,
+			file_path,
+			file_name,
+			file_saveName,
+			file_date,
+			file_downCnt,
+			file_size
+			FROM file
+			WHERE file_seq = #{file_seq}
+		]]>
+    </select>
 
 
 

@@ -6,7 +6,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <title>자유게시판</title>
     <style>
         a {
@@ -143,11 +142,9 @@
                     <option value="T" <c:out value="${type eq 'T' ? 'selected' : ''}"/>>제목</option>
                 </select>
 
-                <input type="text" value="${searchKeyword}" name="searchKeyword" id="searchKeyword" style="width: 200px; height: 30px;"/>
+                <input type="text" value="${searchKeyword}" name="searchKeyword" id="searchKeyword" onkeypress="if( event.keyCode == 13 ){enterKey();}" style="width: 200px; height: 30px;"/>
 
-                <a href="#">
-                    <button type="button" id="search_btn">검색</button>
-                </a>
+                <button type="button" id="search_btn" onclick="enterKey();" style="cursor: pointer" >검색</button>
                 <a href="/board/board_list">
                     <button class="reset_btn" type="button">초기화</button>
                 </a>
@@ -195,9 +192,6 @@
                 <option value="10" <c:if test="${allSearch.getListSize() == 10 }">selected="selected"</c:if>>10개씩 보기</option>
                 <option value="15" <c:if test="${allSearch.getListSize() == 15 }">selected="selected"</c:if>>15개씩 보기</option>
                 <option value="20" <c:if test="${allSearch.getListSize() == 20 }">selected="selected"</c:if>>20개씩 보기</option>
-<%--                <option value="10">10개씩 보기</option>--%>
-<%--                <option value="15">15개씩 보기</option>--%>
-<%--                <option value="20">20개씩 보기</option>--%>
             </select>
 
             <a href="/board/board_insert.do" class="top-btn">글 등록</a>
@@ -237,10 +231,12 @@
     </form>
 </div>
 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
 
-    // 검색버튼 클릭할 경우
-    $(document).on('click', '#search_btn', function(){
+    // 엔터키 검색
+    function enterKey(){
+        history.replaceState({}, null, location.pathname);
 
         let searchType = $("#select_box").val();
         let searchKeyword = $("#searchKeyword").val();
@@ -264,16 +260,46 @@
 
         })
 
-        // $("#listForm").find("input[name='type']").val(searchType);
-        // $("#listForm").find("input[name='searchKeyword']").val(searchKeyword);
-        // $("#listForm").submit();
+        let url = "/board/board_list?type=" + $("#type").val() + "&searchKeyword=" + $("#searchKeyword").val();
+
+
+        location.href = url;
+
+        make();
+    }
+
+    // 검색버튼 클릭할 경우
+   /* $(document).on('click', '#search_btn', function(){
+
+        history.replaceState({}, null, location.pathname);
+
+        let searchType = $("#select_box").val();
+        let searchKeyword = $("#searchKeyword").val();
+
+        let realType = $("#type").val(searchType);
+
+        console.log($("#type").val());
+
+        if(!searchType){
+            alert("검색 분류를 선택해주세요.");
+            return false;
+        }
+
+        if(!searchKeyword){
+            alert("검색 단어를 입력해주세요.");
+            return false;
+        }
+
+        // 변경된 selected 값 찾기
+        $("select[name=searchType]").change(function(){
+
+        })
 
         let url = "/board/board_list?type=" + $("#type").val() + "&searchKeyword=" + $("#searchKeyword").val();
         location.href = url;
-        // alert(url);
 
         make();
-    });
+    });*/
 
     // 정렬
     // <thead> 와 <tbody> 로 구분을 지어야 오름, 내림차순 가능

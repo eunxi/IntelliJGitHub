@@ -23,29 +23,25 @@ public class FileController {
     FileService fileService;
 
     // 파일 다운로드 처리
-    @RequestMapping(value = "/file_download.do/{seq}/{order_seq}")
+    @RequestMapping(value = "/file_download.do/{b_num}/{file_seq}")
     @ResponseBody
-    public void file_download(@PathVariable("order_seq") int order_seq, @PathVariable("seq") int seq, HttpServletResponse response) throws Exception {
+    public void file_download(@PathVariable("file_seq") int file_seq, @PathVariable("b_num") int b_num, HttpServletResponse response) throws Exception {
         System.out.println("FILE Download Controller");
 
-        System.out.println(">>> seq" + seq);
-        System.out.println(">>> order_seq" + order_seq);
+        System.out.println(">>> b_num" + b_num);
 
-        int o_seq = (order_seq - 1);
-        List<FileVO> fileList = fileService.fileDetail(seq);
-        System.out.println("----------------- file list -----------------");
-        System.out.println(fileList.get(o_seq));
-//
-        String path = fileList.get(o_seq).getFile_path();
-//            String name = fileList.get(seq).getFile_path();
-//            String path = "C:\\SAVE\\upload\\board\\" + name;
+        int o_seq = 1;
+
+        List<FileVO> fileList = fileService.fileDetail(b_num);
+        FileVO file_info = fileService.file_downDetail(file_seq);
+
+        String path = file_info.getFile_path();
+        System.out.println("path : " + path);
 
         File file = new File(path);
 
-        response.setHeader("Content-Disposition", "attachment; filename=" + new String(fileList.get(o_seq).getFile_name().getBytes("UTF-8"), "ISO-8859-1")); // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
-//            response.setHeader("Content-Disposition", "attachment; filename=" + fileList.get(seq).getFile_name()); // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
-        System.out.println("file name : " + fileList.get(o_seq).getFile_name());
-
+        response.setHeader("Content-Disposition", "attachment; filename=" + new String(file_info.getFile_name().getBytes("UTF-8"), "ISO-8859-1")); // 다운로드 되거나 로컬에 저장되는 용도로 쓰이는지를 알려주는 헤더
+        System.out.println("file name : " + file_info.getFile_name());
 
         FileInputStream fileInputStream = new FileInputStream(path); // 파일 읽어오기
         OutputStream out = response.getOutputStream();

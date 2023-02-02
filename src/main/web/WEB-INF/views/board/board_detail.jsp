@@ -83,7 +83,7 @@
 		<hr>
 
 		<div class="detailContent" style="height: 450px; overflow: auto;">
-			${board.board_content}
+			<pre>${board.board_content}</pre>
 		</div>
 		<hr>
 
@@ -91,7 +91,7 @@
 			<c:if test="${not empty fileList}">
 				<p>첨부 파일</p>
 				<c:forEach var="file" items="${fileList}">
-					<p><a href='/file_download.do/${file.seq}/${file.order_seq}' style="margin-left: 1%; font-size: small;" id="file_btn">${file.file_name }</a></p>
+					<p style="margin-left: 1%; font-size: small;"><a href='/file_download.do/${file.b_num}/${file.file_seq}' id="file_btn">${file.file_name }</a> (${file.file_size}MB)</p>
 				</c:forEach>
 			</c:if>
 
@@ -151,10 +151,10 @@
 
 	// 목록
 	$(".list_btn").click(function(){
-		let url = "/board/board_list?board_seq=${searchVO.board_seq}&page=${searchVO.page}" +
-					"&listSize=${searchVO.listSize}" +
-					"&type=${searchVO.type}" +
-					"&searchKeyword=${searchVO.searchKeyword}";
+		let url = "/board/board_list?page=${searchVO.page}" +
+				"&listSize=${searchVO.listSize}" +
+				"&type=${searchVO.type}" +
+				"&searchKeyword=${searchVO.searchKeyword}";
 
 		location.href = url;
 	})

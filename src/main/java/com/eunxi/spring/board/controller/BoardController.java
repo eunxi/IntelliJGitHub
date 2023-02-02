@@ -14,12 +14,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/board")
@@ -31,18 +29,11 @@ public class BoardController {
     @Autowired
     FileService fileService;
 
-    // @RequestParam(전달인자 이름으로, 실제 값을 표시) : 파라미터의 값과 이름을 함께 전달하는 방식
     @GetMapping("/board_list")
     public String getBoardList(BoardVO vo, Model model, String type, @RequestParam(value = "listSize", defaultValue = "10") int listSize) {
         System.out.println("Board List Controller");
 
-        //리스트 사이즈 확인
-        //없으면 10
-        //있으면 parameter
-        // listSize 에 고정적인 값을 줘버리면 해당 값으로만 계속 출력되기 때문에, listSize 값이 없을 경우와 있을 경우를 나눠서 사용
-
         vo.setListSize(listSize); // 한 페이지에 보여줄 레코드 수 지정
-
         vo.setStartList(1); // 시작 페이지 지정
         vo.setType(type);
 
@@ -74,12 +65,6 @@ public class BoardController {
         }
 
         model.addAttribute("boardList", boardList); // 목록
-
-        // no, 데이터를 가져오는지 확인
-//        for(int i = 0 ; i < boardList.size() ; i++){
-//            System.out.println(boardList.get(i));
-//        }
-
         model.addAttribute("cnt", total_cnt); // 보여질 내용 수(전체 게시글 수)
         model.addAttribute("page", cnt / vo.getListSize() + 1); // 총 페이지
         model.addAttribute("allCount", cnt); // 게시글 총 개수 - 목록에서 사용하는 총 개수 변수
@@ -136,24 +121,12 @@ public class BoardController {
     }
 
     // 등록 부분 처리
-    // RedirectAttributes: 리다이렉트 이후 저장된 플래시 속성 모델로 이동 - URL 노출 X
-    // 새롭게 등록된 게시물의 번호를 위해 RedirectAttributes 사용, 리턴할 때 redirect 사용
-    // 실제 file 은 List<MultipartFile> 로 받고, 나머지는 Map<String, Object> 로 받음
     @PostMapping("/board_insertAction")
     @ResponseBody
     public String boardInsert_action(Model model, BoardVO vo, MultipartHttpServletRequest files, @RequestParam("file") List<MultipartFile> file, @RequestParam Map<String, Object> map, @RequestParam("board_anonymous") boolean board_anonymous, RedirectAttributes redirect) throws IOException {
         System.out.println("Board Insert Post Controller");
 
-        // ajax 에서 파일과 데이터들이 넘어오는지 확인
-//        System.out.println(file);
-//        for(int i = 0 ; i < file.size() ; i++){
-//            System.out.println(file.get(i).getOriginalFilename());
-//        }
-//
-//        System.out.println(">>>> MAP 형태 불러오기");
-//        for(String key : map.keySet()){
-//            System.out.println("key: " + key + ", value: " + map.get(key));
-//        }
+        int file_size = file.size();
 
         String title = map.get("board_title").toString(); // map Object를 toString()을 통해 String 타입으로 변경
         String id = map.get("user_id").toString();
@@ -166,16 +139,15 @@ public class BoardController {
         vo.setBoard_content(content);
 
         String filePath = "C:\\SAVE\\upload\\board";
-//        List<MultipartFile> list = files.getFiles("file"); // 웹에서 파일 받는 코드
 
         // 게시글 등록
         boardService.boardInsert(vo);
         int seq = boardService.getBoardSeq(vo);
 
         FileUtils fileUtils = new FileUtils();
-        List<FileVO> fileList = fileUtils.parseFileInfo(seq, "B", filePath, files);
+        List<FileVO> fileList = fileUtils.parseFileInfo(1, seq, "B", filePath, files);
 
-        // 파일 존재할 때만 파일 넣ㅇ주기
+        // 파일 존재할 때만 파일 넣어주기
         if(!fileList.isEmpty()){
             fileService.fileListInsert(fileList);
         }
@@ -186,7 +158,6 @@ public class BoardController {
     }
 
     // 상세 화면
-    // 번호를 받을 수 있도록 @requestParam 이용하여 board_seq 값 넣어주기 - 게시글 내용을 인덱스 값 반영해서 가져오기 - 값 꺼내기 위해 addAttribute 사용
     @GetMapping("/board_detail")
     public String getBoard(@RequestParam("board_seq") int board_seq, Model model, BoardVO vo, FileVO fileVO) throws UnsupportedEncodingException {
         System.out.println("Board Detail Controller");
@@ -207,6 +178,11 @@ public class BoardController {
 
         model.addAttribute("fileList", fileList);
 
+        System.out.println("상세보기 - file List");
+        for(int i = 0; i < fileList.size(); i++){
+            System.out.println(fileList.get(i));
+        }
+
         return "/board/board_detail";
     }
 
@@ -218,6 +194,7 @@ public class BoardController {
 
         List<FileVO> fileList = fileService.fileDetail(board_seq);
 
+        System.out.println("GET 수정 화면");
         for(int i = 0; i < fileList.size(); i++){
             System.out.println(fileList.get(i));
         }
@@ -230,8 +207,7 @@ public class BoardController {
         model.addAttribute("allCount", cnt); // 전체 게시글 수
 
         model.addAttribute("fileList", fileList); // fileList 보내주기
-
-        System.out.println(">>>> fileList: " + fileList);
+        model.addAttribute("file_num", fileList.size());
 
         return "/board/board_update";
     }
@@ -239,17 +215,63 @@ public class BoardController {
     // 수정 부분 처리
     @PostMapping("/board_updateAction")
     @ResponseBody
-    public String boardUpdate_action(@ModelAttribute("searchVO") BoardVO vo, @RequestParam("file") List<MultipartFile> file,  MultipartHttpServletRequest files, RedirectAttributes redirect) throws UnsupportedEncodingException {
+    public String boardUpdate_action(@ModelAttribute("searchVO") BoardVO vo, @RequestParam("file") List<MultipartFile> file, @RequestParam("delete_file") List<Integer> delete_file, @RequestParam Map<String, Object> map, @RequestParam("board_anonymous") boolean board_anonymous,  @RequestParam("page") int page, @RequestParam("board_seq") int board_seq,  @RequestParam("listSize") int listSize,  MultipartHttpServletRequest files, RedirectAttributes redirect) throws IOException {
         System.out.println("Board Update Post Controller");
 
-        System.out.println(">>>>>>>>>>>> AJAX 연동 확인 시작");
-        System.out.println(file);
-        System.out.println(">>>>>>>>>>>> AJAX 연동 확인 끝");
+        // 삭제하는 파일의 order_seq 확인 후, 삭제 진행
+        for(int i = 0; i < delete_file.size(); i++){
+            System.out.println(delete_file);
+            fileService.fileListDelete(delete_file.get(i));
+        }
+
+        // 삭제 후 값을 구하면 order_seq 가 달라질까?
+        List<FileVO> list = fileService.fileDetail(board_seq);
+        int division_num = list.size();
+
+        // order_seq 가 0 이라면, 1부터 시작
+        int order_seq = division_num;
+        System.out.println("order_seq : " + order_seq);
+
+        if(division_num == 0){
+            order_seq = 1;
+        }else{
+            order_seq += division_num;
+            System.out.println("순번 지정 후 " + order_seq);
+        }
+
+        String title = map.get("board_title").toString();
+        String user = map.get("user_id").toString();
+        String content = map.get("board_content").toString();
+        String type = map.get("type").toString();
+        String searchKeyword = map.get("searchKeyword").toString();
+
+        vo.setBoard_seq(board_seq);
+        vo.setBoard_title(title);
+        vo.setUser_id(user);
+        vo.setBoard_content(content);
+        vo.setBoard_anonymous(board_anonymous);
+        vo.setPage(page);
+        vo.setListSize(listSize);
+        vo.setType(type);
+        vo.setSearchKeyword(searchKeyword);
+
+        int file_size = file.size();
+
+        System.out.println("----------------------- UPDATE BOARD : " + vo);
+
+        // 파일 업로드 코드
+        String file_path = "C:\\SAVE\\upload\\board";
+        FileUtils fileUtils = new FileUtils();
+        List<FileVO> file_list = fileUtils.parseFileInfo(order_seq, board_seq, "B", file_path, files);
 
         boardService.boardUpdate(vo);
 
-        redirect.addFlashAttribute("redirect", vo.getBoard_seq());
+        // 파일 존재할 때만 파일 넣어주기
+        if(!file_list.isEmpty()){
+            fileService.fileListInsert(file_list);
+        }
 
+        redirect.addFlashAttribute("redirect", vo.getBoard_seq());
         redirect.addFlashAttribute("page", vo.getPage());
         redirect.addFlashAttribute("listSize", vo.getListSize());
         redirect.addFlashAttribute("type", vo.getType());
@@ -270,10 +292,6 @@ public class BoardController {
         redirect.addFlashAttribute("listSize", vo.getListSize());
         redirect.addFlashAttribute("type", vo.getType());
         redirect.addFlashAttribute("searchKeyword", vo.getSearchKeyword());
-
-        System.out.println("=====>>>>>> board_delete vo : " + vo);
-//        System.out.println("=====>>>>>> board_delete vo : " + vo);
-//        System.out.println("=====>>>>>> board_delete vo : " + vo);
 
         return "redirect:/board/board_list?board_seq=" + vo.getBoard_seq() + "&page=" + vo.getPage() + "&listSize=" + vo.getListSize() + "&type" + vo.getType() + "&searchKeyword=" + vo.getSearchKeyword();
     }

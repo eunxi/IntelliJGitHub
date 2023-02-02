@@ -132,8 +132,8 @@
 		UPDATE BOARD SET
 		board_title = #{board_title},
 		board_content = #{board_content},
-		user_id = if(board_anonymous = 1, "SYSTEM", "익명"),
-		board_anonymous = #{board_anonymous}
+		board_anonymous = #{board_anonymous},
+		user_id = if(board_anonymous = 1, "익명", "SYSTEM")
 		WHERE board_seq = #{board_seq}
 	</update>
 

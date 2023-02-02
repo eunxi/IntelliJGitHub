@@ -1,30 +1,21 @@
 package com.eunxi.spring.file.service;
 
-import com.eunxi.spring.board.service.BoardVO;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 // 여러 개의 파일을 담아서 리스트로 던져줄 객체 생성
 public class FileUtils {
-    public List<FileVO> parseFileInfo(int seq, String tbl_type, String filePath, MultipartHttpServletRequest files) throws IOException {
+    public List<FileVO> parseFileInfo(int order_seq, int seq, String tbl_type, String filePath, MultipartHttpServletRequest files) throws IOException {
 
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> FileUtils : " + seq);
         if(ObjectUtils.isEmpty(files)) {
             return null;
         }
-
-        // 파일 업로드 경로
-//        String filePath = "C:\\SAVE\\upload";
 
         List<FileVO> fileList = new ArrayList<FileVO>();
 
@@ -36,8 +27,6 @@ public class FileUtils {
 
         //파일 이름들을 iterator로 담음
         Iterator<String> iterator = files.getFileNames();
-
-        int order_seq = 1;
 
         while(iterator.hasNext()) {
             //파일명으로 파일 리스트 꺼내오기
@@ -52,12 +41,16 @@ public class FileUtils {
                 String save_name = uniqueName + mf.getOriginalFilename();
                 System.out.println("SAVE_NAME : " + save_name);
 
+                int fileSize = (((int)mf.getSize() / 1024) / 1024); // MB 사이즈
+                System.out.println("FILE_SIZE : " + fileSize);
+
                 FileVO boardFile = new FileVO();
-                boardFile.setSeq(seq);
-                boardFile.setOrder_seq(order_seq);
+                boardFile.setB_num(seq);
+                boardFile.setDivision_num(order_seq);
                 boardFile.setTbl_type(tbl_type);
                 boardFile.setFile_name(mf.getOriginalFilename());
                 boardFile.setFile_saveName(save_name);
+                boardFile.setFile_size(fileSize);
 //                boardFile.setFile_path(filePath);
                 boardFile.setFile_path(filePath + "\\" + save_name);
                 fileList.add(boardFile);
