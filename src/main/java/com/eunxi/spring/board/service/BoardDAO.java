@@ -18,13 +18,9 @@ public class BoardDAO {
     public List<BoardVO> getBoardList(BoardVO vo){
         int limit = vo.getListSize();
         int offset = ( vo.getPage() - 1 ) * limit;
-//        int limit = 10;
-//        int offset = 1;
 
         RowBounds rowBounds = new RowBounds(offset, limit);
         System.out.println(vo);
-        //list size  = 10
-        //page = 2
 
         return session.selectList("boardDao.getBoardList", vo, rowBounds);
     }

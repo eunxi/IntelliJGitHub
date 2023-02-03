@@ -1,11 +1,8 @@
 package com.eunxi.spring.board.service;
 
 import com.eunxi.spring.file.service.FileDAO;
-import com.eunxi.spring.file.service.FileUtils;
-import com.eunxi.spring.file.service.FileVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

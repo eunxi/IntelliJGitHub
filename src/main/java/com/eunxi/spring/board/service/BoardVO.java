@@ -5,15 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.xml.bind.annotation.XmlTransient;
 import java.util.Date;
 
 @Setter
 @Getter
 @ToString
-// BoardVO에 extends하고 PageVO 선언하여 사용 가능하도록 진행
 public class BoardVO {
     // DB
     private int no; // sql문에서 rownum을 같이 하나로 넘겨주는거니깐, 얘도 함께 넘겨줘야함!!!!
@@ -30,8 +27,6 @@ public class BoardVO {
 
     // 페이징
     private int page;
-//    private int startList = 1; // 시작 페이지
-//    private int listSize = 10;  // 한 페이지에 보여줄 레코드 수
     private int startList; // 시작 페이지
     private int listSize;  // 한 페이지에 보여줄 레코드 수
 

@@ -171,7 +171,7 @@
                         <c:set var="allCount" value="${allCount - 1}"/>
                     </td>
                     <td>
-                        <a href="/board/board_detail?board_seq=${list.board_seq}&seq=${allCount}&page=${allSearch.page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}">${list.board_title}</a>
+                        <a href="/board/board_detail?board_seq=${list.board_seq}&page=${allSearch.page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}">${list.board_title}</a>
                     </td>
                     <td>${list.user_id}</td>
                     <td>
@@ -460,7 +460,7 @@
                         '<td>' + result[i].no +
                         '<input type="hidden" name="board_seq" id="board_seq" value="' + result[i].board_seq + '"/></td>' +
                         '<td>' +
-                        '<a href="/board/board_detail?board_seq=' + result[i].board_seq + '&seq=' + result[i].no + '&page=' + now_page + '&listSize=' + listSize + '&type=' + type + '&searchKeyword=' + searchKeyword + '">' + result[i].board_title + '</a></td>' +
+                        '<a href="/board/board_detail?board_seq=' + result[i].board_seq +/* '&seq=' + result[i].no + */'&page=' + now_page + '&listSize=' + listSize + '&type=' + type + '&searchKeyword=' + searchKeyword + '">' + result[i].board_title + '</a></td>' +
                         '<td>' + result[i].user_id + '</td>' +
                         '<td>' + result[i].board_date + '</td>' +
                         '<td>' + result[i].board_cnt + '</td>'

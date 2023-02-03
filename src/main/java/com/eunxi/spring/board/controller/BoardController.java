@@ -5,7 +5,8 @@ import com.eunxi.spring.board.service.BoardVO;
 import com.eunxi.spring.file.service.FileService;
 import com.eunxi.spring.file.service.FileUtils;
 import com.eunxi.spring.file.service.FileVO;
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.eunxi.spring.reply.service.ReplyService;
+import com.eunxi.spring.reply.service.ReplyVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +30,9 @@ public class BoardController {
 
     @Autowired
     FileService fileService;
+
+    @Autowired
+    ReplyService replyService;
 
     @GetMapping("/board_list")
     public String getBoardList(BoardVO vo, Model model, String type, @RequestParam(value = "listSize", defaultValue = "10") int listSize) {
@@ -182,6 +187,25 @@ public class BoardController {
         for(int i = 0; i < fileList.size(); i++){
             System.out.println(fileList.get(i));
         }
+
+        System.out.println("상세보기 board_seq :" + board_seq);
+
+        // 댓글 조회 부분 - 게시글 읽어오면서 댓글 읽어오는 방식 사용 - Map 활용
+        Map<String, Object> map = new HashMap<>();
+        map.put("b_num", board_seq);
+        map.put("tbl_type", "B");
+
+        List<ReplyVO> reply_list = replyService.replyList(map);
+
+        System.out.println("상세보기 댓글 구현 reply_list");
+        for(int i = 0; i < reply_list.size(); i++){
+            System.out.println(reply_list.get(i));
+        }
+
+        int reply_total = reply_list.size();
+
+        model.addAttribute("reply", reply_list);
+        model.addAttribute("reply_total", reply_total);
 
         return "/board/board_detail";
     }

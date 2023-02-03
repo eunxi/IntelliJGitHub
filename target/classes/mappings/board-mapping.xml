@@ -13,19 +13,7 @@
 	<result property="board_anonymous" column="BOARD_ANONYMOUS" />
 </resultMap>
 
-<resultMap type="file" id="fileResult">
-    <result property="file_seq" column="FILE_SEQ" />
-    <result property="type" column="TYPE" />
-    <result property="seq" column="SEQ" />
-    <result property="order_seq" column="ORDER_SEQ" />
-    <result property="file_path" column="FILE_PATH" />
-    <result property="file_name" column="FILE_NAME" />
-    <result property="file_date" column="FILE_DATE" />
-    <result property="file_downCnt" column="FILE_CNT" />
-</resultMap>
-
-	<!-- 재사용 가능한 SQL 정의, include 로 불러오기 가능 -->
-	<!-- 검색 조건문 -->
+	<!-- 재사용 가능한 SQL 정의, include 로 불러오기 가능 | 검색 조건문 -->
 	<sql id="boardSearch">
 		<trim prefix="where (" suffix=")" prefixOverrides="OR">
 			<trim prefix="OR">
@@ -45,8 +33,7 @@
 	</sql>
 
 	<!-- 게시판 목록 -->
-	<!-- if : 검색 조건 없이 화면 이동함으로써 값이 없는 에러 방지를 위해 작성 -->
-	<!-- @rownum 사용해서 리스트 출력 -->
+	<!-- if : 검색 조건 없이 화면 이동함으로써 값이 없는 에러 방지를 위해 작성 | @rownum 사용해서 리스트 출력 -->
 	<select id="getBoardList" resultType="board">
 		<![CDATA[
 		SELECT A.* FROM
@@ -107,8 +94,7 @@
 		)
 	</insert>
 
-	<!-- 상세 화면 -->
-	<!-- 파라미터 int, 반환 BoardVO -->
+	<!-- 상세 화면 | 파라미터 int, 반환 BoardVO -->
 	<select id="getBoard" parameterType="int" resultType="board">
 		SELECT
 		board_seq,

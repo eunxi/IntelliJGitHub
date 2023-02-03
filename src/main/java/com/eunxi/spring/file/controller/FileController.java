@@ -1,20 +1,16 @@
 package com.eunxi.spring.file.controller;
 
 import com.eunxi.spring.file.service.FileService;
-import com.eunxi.spring.file.service.FileUtils;
 import com.eunxi.spring.file.service.FileVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 public class FileController {
@@ -27,10 +23,6 @@ public class FileController {
     @ResponseBody
     public void file_download(@PathVariable("file_seq") int file_seq, @PathVariable("b_num") int b_num, HttpServletResponse response) throws Exception {
         System.out.println("FILE Download Controller");
-
-        System.out.println(">>> b_num" + b_num);
-
-        int o_seq = 1;
 
         List<FileVO> fileList = fileService.fileDetail(b_num);
         FileVO file_info = fileService.file_downDetail(file_seq);
