@@ -5,15 +5,6 @@
 <head>
 	<title>자유게시판 상세</title>
 	<style>
-		/* 보여주기 */
-		.show{
-			display: block;
-		}
-
-		/* 숨기기 */
-		.hide{
-			display: none;
-		}
 
 		#inner_box {
 			margin : 50px 80px 50px 80px;
@@ -133,20 +124,10 @@
 	<hr style="margin-top: 5%;">
 	<div class="col-8 reply-form" >
 		<p>댓글 [${reply_total}]</p>
-		<!-- 댓글 리스트 -->
-		<c:forEach items="${reply}" var="reply">
-			<div id="">
-			<div id="reply_form_${reply.r_seq}" style="border: 1px solid darkgray; margin-bottom: 2%;">
-				<span id="reply_span${reply.r_seq}">
-					<p style="font-size: small; margin-left: 1%; white-space:pre;" id="reply_content_${reply.r_seq}"> ${reply.r_content}</p>
-						<span style="margin-left: 1%; font-size: small; margin-bottom: 2%;"> <span id="reply_user_${reply.r_seq}">${reply.user_id}</span>
-							<span id="reply_date_${reply.r_seq}"> (<fmt:formatDate  value="${reply.r_date}" type="DATE" pattern="yyyy-MM-dd"/>) </span>
-						<a id="reply_update_${reply.r_seq}" href="#this" onclick="reply_update_form(${reply.r_seq});" style="margin-left: 1%;">수정</a> <a href="#this" onclick="reply_delete_fn();" style="margin-left: 1%;">삭제</a>
-					</p>
-				</span>
-			</div>
-			</div>
-		</c:forEach>
+		<!-- 댓글 리스트 Ajax -->
+		<div id="reply_div">
+
+		</div>
 
 		<!-- 댓글 작성 구간 -->
 		<form method="post" action="/reply/reply_insertAction">
@@ -168,10 +149,6 @@
 				<input type="hidden" id="tbl_type" name="tbl_type" value="B"/>
 			</div>
 		</form>
-
-		<div class="reply_test">
-
-		</div>
 	</div>
 	<!-- 댓글 E -->
 
@@ -181,6 +158,45 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
+	// 댓글 리스트 불러오기
+	$(document).ready(function () {
+		getReply_list();
+	});
+
+	function getReply_list(){
+		let url = "/reply/reply_list/";
+		let b_num = $("#board_seq").val();
+		// let r_seq = $("#");
+
+		$.ajax({
+			url: url + b_num,
+			type: 'post',
+			dataType: 'json',
+			success: function (result) {
+				console.log(result);
+				let html = '';
+				if(result.length < 1){
+					html = "등록된 댓글이 없습니다.";
+				}else{
+					$(result).each(function(){
+						html += '<div id="reply_seq_' + this.r_seq + '" style="border: 1px solid darkgray; margin-bottom: 2%;"><span>' +
+								'<p style="font-size: small; margin-left: 1%;"><pre style="margin-left: 1%;">' + this.r_content + '</pre></p>' +
+								'<span style="margin-left: 1%; font-size: small; margin-bottom: 2%;"> <span>' + this.user_id + '</span>' +
+								'<span> (' + this.r_date + ') </span>' +
+								'<a href="#this" style="margin-left: 1%;" onclick="reply_update_form(' + this.r_seq + ',\'' + this.r_date + '\', \'' + this.r_content + '\', \'' + this.user_id + '\')">수정</a>' +
+								'<a href="#this" style="margin-left: 1%;" onclick="reply_delete_fn(' + this.r_seq + ')">삭제</a></p></span></div>'
+						;
+					})
+				}
+
+				$("#reply_div").append(html);
+			},
+			error: function(error){
+				alert("실패");
+			}
+		})
+	}
+
 	// 댓글 작성 초기화
 	function reply_reset_fn(){
 		document.getElementById("r_content").value='';
@@ -194,6 +210,8 @@
 			return false;
 		}
 
+		let content = $("#r_content").val().replaceAll("\n", "<br/>");
+
 		let data_form = {
 			b_num : $("#board_seq").val(),
 			page : $("#page").val(),
@@ -202,7 +220,7 @@
 			searchKeyword : $("#searchKeyword").val(),
 			tbl_type : $("#tbl_type").val(),
 			user_id : $("#user_id").val(),
-			r_content : $("#r_content").val()
+			r_content : content
 		}
 
 		$.ajax({
@@ -218,37 +236,95 @@
 		});
 	}
 
-	// 댓글 수정
-	function reply_update_form(num){
-		alert("댓글 수정");
-
-/*		console.log(num , "번째 댓글 수정");
-		let reply_update = $("#reply_update_" + num); // 수정 버튼 -> 막아주기
-		let content = $("#reply_content_" + num).html();
-		let user = $("#reply_user_" + num).html();
+	// 댓글 수정 form 변경만 진행
+	function reply_update_form(r_seq, r_date, r_content, user_id){
+		console.log("댓글 수정 데이터 값");
 
 		let html = '';
 
-		html += '<div id="reply_layer_' + num + '"><p style="margin-left: 1%; margin-top: 1%;"><label style="font-size: small;">댓글 작성자</label> <input type="text" readonly name="reply_update_user" id="reply_update_user" style="width: 200px; height: 30px;" value="' + user + '">' +
-				'<button style="margin-left: 15%;" type="button" onclick="reply_insert_fn(' + num + ');">수정</button>' +
-				'<button style="margin-left: 1%;" type="button" onclick="rollback(' + num + ');">취소</button></p>' +
-				'<p style="margin-left: 1%;" id="text_form"><textarea name="reply_update_content" id="reply_update_content" placeholder="댓글을 작성해주세요.">' + content + '</textarea></p></div>';
+		r_content = r_content.replaceAll("<br/>", "\n");
+		r_content = r_content.replaceAll("<br>", "\n");
+		r_content = r_content.replaceAll("</a>", "");
 
-		$("#reply_form_" + num).append(html);*/
+		html += '<div id="reply_seq_' + r_seq + '"><p>' +
+				'<label style="font-size: small;">댓글 작성자</label> <input type="text" disabled style="width: 200px; height: 30px;" value="' + user_id + '">' +
+				'<button style="margin-left: 11%;" type="button" onclick="update_btn(' + r_seq + ');">수정</button>' +
+				'<button style="margin-left: 1%;" type="button" onclick="location.reload();">취소</button></p>' +
+				'<p id="text_form"><textarea id="update_content_' + r_seq + '" placeholder="댓글을 작성해주세요.">' + r_content + '</textarea></p></div>';
+
+		$("#reply_seq_" + r_seq).replaceWith(html);
 	}
 
-/*	function rollback(no){
-		console.log(no);
-		$("#reply_layer_" + no).remove();
-	}*/
+	// 댓글 수정 ajax
+	function update_btn(r_seq){
+		if($("#update_content_" + r_seq).val() == ''){
+			alert("댓글을 입력해주세요");
+			$("#update_content_" + r_seq).focus();
+			return false;
+		}
 
-/*	// 수정 ajax
-	function reply_insert_fn(){
-	}*/
+		console.log("r_seq : " + r_seq);
+		let content = $("#update_content_" + r_seq).val().replaceAll("\n", "<br/>");
+
+		let data_form = {
+			r_seq : r_seq,
+			r_content : content,
+			b_num : $("#board_seq").val(),
+			page : $("#page").val(),
+			list_size : $("#listSize").val(),
+			type : $("#type").val(),
+			searchKeyword : $("#searchKeyword").val(),
+			tbl_type : $("#tbl_type").val(),
+			user_id : $("#user_id").val()
+		}
+
+		$.ajax({
+			url: '/reply/reply_updateAction',
+			type: 'post',
+			data: data_form,
+			success: function(result){
+				location.href = "/board/board_detail?board_seq=" + data_form.b_num + "&page=" + data_form.page + "&listSize=" + data_form.list_size + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
+			},
+			error: function (error) {
+				alert("댓글 수정 ajax 실패");
+			}
+		});
+	}
 
 	// 댓글 삭제
-	function reply_delete_fn(){
+	function reply_delete_fn(r_seq){
 		alert("댓글 삭제");
+
+		// let content = $("#update_content_" + r_seq).val();
+
+		let data_form = {
+			r_seq : r_seq,
+			// r_content : content,
+			b_num : $("#board_seq").val(),
+			page : $("#page").val(),
+			list_size : $("#listSize").val(),
+			type : $("#type").val(),
+			searchKeyword : $("#searchKeyword").val(),
+			tbl_type : $("#tbl_type").val(),
+			user_id : $("#user_id").val()
+		}
+
+		console.log(data_form);
+
+		$.ajax({
+			url: '/reply/reply_delete',
+			type: 'post',
+			data: data_form,
+			success: function(result){
+				// console.log("댓글 삭제 성공!");
+				location.href = "/board/board_detail?board_seq=" + data_form.b_num + "&page=" + data_form.page + "&listSize=" + data_form.list_size + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
+
+			},
+			error: function (error) {
+				alert("댓글 삭제 실패!");
+			}
+		})
+
 	}
 
 	// 수정

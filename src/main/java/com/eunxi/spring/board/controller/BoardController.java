@@ -190,23 +190,6 @@ public class BoardController {
 
         System.out.println("상세보기 board_seq :" + board_seq);
 
-        // 댓글 조회 부분 - 게시글 읽어오면서 댓글 읽어오는 방식 사용 - Map 활용
-        Map<String, Object> map = new HashMap<>();
-        map.put("b_num", board_seq);
-        map.put("tbl_type", "B");
-
-        List<ReplyVO> reply_list = replyService.replyList(map);
-
-        System.out.println("상세보기 댓글 구현 reply_list");
-        for(int i = 0; i < reply_list.size(); i++){
-            System.out.println(reply_list.get(i));
-        }
-
-        int reply_total = reply_list.size();
-
-        model.addAttribute("reply", reply_list);
-        model.addAttribute("reply_total", reply_total);
-
         return "/board/board_detail";
     }
 
