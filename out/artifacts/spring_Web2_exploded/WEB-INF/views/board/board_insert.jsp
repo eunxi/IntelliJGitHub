@@ -239,12 +239,6 @@
             return false;
         }
 
-        // if ($("#board_anonymous").val() == 0 || $("#user_id").val() == "" || blank_pattern.test($("#user_id").val()) == true) {
-        //     alert("작성자를 입력해주세요");
-        //     $("#user_id").focus();
-        //     return false;
-        // }
-
         if ($("#board_content").val() == "") {
             alert("내용을 입력해주세요");
             $("#board_content").focus();

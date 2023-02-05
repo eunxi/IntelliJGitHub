@@ -72,7 +72,7 @@ public class BoardController {
         model.addAttribute("boardList", boardList); // 목록
         model.addAttribute("cnt", total_cnt); // 보여질 내용 수(전체 게시글 수)
         model.addAttribute("page", cnt / vo.getListSize() + 1); // 총 페이지
-        model.addAttribute("allCount", cnt); // 게시글 총 개수 - 목록에서 사용하는 총 개수 변수
+        model.addAttribute("allCountr", cnt); // 게시글 총 개수 - 목록에서 사용하는 총 개수 변수
         model.addAttribute("all_count", all_count); // 게시글 총 개수2 - ajax에서 사용하는 총 개수 변수
         model.addAttribute("allPage", vo.getPage()); // 현재 페이지
         model.addAttribute("allSearch", vo); // 검색할 내용 넘겨주기 - vo에 같이 넣어놨음
@@ -183,12 +183,46 @@ public class BoardController {
 
         model.addAttribute("fileList", fileList);
 
-        System.out.println("상세보기 - file List");
-        for(int i = 0; i < fileList.size(); i++){
-            System.out.println(fileList.get(i));
+        // 댓글 페이징
+        ReplyVO reply = new ReplyVO();
+        reply.setAmount(10);
+
+        if(reply.getPage() == 0){
+            reply.setPage(1);
         }
 
-        System.out.println("상세보기 board_seq :" + board_seq);
+        int reply_total = replyService.replyTotal(board_seq); // 댓글 전체 개수
+        int reply_cnt = replyService.replyTotal(board_seq); // 댓글 전체 개수
+        int reply_amount = reply.getAmount();
+        int reply_num = reply_total - (reply.getPage() - 1) * reply.getAmount();
+        System.out.println("reply_num = " + reply_num);
+
+        if(reply_total % reply.getAmount() == 0){
+            reply_total--;
+        }
+
+        // startPage
+        if(reply.getPage() < 5){
+            model.addAttribute("startPage", 1);
+        }else{
+            model.addAttribute("startPage", ((reply.getPage() - 1) / reply_amount * reply_amount + 1));
+        }
+
+        // endPage
+        if(reply.getPage() + 2 > reply_total / reply.getAmount() + 1){
+            model.addAttribute("endPage", reply_cnt / reply.getAmount() + 1);
+        }else {
+            model.addAttribute("endPage", ((reply.getPage() - 1) / reply_amount * reply_amount + 1) + reply_amount - 1);
+        }
+
+        System.out.println("상세 화면 reply VO" + reply);
+
+        model.addAttribute("reply_num", reply_num); // 보여질 댓글 수
+        model.addAttribute("r_allPage", reply_total / reply.getAmount() + 1); // 총 페이지
+        model.addAttribute("r_total", reply_total); // 댓글 총 개수
+        model.addAttribute("reply_cnt", reply_cnt); // 댓글 총 개수 (ajax 사용)
+        model.addAttribute("r_page", reply.getPage()); // 현재 페이지
+        model.addAttribute("r_amount", reply_amount); // 보여질 개수
 
         return "/board/board_detail";
     }

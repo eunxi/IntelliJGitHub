@@ -30,6 +30,12 @@
 			color: black;
 		}
 
+		.active {
+			background-color: skyblue;
+			width: 30px;
+			height: 30px;
+		}
+
 		.update_btn {
 			font-size: 18px;
 			border: none;
@@ -67,6 +73,20 @@
 			width: 40%;
 			height: 6.25em;
 			resize: none;
+		}
+
+		ul {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		li {
+			margin: 0 2% 0 0;
+			padding: 0 0 0 0;
+			border: 0;
+			float: left;
+			text-align: center;
 		}
 
 	</style>
@@ -123,11 +143,7 @@
 	<!-- 댓글 S -->
 	<hr style="margin-top: 5%;">
 	<div class="col-8 reply-form" >
-		<p>댓글 [${reply_total}]</p>
-		<!-- 댓글 리스트 Ajax -->
-		<div id="reply_div">
-
-		</div>
+		<p id="reply_cnt">댓글 [${r_total}]</p>
 
 		<!-- 댓글 작성 구간 -->
 		<form method="post" action="/reply/reply_insertAction">
@@ -147,8 +163,49 @@
 				<input type="hidden" value="${searchVO.type}" name="type" id="type"/>
 				<input type="hidden" value="${searchVO.searchKeyword}" name="searchKeyword" id="searchKeyword"/>
 				<input type="hidden" id="tbl_type" name="tbl_type" value="B"/>
+
+				<input type="text" value="${r_page}" id="r_page"/>
+				<input type="text" value="${r_amount}" id="r_amount"/>
+				<input type="text" value="${endPage}" id="endPage"/>
+
 			</div>
 		</form>
+
+		<!-- 댓글 리스트 Ajax -->
+		<div id="reply_div">
+
+		</div>
+
+		<!-- 댓글 페이징 S -->
+		<div class="reply_pagination" style="margin-left: 45%;">
+			<ul id="pagination">
+				<c:if test="${r_page ne 1}">
+					<li class="page-item"><a class="page-link" href="#">Previous</a></li>
+				</c:if>
+
+				<c:forEach begin="${startPage}" end="${endPage}" var="i">
+					<c:if test="${r_page ne i}">
+						<li class="page-item"><a class="page-link" href="#this"> ${i} </a></li>
+					</c:if>
+
+					<c:if test="${r_page eq i}">
+						<li class="page-item active"><a class="page-link" href="#this"> ${i} </a></li>
+					</c:if>
+				</c:forEach>
+
+				<c:if test="${r_page lt r_total / r_amount}">
+					<li class="page-item"><a class="page-link" href="#">Next</a></li>
+				</c:if>
+			</ul>
+		</div>
+		<!-- 댓글 페이징 E -->
+
+		<div class="scroll_up">
+			<button style="float: right" type="button" onclick="up_btn();">Up</button>
+		</div>
+
+		<div></div>
+
 	</div>
 	<!-- 댓글 E -->
 
@@ -158,25 +215,62 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
+
+	// 댓글 페이징
+	$(document).on('click', '#pagination', function(e){
+        // console.log(($(e.target)).text().trim());
+
+        if($(e.target).text().trim() == "Previous"){
+            $("#r_page").val(Number($("#r_page").val()) - 1);
+        }else if($(e.target).text().trim() == "Next"){
+        	$("#r_page").val(Number($("#r_page").val()) + 1);
+        	// console.log($("#r_page").val(Number($("#r_page").val()) + 1));
+		}else{
+        	$("#r_page").val(Number($(e.target).text()));
+        	// console.log($("#r_page").val(Number($(e.target).text())));
+		}
+
+        let page = Number($("#r_page").val());
+        let b_num = Number($("#board_seq").val());
+
+        console.log("page : " + page);
+        console.log("b_num : " + b_num);
+
+        getReply_list();
+	})
+
+	// 스크롤 위
+	function up_btn(){
+		window.scrollTo(0, 0);
+	}
+
 	// 댓글 리스트 불러오기
 	$(document).ready(function () {
 		getReply_list();
 	});
 
 	function getReply_list(){
-		let url = "/reply/reply_list/";
-		let b_num = $("#board_seq").val();
-		// let r_seq = $("#");
+		let url = "/reply/reply_list";
+		let page = Number($("#r_page").val());
+
+		let data_form = {
+			b_num : $("#board_seq").val(),
+			r_page : $("#r_page").val(),
+			r_amount : $("#r_amount").val()
+		}
+
+		let html = '';
+		let page_html = '';
 
 		$.ajax({
-			url: url + b_num,
+			url: url,
 			type: 'post',
 			dataType: 'json',
+			data : data_form,
 			success: function (result) {
 				console.log(result);
-				let html = '';
 				if(result.length < 1){
-					html = "등록된 댓글이 없습니다.";
+					html = "<div style='font-size: small; color: darkgray;'>등록된 댓글이 없습니다.</div>";
 				}else{
 					$(result).each(function(){
 						html += '<div id="reply_seq_' + this.r_seq + '" style="border: 1px solid darkgray; margin-bottom: 2%;"><span>' +
@@ -187,8 +281,13 @@
 								'<a href="#this" style="margin-left: 1%;" onclick="reply_delete_fn(' + this.r_seq + ')">삭제</a></p></span></div>'
 						;
 					})
-				}
+				};
 
+				let endPage = Number($("#endPage").val());
+				console.log("endPage : " + endPage);
+				console.log("page : " + page); // 댓글 목록에 페이지네이션 연결시작
+				console.log("endPage : " + endPage);
+// pagination
 				$("#reply_div").append(html);
 			},
 			error: function(error){
