@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="replyDao">
+
+	<resultMap type="reply" id="replyResult">
+		<result property="r_seq" column="R_SEQ" />
+		<result property="b_num" column="B_NUM" />
+		<result property="tbl_type" column="TBL_TYPE" />
+		<result property="user_id" column="USER_ID" />
+		<result property="r_content" column="R_CONTENT" />
+		<result property="r_date" column="R_DATE" />
+	</resultMap>
+
+	<!-- 댓글 조회 및 페이징 -->
+	<select id="replyList" parameterType="Map" resultType="reply">
+		<![CDATA[
+		SELECT * FROM
+			(SELECT @ROWNUM := @ROWNUM + 1 AS no,
+					r_seq,
+					b_num,
+					tbl_type,
+					r_content,
+					user_id,
+					r_date
+			 FROM REPLY,
+				  (SELECT @ROWNUM := 0) rnum WHERE b_num = #{b_num} and tbl_type = #{tbl_type})
+		as A WHERE no > (#{page} -1) * #{amount} and no <= #{amount} * #{page};
+		]]>
+	</select>
+
+<!--	<select id="replyList" parameterType="Map" resultType="reply">
+		<![CDATA[
+		SELECT
+			r_seq,
+			b_num,
+			tbl_type,
+			user_id,
+			r_content,
+			r_date
+		FROM REPLY
+		WHERE b_num = #{b_num} and tbl_type = #{tbl_type}
+		]]>
+	</select>-->
+
+	<!-- 댓글 작성 -->
+	<insert id="replyInsert" parameterType="reply">
+		<![CDATA[
+			INSERT INTO REPLY
+			(
+			 b_num,
+			 tbl_type,
+			 user_id,
+			 r_content
+			)
+			VALUES
+			(
+			 #{b_num},
+			 #{tbl_type},
+			 "SYSTEM",
+			 #{r_content}
+			)
+		]]>
+	</insert>
+
+	<!-- 댓글 수정 -->
+	<update id="replyUpdate" parameterType="reply">
+		<![CDATA[
+			UPDATE REPLY SET
+			r_content = #{r_content}
+			WHERE r_seq = #{r_seq}
+		]]>
+	</update>
+
+	<!-- 댓글 삭제 -->
+	<delete id="replyDelete" parameterType="int">
+		DELETE FROM REPLY
+		WHERE r_seq = #{r_seq}
+	</delete>
+
+	<!-- 댓글 개수 -->
+	<select id="replyTotal" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM REPLY
+		WHERE b_num = #{b_num}
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>
