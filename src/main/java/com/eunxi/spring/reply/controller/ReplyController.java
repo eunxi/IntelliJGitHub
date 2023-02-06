@@ -25,10 +25,6 @@ public class ReplyController {
     public List<ReplyVO> reply_list(int b_num, Map<String, Object> map, int r_page, int r_amount){
         System.out.println("Reply List Controller");
 
-        System.out.println("댓글 조회 b_num : " + b_num);
-        System.out.println("댓글 조회 r_page : " + r_page);
-        System.out.println("댓글 조회 r_amount : " + r_amount);
-
         int cnt = replyService.replyTotal(b_num);
 
         map.put("b_num", b_num);

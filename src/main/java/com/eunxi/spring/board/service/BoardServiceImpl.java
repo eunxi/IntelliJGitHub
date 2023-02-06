@@ -57,4 +57,14 @@ public class BoardServiceImpl implements BoardService{
     public int getBoardSeq(BoardVO vo) {
         return boardDao.getBoardSeq(vo);
     }
+
+    @Override
+    public void board_com_insert(BoardVO vo) {
+        boardDao.board_com_insert(vo);
+    }
+
+    @Override
+    public void board_com_update(BoardVO vo) {
+        boardDao.board_com_update(vo);
+    }
 }

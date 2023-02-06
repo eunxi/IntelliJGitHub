@@ -20,7 +20,6 @@ public class BoardDAO {
         int offset = ( vo.getPage() - 1 ) * limit;
 
         RowBounds rowBounds = new RowBounds(offset, limit);
-        System.out.println(vo);
 
         return session.selectList("boardDao.getBoardList", vo, rowBounds);
     }
@@ -58,9 +57,19 @@ public class BoardDAO {
 
     // 게시글 번호 가져오기
     public int getBoardSeq(BoardVO vo){
-        System.out.println("BoardDAO --- getBoardSeq --- VO : " + vo);
 
         return session.selectOne("boardDao.getBoardSeq", vo);
     }
+
+    // 답글 등록
+    public void board_com_insert(BoardVO vo){
+        session.insert("boardDao.board_com_insert", vo);
+    }
+
+    // 답글 step 업데이트
+    public void board_com_update(BoardVO vo){
+        session.update("boardDao.board_com_update", vo);
+    }
+
 
 }

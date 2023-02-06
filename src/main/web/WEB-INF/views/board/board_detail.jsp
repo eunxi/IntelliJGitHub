@@ -15,15 +15,15 @@
 		}
 
 		a:link {
-			color: darkgray;
+			color: black;
 		}
 
 		a:visited {
-			color: darkgray;
+			color: black;
 		}
 
 		a:hover {
-			color: black;
+			color: darkgray;
 		}
 
 		a:active {
@@ -69,6 +69,17 @@
 			cursor: pointer;
 		}
 
+		.comment_btn {
+			font-size: 18px;
+			border: none;
+			background-color: darkgray;
+			width: 50px;
+			height: 30px;
+			border-radius: 15px;
+			color: #fff;
+			cursor: pointer;
+		}
+
 		textarea{
 			width: 40%;
 			height: 6.25em;
@@ -87,6 +98,10 @@
 			border: 0;
 			float: left;
 			text-align: center;
+		}
+
+		#pagination{
+			cursor: pointer;
 		}
 
 	</style>
@@ -134,6 +149,8 @@
 			<a href="javascript:void(0)"><button class="update_btn" type="button">수정</button></a>
 			<a href="javascript:void(0)"><button class="del_btn" type="button">삭제</button></a>
 			<a href="javascript:void(0)"><button class="list_btn" type="button">목록</button></a>
+<%--			<a href="/comment/com_insert"><button class="comment_btn" type="button">답글</button></a>--%>
+			<a href="javascript:void(0)"><button class="comment_btn" type="button">답글</button></a>
 		</div>
 		<!-- 버튼 E -->
 
@@ -156,6 +173,7 @@
 				<p id="text_form">
 					<textarea name="r_content" id="r_content" placeholder="댓글을 작성해주세요."></textarea>
 				</p>
+
 				<!-- 페이지 유지하는데 필요한 데이터 값들 -->
 				<input type="hidden" value="${searchVO.board_seq}" name="board_seq" id="board_seq"/>
 				<input type="hidden" value="${searchVO.page}" name="page" id="page"/>
@@ -164,9 +182,13 @@
 				<input type="hidden" value="${searchVO.searchKeyword}" name="searchKeyword" id="searchKeyword"/>
 				<input type="hidden" id="tbl_type" name="tbl_type" value="B"/>
 
-				<input type="text" value="${r_page}" id="r_page"/>
-				<input type="text" value="${r_amount}" id="r_amount"/>
-				<input type="text" value="${endPage}" id="endPage"/>
+				<input type="hidden" value="${r_page}" id="r_page" name="r_page"/>
+				<input type="hidden" value="${r_amount}" id="r_amount" name="r_amount"/>
+				<input type="hidden" value="${endPage}" id="endPage"/>
+
+				<input type="text" value="${board.step}" id="step" name="step"/>
+				<input type="text" value="${board.indent}" id="indent" name="indent"/>
+				<input type="text" value="${board.root}" id="root" name="root"/>
 
 			</div>
 		</form>
@@ -218,16 +240,13 @@
 
 	// 댓글 페이징
 	$(document).on('click', '#pagination', function(e){
-        // console.log(($(e.target)).text().trim());
 
         if($(e.target).text().trim() == "Previous"){
             $("#r_page").val(Number($("#r_page").val()) - 1);
         }else if($(e.target).text().trim() == "Next"){
         	$("#r_page").val(Number($("#r_page").val()) + 1);
-        	// console.log($("#r_page").val(Number($("#r_page").val()) + 1));
 		}else{
         	$("#r_page").val(Number($(e.target).text()));
-        	// console.log($("#r_page").val(Number($(e.target).text())));
 		}
 
         let page = Number($("#r_page").val());
@@ -250,8 +269,8 @@
 	});
 
 	function getReply_list(){
-		let url = "/reply/reply_list";
 		let page = Number($("#r_page").val());
+		let r_amount = Number($("#r_amount").val());
 
 		let data_form = {
 			b_num : $("#board_seq").val(),
@@ -263,7 +282,7 @@
 		let page_html = '';
 
 		$.ajax({
-			url: url,
+			url: "/reply/reply_list",
 			type: 'post',
 			dataType: 'json',
 			data : data_form,
@@ -284,11 +303,55 @@
 				};
 
 				let endPage = Number($("#endPage").val());
-				console.log("endPage : " + endPage);
-				console.log("page : " + page); // 댓글 목록에 페이지네이션 연결시작
-				console.log("endPage : " + endPage);
-// pagination
+
+				// Pagination
+				let start_page = 0;
+				let end_page = 0
+				let amount = r_amount;
+
+
+				if(start_page < 3){
+					start_page = 1;
+
+				}else{
+					start_page = page - 2;
+				}
+
+				if(page + 2 > end_page){
+					end_page = endPage;
+				}else {
+					end_page = page + 2;
+				}
+
+				if(page > 1){
+					page_html += '<li class="page-item"><a class="page-link">Previous</a></li>';
+				}
+
+				for(let i = start_page; i <= end_page; i++){
+
+					if(page != i){
+						console.log("page != i : " + page + " " + i )
+						page_html += '<li class="page-item"><a class="page-link">' + i + '</a></li>';
+					}
+
+					if(page == i){
+						console.log("page == i : " + page + " " + i )
+						page_html += '<li class="page-item active"><a class="page-link">' + i + '</a></li>';
+					}
+				}
+
+				if(page < endPage){
+					page_html += '<li class="page-item"><a class="page-link">Next</a></li>';
+				}
+
+				// html += '<div class="reply_pagination" style="margin-left: 45%;"><ul id="pagination"></ul></div>';
+
+				$("#reply_div").empty();
 				$("#reply_div").append(html);
+
+				$("#pagination").empty();
+				$("#pagination").append(page_html);
+
 			},
 			error: function(error){
 				alert("실패");
@@ -362,7 +425,6 @@
 			return false;
 		}
 
-		console.log("r_seq : " + r_seq);
 		let content = $("#update_content_" + r_seq).val().replaceAll("\n", "<br/>");
 
 		let data_form = {
@@ -394,11 +456,8 @@
 	function reply_delete_fn(r_seq){
 		alert("댓글 삭제");
 
-		// let content = $("#update_content_" + r_seq).val();
-
 		let data_form = {
 			r_seq : r_seq,
-			// r_content : content,
 			b_num : $("#board_seq").val(),
 			page : $("#page").val(),
 			list_size : $("#listSize").val(),
@@ -415,7 +474,6 @@
 			type: 'post',
 			data: data_form,
 			success: function(result){
-				// console.log("댓글 삭제 성공!");
 				location.href = "/board/board_detail?board_seq=" + data_form.b_num + "&page=" + data_form.page + "&listSize=" + data_form.list_size + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
 
 			},
@@ -425,6 +483,12 @@
 		})
 
 	}
+
+	// 답글
+	$(".comment_btn").click(function(){
+		let url = "/comment/com_insert?board_seq=${searchVO.board_seq}&page=${searchVO.page}&listSize=${searchVO.listSize}&type=${searchVO.type}&searchKeyword=${searchVO.searchKeyword}";
+		location.href = url;
+	})
 
 	// 수정
 	$(".update_btn").click(function(){

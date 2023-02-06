@@ -170,8 +170,11 @@
                         <input type="hidden" name="board_seq" id="board_seq" value="${list.board_seq}"/>
                         <c:set var="allCount" value="${allCount - 1}"/>
                     </td>
-                    <td>
-                        <a href="/board/board_detail?board_seq=${list.board_seq}&page=${allSearch.page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}">${list.board_title}</a>
+                    <td class="board_title">
+                        <c:forEach var="i" begin="1" end="${list.indent}">
+                            ${i eq list.indent ? "RE" : "&nbsp;"}
+                        </c:forEach>
+                        <a href="/board/board_detail?board_seq=${list.board_seq}&page=${allSearch.page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}" style="float: left;">${list.board_title}</a>
                     </td>
                     <td>${list.user_id}</td>
                     <td>
@@ -404,11 +407,9 @@
                 // 화면 페이지 번호
                 for(let i = startPage; i <= endPage; i++){
                     if(Number($("#search_page").val()) != i){
-                        //content += `<li class="page-item"><a class="page-link" href="#">${i}</a></li>`;
                         content += '<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>';
                     }
                     if(Number($("#search_page").val()) == i){
-                        //content += `<li class="page-item active"><a class="page-link" href="#">${i}</a></li>`;
                         content += '<li class="page-item active"><a class="page-link" href="#">' + i + '</a></li>';
                     }
                 }
@@ -460,7 +461,7 @@
                         '<td>' + result[i].no +
                         '<input type="hidden" name="board_seq" id="board_seq" value="' + result[i].board_seq + '"/></td>' +
                         '<td>' +
-                        '<a href="/board/board_detail?board_seq=' + result[i].board_seq +/* '&seq=' + result[i].no + */'&page=' + now_page + '&listSize=' + listSize + '&type=' + type + '&searchKeyword=' + searchKeyword + '">' + result[i].board_title + '</a></td>' +
+                        '<a style="float: left;" href="/board/board_detail?board_seq=' + result[i].board_seq +/* '&seq=' + result[i].no + */'&page=' + now_page + '&listSize=' + listSize + '&type=' + type + '&searchKeyword=' + searchKeyword + '">&nbsp;' + result[i].board_title + '</a></td>' +
                         '<td>' + result[i].user_id + '</td>' +
                         '<td>' + result[i].board_date + '</td>' +
                         '<td>' + result[i].board_cnt + '</td>'

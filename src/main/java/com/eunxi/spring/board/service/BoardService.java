@@ -13,4 +13,8 @@ public interface BoardService {
     void boardDelete(int board_seq); // 삭제
     void getBoardCnt(int board_seq); // 조회수
 
+    void board_com_insert(BoardVO vo); // 답글 등록
+    void board_com_update(BoardVO vo); // 답글 step 업데이트
+
+
 }

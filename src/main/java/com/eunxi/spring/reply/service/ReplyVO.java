@@ -23,7 +23,7 @@ public class ReplyVO {
     private Date r_date; // 댓글 작성 날짜
 
     // 페이징
-    private int page;
-    private int amount;
+    private int r_page = 1;
+    private int r_amount;
     private int startPage;
 }

@@ -25,6 +25,11 @@ public class BoardVO {
     private String board_content;
     private boolean board_anonymous; // 익명 여부
 
+    // 답글
+    private int root;
+    private int step;
+    private int indent;
+
     // 페이징
     private int page;
     private int startList; // 시작 페이지
