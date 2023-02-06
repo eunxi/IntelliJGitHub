@@ -174,7 +174,7 @@
                         <c:forEach var="i" begin="1" end="${list.indent}">
                             ${i eq list.indent ? "RE" : "&nbsp;"}
                         </c:forEach>
-                        <a href="/board/board_detail?board_seq=${list.board_seq}&page=${allSearch.page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}" style="float: left;">${list.board_title}</a>
+                        <a href="/board/board_detail?board_seq=${list.board_seq}&page=${allSearch.page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}" style="float: left;">&nbsp;${list.board_title}</a>
                     </td>
                     <td>${list.user_id}</td>
                     <td>

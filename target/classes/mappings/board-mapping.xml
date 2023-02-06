@@ -44,7 +44,10 @@
 			board_cnt,
 			board_title,
 			board_content,
-			board_anonymous
+			board_anonymous,
+			root,
+			step,
+			indent
 			FROM BOARD,
 			(SELECT @rownum := 0) rnum ) A
 		]]>
@@ -52,6 +55,7 @@
 			<include refid="boardSearch"></include>
         </if>
 		<![CDATA[
+/*			ORDER BY root DESC, indent ASC*/
 			ORDER BY board_seq DESC
 		]]>
 	</select>
@@ -77,7 +81,10 @@
 		board_cnt,
 		board_title,
 		board_content,
-		board_anonymous
+		board_anonymous,
+		root,
+		step,
+		indent
 		)
 		VALUES
 		(
@@ -90,7 +97,10 @@
 		#{board_cnt},
 		#{board_title},
 		#{board_content},
-		#{board_anonymous}
+		#{board_anonymous},
+		#{board_seq},
+		#{step},
+		#{indent}
 		)
 	</insert>
 
@@ -103,7 +113,10 @@
 		board_cnt,
 		board_title,
 		board_content,
-		board_anonymous
+		board_anonymous,
+		root,
+		step,
+		indent
 		FROM BOARD
 		WHERE board_seq = #{board_seq}
 	</select>
@@ -133,6 +146,83 @@
 	<select id="getBoardSeq" parameterType="board" resultType="int">
 		SELECT board_seq FROM BOARD WHERE board_seq = #{board_seq}
 	</select>
+
+	<!-- 답글 등록 -->
+	<insert id="board_com_insert" parameterType="board">
+		<!-- 원글의 step 보다 더 큰 step 을 가진 글이 있다면 해당 글의 step 을 먼저 +1 -->
+		<![CDATA[
+			    INSERT INTO BOARD
+			    (
+					user_id,
+					board_cnt,
+					board_title,
+					board_content,
+					board_anonymous,
+			        root,
+					step,
+					indent
+			    )
+			    VALUES
+			    (
+					"SYSTEM",
+			        #{board_cnt},
+					#{board_title},
+					#{board_content},
+					#{board_anonymous},
+					#{root},
+					#{step} + 1,
+					#{indent} + 1
+			    );
+		]]>
+	</insert>
+
+<!--	 답글 상태 업데이트 | 원글의 step 보다 더 큰 step 을 가진 글이 있다면 해당 글의 step 을 먼저 +1-->
+	<update id="board_com_update" parameterType="board">
+		<![CDATA[
+			UPDATE BOARD SET step = step + 1
+			WHERE root = #{root} AND step > #{step};
+		]]>
+	</update>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
