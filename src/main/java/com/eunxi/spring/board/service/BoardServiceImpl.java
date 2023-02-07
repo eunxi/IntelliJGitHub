@@ -11,9 +11,6 @@ public class BoardServiceImpl implements BoardService{
     @Autowired
     private BoardDAO boardDao;
 
-    @Autowired
-    private FileDAO fileDao;
-
     @Override
     public List<BoardVO> getBoardList(BoardVO vo) {
         if(vo.getPage() == 0){
@@ -67,4 +64,5 @@ public class BoardServiceImpl implements BoardService{
     public void board_com_update(BoardVO vo) {
         boardDao.board_com_update(vo);
     }
+
 }

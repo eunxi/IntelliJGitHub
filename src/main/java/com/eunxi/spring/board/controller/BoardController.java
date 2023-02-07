@@ -43,11 +43,6 @@ public class BoardController {
 
         List<BoardVO> boardList = boardService.getBoardList(vo);
 
-        System.out.println("리스트 boardList 값");
-        for(int i = 0; i < boardList.size(); i++){
-            System.out.println(boardList.get(i));
-        }
-
         int cnt = boardService.getBoardListCnt(vo);
         int all_count = boardService.getBoardListCnt(vo);
 
@@ -129,10 +124,10 @@ public class BoardController {
         return "/board/board_insert";
     }
 
-    // 등록 부분 처리
+    // 등록 부분 처리 -  @RequestParam("file") List<MultipartFile> file 는 불필요해서 제거
     @PostMapping("/board_insertAction")
     @ResponseBody
-    public String boardInsert_action(BoardVO vo, MultipartHttpServletRequest files, @RequestParam("file") List<MultipartFile> file, @RequestParam Map<String, Object> map, @RequestParam("board_anonymous") boolean board_anonymous, RedirectAttributes redirect) throws IOException {
+    public String boardInsert_action(BoardVO vo, MultipartHttpServletRequest files, @RequestParam Map<String, Object> map, @RequestParam("board_anonymous") boolean board_anonymous, RedirectAttributes redirect) throws IOException {
         System.out.println("Board Insert Post Controller");
 
         String title = map.get("board_title").toString(); // map Object를 toString()을 통해 String 타입으로 변경
@@ -332,6 +327,7 @@ public class BoardController {
         System.out.println("Board Delete Controller");
 
         boardService.boardDelete(board_seq);
+        System.out.println("board_delete vo : " + vo.getBoard_state());
 
         redirect.addFlashAttribute("page", vo.getPage());
         redirect.addFlashAttribute("listSize", vo.getListSize());
@@ -339,6 +335,7 @@ public class BoardController {
         redirect.addFlashAttribute("searchKeyword", vo.getSearchKeyword());
 
         return "redirect:/board/board_list?board_seq=" + vo.getBoard_seq() + "&page=" + vo.getPage() + "&listSize=" + vo.getListSize() + "&type" + vo.getType() + "&searchKeyword=" + vo.getSearchKeyword();
+//        return "redirect:/board/board_list";
     }
 
 

@@ -166,21 +166,36 @@
             <tbody class="listData">
             <c:forEach var="list" items="${boardList}">
                 <tr>
-                    <td>${list.no}
+                    <td class="b_no">${list.no}
                         <input type="hidden" name="board_seq" id="board_seq" value="${list.board_seq}"/>
                         <c:set var="allCount" value="${allCount - 1}"/>
                     </td>
-                    <td class="board_title">
-                        <c:forEach var="i" begin="1" end="${list.indent}">
-                            ${i eq list.indent ? "RE" : "&nbsp;"}
-                        </c:forEach>
-                        <a href="/board/board_detail?board_seq=${list.board_seq}&page=${allSearch.page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}" style="float: left;">&nbsp;${list.board_title}</a>
+                    <td class="b_title">
+                        <c:if test="${list.board_state == 'Y'}">
+                            <c:if test="${list.indent == 0}">
+                                <a style="float: left; color: darkgray; ">&nbsp;삭제된 게시글입니다.</a>
+                            </c:if>
+                            <c:if test="${list.indent >= 1}">
+                            <c:forEach var="i" begin="1" end="${list.indent}">
+                                <a style="float: left; color: darkgray; ">&nbsp;&nbsp;${i eq list.indent ? "RE) " : "&nbsp;"}삭제된 게시글입니다.</a>
+                            </c:forEach>
+                            </c:if>
+                        </c:if>
+
+                        <c:if test="${list.board_state != 'Y'}">
+                            <a href="/board/board_detail?board_seq=${list.board_seq}&page=${allSearch.page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}" style="float: left;">&nbsp;
+                                <c:forEach var="i" begin="1" end="${list.indent}">
+                                    ${i eq list.indent ? "RE)" : "&nbsp;"}
+                                </c:forEach>
+                                ${list.board_title}
+                            </a>
+                        </c:if>
                     </td>
-                    <td>${list.user_id}</td>
-                    <td>
+                    <td class="b_user">${list.user_id}</td>
+                    <td class="b_date">
                         <fmt:formatDate value="${list.board_date}" pattern="yyyy-MM-dd"/>
                     </td>
-                    <td>${list.board_cnt}</td>
+                    <td class="b_cnt">${list.board_cnt}</td>
                 </tr>
             </c:forEach>
             </tbody>
@@ -330,11 +345,9 @@
 
         $("#listSize").val(dataPerPage);
 
-        let now_page = $("#search_page").val(); // 현재 페이지 수
         let real_page_end = Math.ceil(Number($("#total_cnt").val()) / Number($("#listSize").val())); // 진짜 총 페이지 - 정수 맞음
 
         $("#total_page").val(real_page_end);
-        let total_page = Number($("#total_page").val()); // 전체 페이지(total_page)에 listSize에 따라 변동되는 real_page_end 값 넣어주기 - 정수 아님
 
         make();
     });
@@ -342,8 +355,6 @@
     // 내용 변경
     function make(){
         let count = 0;
-        let all_count = 0;
-        let dataPerPage = $("#dataPerPage").val(); // option selected 값
         let listSize = Number($("#listSize").val()); // 출력 개수 (VO)
 
         let all_total = Number($("#total_cnt").val()); // 전체 개수
@@ -403,7 +414,6 @@
                     endPage = page + 2;
                 }
 
-                console.log(endPage);
                 // 화면 페이지 번호
                 for(let i = startPage; i <= endPage; i++){
                     if(Number($("#search_page").val()) != i){
@@ -423,7 +433,7 @@
                 // 현재 페이지 번호 변경하는 html
                 let content2 = '';
 
-                content2 += '<span id="page_total">총 ' + all_total + ' 건 | 페이지 ( ' + now_page + ' / ' +  total_page + ' ) </span>';
+                content2 += '<span id="page_total">총 ' + all_total + ' 건 | 페이지 (' + now_page + ' / ' +  total_page + ') </span>';
 
                 $("#page_total").empty();
                 $("#page_total").append(content2);
@@ -449,27 +459,38 @@
             success: function(result){ // Controller의 list가 result로
                 let content = '';
 
-                console.log("now_page: " + now_page);
-                console.log("listSize: " + listSize);
-                console.log("type: " + type);
-                console.log("searchKeyword: " + searchKeyword);
-                console.log("count: " + count);
-
                 for(let i = 0; i < result.length; i++){
                     content +=
                         '<tr>' +
                         '<td>' + result[i].no +
                         '<input type="hidden" name="board_seq" id="board_seq" value="' + result[i].board_seq + '"/></td>' +
-                        '<td>' +
-                        '<a style="float: left;" href="/board/board_detail?board_seq=' + result[i].board_seq +/* '&seq=' + result[i].no + */'&page=' + now_page + '&listSize=' + listSize + '&type=' + type + '&searchKeyword=' + searchKeyword + '">&nbsp;' + result[i].board_title + '</a></td>' +
-                        '<td>' + result[i].user_id + '</td>' +
-                        '<td>' + result[i].board_date + '</td>' +
-                        '<td>' + result[i].board_cnt + '</td>'
-                    ;
+                        '<td>';
+
+                    if(result[i].board_state == 'Y'){
+
+                        if(result[i].indent == 0){
+                            content += '<a style="float: left; color: darkgray; ">&nbsp;삭제된 게시글입니다.</a>';
+                        }else if(result[i].indent >= 1){
+                            content += '<a style="float: left; color: darkgray; ">&nbsp;&nbsp;';
+                                for(let j = 1; j <= result[i].indent; j++){
+                                    content += (j == result[i].indent ? 'RE) ' : '&nbsp; ') + '삭제된 게시글입니다.</a>';
+                                }
+                        }
+
+                    }else if(result[i].board_state != 'Y'){
+                        content += '<a style="float: left;" href="/board/board_detail?board_seq=' + result[i].board_seq + '&page=' + now_page + '&listSize=' + listSize + '&type=' + type + '&searchKeyword=' + searchKeyword + '">&nbsp;&nbsp;';
+
+                        for(let j = 1; j <= result[i].indent; j++){
+                            content += (j == result[i].indent ? 'RE) ' : '&nbsp;');
+                        }
+                        content += result[i].board_title;
+                    }
+
+                    content += '</a></td>' + '<td>' + result[i].user_id + '</td>' + '<td>' + result[i].board_date + '</td>' + '<td>' + result[i].board_cnt + '</td>' ;
                 }
 
-                $("#sort_table tbody").empty();
-                $("#sort_table tbody").append(content);
+                $(".listData").empty();
+                $(".listData").append(content);
 
             },
             error: function(error){

@@ -36,9 +36,9 @@
 	<!-- if : 검색 조건 없이 화면 이동함으로써 값이 없는 에러 방지를 위해 작성 | @rownum 사용해서 리스트 출력 -->
 	<select id="getBoardList" resultType="board">
 		<![CDATA[
-		SELECT A.* FROM
-			(SELECT @rownum := @rownum + 1 AS no,
-			board_seq,
+        SELECT
+            no,
+            board_seq,
 			user_id,
 			board_date,
 			board_cnt,
@@ -47,17 +47,31 @@
 			board_anonymous,
 			root,
 			step,
-			indent
-			FROM BOARD,
-			(SELECT @rownum := 0) rnum ) A
-		]]>
-        <if test="searchKeyword != null and searchKeyword != ''">
-			<include refid="boardSearch"></include>
-        </if>
-		<![CDATA[
-/*			ORDER BY root DESC, indent ASC*/
-			ORDER BY board_seq DESC
-		]]>
+			indent,
+		   board_state
+        FROM
+        (SELECT @rownum := @rownum + 1 AS no, A.* FROM
+            (SELECT
+				board_seq,
+				user_id,
+				board_date,
+				board_cnt,
+				board_title,
+				board_content,
+				board_anonymous,
+				root,
+				step,
+				indent,
+				board_state
+            FROM BOARD, (SELECT @rownum := 0) A
+        ]]>
+                <if test="searchKeyword != null and searchKeyword != ''">
+                    <include refid="boardSearch"></include>
+                </if>
+        <![CDATA[
+                ORDER BY root DESC, step ASC) A
+                ORDER BY no ASC) A;
+         ]]>
 	</select>
 
 	<!-- 전체 게시글 수 -->
@@ -72,6 +86,7 @@
 	
 	<!-- 등록 -->
 	<insert id="boardInsert" parameterType="board">
+        <!-- selectKey: 입력 전 특정 키 값을 가져와서 이용 후 처리하는 방식 -->
 		<selectKey resultType="int" keyProperty="board_seq" order="BEFORE">
 			SELECT MAX(board_seq) + 1 FROM BOARD
 		</selectKey>
@@ -84,7 +99,8 @@
 		board_anonymous,
 		root,
 		step,
-		indent
+		indent,
+		board_state
 		)
 		VALUES
 		(
@@ -100,7 +116,8 @@
 		#{board_anonymous},
 		#{board_seq},
 		#{step},
-		#{indent}
+		#{indent},
+		#{board_state}
 		)
 	</insert>
 
@@ -116,7 +133,8 @@
 		board_anonymous,
 		root,
 		step,
-		indent
+		indent,
+		board_state
 		FROM BOARD
 		WHERE board_seq = #{board_seq}
 	</select>
@@ -137,10 +155,14 @@
 	</update>
 
 	<!-- 삭제 -->
-	<delete id="boardDelete" parameterType="int">
+<!--	<delete id="boardDelete" parameterType="int">
 		DELETE FROM BOARD
 		WHERE board_seq = #{board_seq}
-	</delete>
+	</delete>-->
+
+	<update id="boardDelete" parameterType="int">
+		UPDATE BOARD SET board_state = 'Y' WHERE board_seq = #{board_seq}
+	</update>
 
 	<!-- 게시글 번호만 가져오기 -->
 	<select id="getBoardSeq" parameterType="board" resultType="int">
@@ -150,30 +172,38 @@
 	<!-- 답글 등록 -->
 	<insert id="board_com_insert" parameterType="board">
 		<!-- 원글의 step 보다 더 큰 step 을 가진 글이 있다면 해당 글의 step 을 먼저 +1 -->
-		<![CDATA[
-			    INSERT INTO BOARD
-			    (
-					user_id,
-					board_cnt,
-					board_title,
-					board_content,
-					board_anonymous,
-			        root,
-					step,
-					indent
-			    )
-			    VALUES
-			    (
-					"SYSTEM",
-			        #{board_cnt},
-					#{board_title},
-					#{board_content},
-					#{board_anonymous},
-					#{root},
-					#{step} + 1,
-					#{indent} + 1
-			    );
-		]]>
+        <selectKey resultType="int" keyProperty="board_seq" order="BEFORE">
+            SELECT MAX(board_seq) + 1 FROM BOARD
+        </selectKey>
+        INSERT INTO BOARD
+        (
+            user_id,
+            board_cnt,
+            board_title,
+            board_content,
+            board_anonymous,
+            root,
+            step,
+            indent,
+			board_state
+        )
+        VALUES
+        (
+            <if test="board_anonymous == 1">
+            "익명",
+            </if>
+            <if test="board_anonymous == 0">
+            "SYSTEM",
+            </if>
+            #{board_cnt},
+            #{board_title},
+            #{board_content},
+            #{board_anonymous},
+            #{root},
+            #{step} + 1,
+            #{indent} + 1,
+         	#{board_state}
+        );
 	</insert>
 
 <!--	 답글 상태 업데이트 | 원글의 step 보다 더 큰 step 을 가진 글이 있다면 해당 글의 step 을 먼저 +1-->

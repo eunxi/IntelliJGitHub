@@ -8,9 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-// 여러 개의 파일을 담아서 리스트로 던져줄 객체 생성
+// 여러 개의 파일을 담아서 리스트로 던져줄 객체 생성 (파일 개수, 파일 존재하는 게시글 번호, 게시글 타입, 파일 경로, 파일)
 public class FileUtils {
-    public List<FileVO> parseFileInfo(int order_seq, int seq, String tbl_type, String filePath, MultipartHttpServletRequest files) throws IOException {
+    public List<FileVO> parseFileInfo(int file_num, int seq, String tbl_type, String filePath, MultipartHttpServletRequest files) throws IOException {
 
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> FileUtils : " + seq);
         if(ObjectUtils.isEmpty(files)) {
@@ -46,7 +46,7 @@ public class FileUtils {
 
                 FileVO boardFile = new FileVO();
                 boardFile.setB_num(seq);
-                boardFile.setDivision_num(order_seq);
+                boardFile.setDivision_num(file_num);
                 boardFile.setTbl_type(tbl_type);
                 boardFile.setFile_name(mf.getOriginalFilename());
                 boardFile.setFile_saveName(save_name);
@@ -59,7 +59,7 @@ public class FileUtils {
                 file = new File(filePath + "\\" + save_name);
                 mf.transferTo(file);
 
-                order_seq++;
+                file_num++;
             }
         }
 

@@ -80,6 +80,17 @@
 			cursor: pointer;
 		}
 
+		.c_update_btn {
+			font-size: 18px;
+			border: none;
+			background-color: blue;
+			width: 50px;
+			height: 30px;
+			border-radius: 15px;
+			color: #fff;
+			cursor: pointer;
+		}
+
 		textarea{
 			width: 40%;
 			height: 6.25em;
@@ -146,10 +157,15 @@
 
 		<!-- 버튼 S -->
 		<div style="float: right; margin-bottom: 1%;">
-			<a href="javascript:void(0)"><button class="update_btn" type="button">수정</button></a>
+			<c:if test="${board.step >= 1}">
+				<a href="javascript:void(0)"><button class="c_update_btn" type="button">수정</button></a>
+			</c:if>
+
+			<c:if test="${board.step == 0}">
+				<a href="javascript:void(0)"><button class="update_btn" type="button">수정</button></a>
+			</c:if>
 			<a href="javascript:void(0)"><button class="del_btn" type="button">삭제</button></a>
 			<a href="javascript:void(0)"><button class="list_btn" type="button">목록</button></a>
-<%--			<a href="/comment/com_insert"><button class="comment_btn" type="button">답글</button></a>--%>
 			<a href="javascript:void(0)"><button class="comment_btn" type="button">답글</button></a>
 		</div>
 		<!-- 버튼 E -->
@@ -175,7 +191,7 @@
 				</p>
 
 				<!-- 페이지 유지하는데 필요한 데이터 값들 -->
-				<input type="hidden" value="${searchVO.board_seq}" name="board_seq" id="board_seq"/>
+				<input type="text" value="${searchVO.board_seq}" name="board_seq" id="board_seq"/>
 				<input type="hidden" value="${searchVO.page}" name="page" id="page"/>
 				<input type="hidden" value="${searchVO.listSize}" name="listSize" id="listSize"/>
 				<input type="hidden" value="${searchVO.type}" name="type" id="type"/>
@@ -488,6 +504,11 @@
 	$(".comment_btn").click(function(){
 		let url = "/comment/com_insert?board_seq=${searchVO.board_seq}&page=${searchVO.page}&listSize=${searchVO.listSize}&type=${searchVO.type}&searchKeyword=${searchVO.searchKeyword}";
 		location.href = url;
+	})
+
+	// 답글 수정
+	$(".c_update_btn").click(function(){
+		alert("답글 수정!");
 	})
 
 	// 수정

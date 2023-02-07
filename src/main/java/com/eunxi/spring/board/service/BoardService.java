@@ -16,5 +16,4 @@ public interface BoardService {
     void board_com_insert(BoardVO vo); // 답글 등록
     void board_com_update(BoardVO vo); // 답글 step 업데이트
 
-
 }

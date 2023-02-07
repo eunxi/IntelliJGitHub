@@ -173,12 +173,10 @@
             file_arr.push(files[i]);
         }
 
-        // $('#file_upload_list').empty(); // 기존 파일까지 전부다 삭제되기 때문에
-        $('.insert_file').remove(); // 새로 파일이 추가될 때 해당 class 를 이용해서 추가된 파일에서 삭제가 가능하도록
+        $('.insert_file').remove(); // 기존 파일까지 전부 삭제되면 안되기 때문에, 새로운 id / class 값을 주고, 새로 파일이 추가될 때 해당 class 를 이용해서 추가된 파일에서 삭제가 가능하도록 진행
 
         for (let i = 0; i < file_arr.length; i++) {
             let file_size = getByteSize(file_arr[i].size);
-            <%--html += '<c:if test="${not empty fileList}"><c:forEach var="file" items="${fileList}">' + file_arr[i].name + '</c:forEach></c:if>';--%>
             html += '<p id="file_list_' + i + '" class="insert_file" style="font-size: small; margin-left: 13%;">' + file_arr[i].name +
                 '<b style="display: none" id="file_' + i + '"> ' + i +
                 ' </b><span> (' + file_size + ') </span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="new_file_delete(\'' + i + '\')">삭제</a></p>';
