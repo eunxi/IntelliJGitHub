@@ -99,8 +99,7 @@
 		board_anonymous,
 		root,
 		step,
-		indent,
-		board_state
+		indent
 		)
 		VALUES
 		(
@@ -116,8 +115,7 @@
 		#{board_anonymous},
 		#{board_seq},
 		#{step},
-		#{indent},
-		#{board_state}
+		#{indent}
 		)
 	</insert>
 
@@ -144,7 +142,7 @@
 		UPDATE BOARD SET board_cnt = board_cnt + 1 WHERE board_seq = #{board_seq}
 	</update>
 
-	<!-- 수정 -->
+	<!-- 수정 (게시글 & 답글) -->
 	<update id="boardUpdate" parameterType="board">
 		UPDATE BOARD SET
 		board_title = #{board_title},
@@ -154,7 +152,7 @@
 		WHERE board_seq = #{board_seq}
 	</update>
 
-	<!-- 삭제 -->
+	<!-- 삭제 (게시글 & 답글) -->
 <!--	<delete id="boardDelete" parameterType="int">
 		DELETE FROM BOARD
 		WHERE board_seq = #{board_seq}
@@ -184,8 +182,7 @@
             board_anonymous,
             root,
             step,
-            indent,
-			board_state
+            indent
         )
         VALUES
         (
@@ -201,21 +198,17 @@
             #{board_anonymous},
             #{root},
             #{step} + 1,
-            #{indent} + 1,
-         	#{board_state}
+            #{indent} + 1
         );
 	</insert>
 
-<!--	 답글 상태 업데이트 | 원글의 step 보다 더 큰 step 을 가진 글이 있다면 해당 글의 step 을 먼저 +1-->
+	<!-- 답글 상태 업데이트 | 원글의 step 보다 더 큰 step 을 가진 글이 있다면 해당 글의 step 을 먼저 +1-->
 	<update id="board_com_update" parameterType="board">
 		<![CDATA[
 			UPDATE BOARD SET step = step + 1
 			WHERE root = #{root} AND step > #{step};
 		]]>
 	</update>
-
-
-
 
 
 

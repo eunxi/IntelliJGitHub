@@ -86,7 +86,7 @@ public class BoardController {
     @PostMapping(value = "/ajax_list.do")
     @ResponseBody
     public List<BoardVO> ajax_list(int search_page, int listSize, String type, String searchKeyword) throws IOException {
-        System.out.println("------------------> Ajax List Controller");
+        System.out.println("Ajax List Controller");
         BoardVO vo = new BoardVO();
 
         // 먼저 넣고 빼오기(set -> get)
@@ -103,7 +103,7 @@ public class BoardController {
     @PostMapping("/ajax_cnt.do")
     @ResponseBody
     public int ajax_cnt(int search_page, int listSize, String type, String searchKeyword) {
-        System.out.println("------------------> Ajax Count Controller");
+        System.out.println("Ajax Count Controller");
         BoardVO vo = new BoardVO();
 
         vo.setPage(search_page); // 페이지 번호 지정
@@ -159,7 +159,7 @@ public class BoardController {
         return "redirect:/board/board_list";
     }
 
-    // 상세 화면
+    // 상세 화면 (게시글, 답글)
     @GetMapping("/board_detail")
     public String getBoard(@RequestParam("board_seq") int board_seq, Model model, BoardVO vo) throws UnsupportedEncodingException {
         System.out.println("Board Detail Controller");
@@ -180,19 +180,14 @@ public class BoardController {
 
         model.addAttribute("fileList", fileList);
 
-        System.out.println("상세보기 getBoard : " + getBoard);
-
         // reply pagination
         ReplyVO reply = new ReplyVO();
         reply.setR_amount(10);
-
-        System.out.println("상세 화면 page : " + reply.getR_page());
 
         int reply_total = replyService.replyTotal(board_seq); // 댓글 전체 개수
         int reply_cnt = replyService.replyTotal(board_seq); // 댓글 전체 개수
         int reply_amount = reply.getR_amount();
         int reply_num = reply_total - (reply.getR_page() - 1) * reply.getR_amount();
-        System.out.println("reply_num = " + reply_num);
 
         if(reply_total % reply.getR_amount() == 0){
             reply_total--;
@@ -260,23 +255,19 @@ public class BoardController {
 
         // 삭제하는 파일의 order_seq 확인 후, 삭제 진행
         for(int i = 0; i < delete_file.size(); i++){
-            System.out.println(delete_file);
             fileService.fileListDelete(delete_file.get(i));
         }
 
-        // 삭제 후 값을 구하면 order_seq 가 달라질까?
         List<FileVO> list = fileService.fileDetail(board_seq);
         int division_num = list.size();
 
         // order_seq 가 0 이라면, 1부터 시작
         int order_seq = division_num;
-        System.out.println("order_seq : " + order_seq);
 
         if(division_num == 0){
             order_seq = 1;
         }else{
             order_seq += division_num;
-            System.out.println("순번 지정 후 " + order_seq);
         }
 
         String title = map.get("board_title").toString();
@@ -294,10 +285,6 @@ public class BoardController {
         vo.setListSize(listSize);
         vo.setType(type);
         vo.setSearchKeyword(searchKeyword);
-
-        int file_size = file.size();
-
-        System.out.println("----------------------- UPDATE BOARD : " + vo);
 
         // 파일 업로드 코드
         String file_path = "C:\\SAVE\\upload\\board";

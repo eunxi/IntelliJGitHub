@@ -24,7 +24,7 @@ public class BoardVO {
     private String board_title;
     private String board_content;
     private boolean board_anonymous; // 익명 여부
-    private String board_state;
+    private String board_state; // 삭제 상태
 
     // 답글
     private int root;

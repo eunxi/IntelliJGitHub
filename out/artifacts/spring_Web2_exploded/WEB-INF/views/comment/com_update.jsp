@@ -69,39 +69,38 @@
 </head>
 <body>
 <div class="row" id="inner_box">
-    <form action="/comment/com_insertAction" id="insert_form" method="post" enctype="multipart/form-data">
+    <form action="/comment/com_updateAction" method="post" enctype="multipart/form-data">
         <div class="col-2"></div>
 
         <div class="col-8" style="height: 50%;">
             <div>
-                <h3>답글 작성</h3>
+                <h3>답글 수정</h3>
             </div>
 
-            <!-- 답글 작성 S -->
+            <!-- 답글 수정 S -->
             <div>
                 <hr>
                 <div>
                     제목
-                    <input type="text" id="board_title" name="board_title" style="width: 80%; margin-left: 10%">
+                    <input type="text" value="${board.board_title}" id="board_title" name="board_title" style="width: 80%; margin-left: 10%">
                 </div>
 
                 <hr>
                 <div>
                     작성자
-                    <input type="text" id="user_id" name="user_id" disabled style="width: 20%; margin-left: 9%;">
+                    <input type="text" value="${board.user_id}" readonly id="user_id" name="user_id" disabled style="width: 20%; margin-left: 9%;">
                 </div>
                 <hr>
 
                 <div>
                     익명여부
-                    <input type="checkbox" value="1" id="board_anonymous" name="board_anonymous"
-                           style="margin-left: 8%;">&nbsp;해당 게시글을 익명으로 작성합니다.
+                    <input type="checkbox" value="1" id="board_anonymous" name="board_anonymous" style="margin-left: 8%;">&nbsp;해당 게시글을 익명으로 작성합니다.
                 </div>
                 <hr>
 
                 <div style="display: flex;">
                     내용
-                    <textarea id="board_content" name="board_content" style="margin-left: 10%"></textarea>
+                    <textarea id="board_content" name="board_content" style="margin-left: 10%">${board.board_content}</textarea>
                 </div>
                 <hr>
 
@@ -110,33 +109,41 @@
                     <input style="margin-left: 10%;" type="file" id="c_file_select" multiple name="c_file">
 
                     <div id="c_file_upload_form">
+                        <!-- 첨부 파일 존재 -->
+                        <c:forEach var="f" items="${file_list}">
+                            <p id="original_${f.file_seq}" style="font-size: small; margin-left: 13%;">
+                                ${f.file_name}
+                                <b id="f_${f.file_seq}">${f.file_seq}</b>
+                                <span> (${f.file_size}MB)</span>
+                                <a style="margin-left: 1%;" href="#this" onclick="f_del(${f.file_seq})">삭제</a>
+                            </p>
+                        </c:forEach>
 
                     </div>
                 </div>
                 <hr>
 
             </div>
-            <!-- 답글 작성 E -->
+            <!-- 답글 수정 E -->
 
             <!-- 버튼 S -->
             <div class="buttons" style="float: right; margin-bottom: 5%;">
-                <button class="insert_btn" id="btn" type="submit">등록</button>
+                <button class="insert_btn" id="c_btn" type="button">등록</button>
                 <button class="cancel_btn" type="button" onclick="javascript:history.back();">취소</button>
             </div>
             <!-- 버튼 E -->
-
         </div>
 
         <div class="input_tag">
+            <input type="hidden" value="${board.board_seq}" id="board_seq" name="board_seq"/>
             <input type="hidden" value="${board.root}" id="root" name="root"/>
             <input type="hidden" value="${board.step}" id="step" name="step"/>
             <input type="hidden" value="${board.indent}" id="indent" name="indent"/>
 
-<%--            <input type="text" value="${board.board_seq}" />
-            <input type="text" value="${vo.page}" id="page" name="page"/>
-            <input type="text" value="${vo.listSize}" id="listSize" name="listSize"/>
-            <input type="text" value="${vo.searchKeyword}" id="searchKeyword" name="searchKeyword"/>
-            <input type="text" value="${vo.type}" id="type" name="type"/>--%>
+            <input type="hidden" value="${page}" id="page" name="page" />
+            <input type="hidden" value="${listSize}" id="listSize" name="listSize" />
+            <input type="hidden" value="${type}" id="type" name="type" />
+            <input type="hidden" value="${searchKeyword}" id="searchKeyword" name="searchKeyword" />
         </div>
 
     </form>
@@ -144,10 +151,8 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
-
-    // 파일
-    let file_list = new Array();
-    console.log(file_list);
+    let del_file = new Array(); // 기존 파일[]
+    let file_list = new Array(); // 추가 파일[]
 
     // 사이즈 변경
     const getByteSize = (size) => {
@@ -166,80 +171,62 @@
             file_list.push(files[i]);
         }
 
-        console.log(file_list);
-
-        $("#c_file_upload_form").empty();
+        $(".new_file").remove();
 
         for(let i = 0; i < file_list.length; i++){
-            let file_size = getByteSize(file_list[i].size); // 파일 사이즈
-
-            html += '<p id="file_name_'+i+'" style="font-size: small; margin-left: 13%;">' + file_list[i].name +
-                    '<b id="file_'+i+'" >' + i +
-                    '</b> <span>(' + file_size + ')</span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(\'' + i + '\')">삭제</a></p>';
+            let file_size = getByteSize(file_list[i].size);
+            html += '<p class="new_file" id="new_' + i + '" style="font-size: small; margin-left: 13%;">' + file_list[i].name +
+                    '<b id="f_' + i + '">' + i + '</b><span> (' + file_size + ') </span>' +
+                    '<a style="margin-left: 1%;" href="#this" onclick="f_new_del(' + i + ')">삭제</a></p>' ;
         }
 
         $("#c_file_upload_form").append(html);
-
         $("#c_file_select").val('');
+
+        console.log(file_list);
+
     })
 
-    // 파일 삭제
-    function file_delete(num){
-        $("#file_name_" + num).remove();
-
-        file_list.splice(num, 1);
-
-        console.log("num: " + num);
+    // 추가 파일 삭제
+    function f_new_del(num){
+        $("#new_" + num).remove();
 
         let html = '';
+        file_list.splice(num, 1); // 제거 파일 -> 남은 파일은 file_list 에 담겨있음!
 
-        $("#c_file_upload_form").empty();
+        $(".new_file").remove();
 
         for(let i = 0; i < file_list.length; i++){
-            let file_size = getByteSize(file_list[i].size); // 파일 사이즈
+            let file_size = getByteSize(file_list[i].size);
+            html += '<p class="new_file" id="new_' + i + '" style="font-size: small; margin-left: 13%;">' + file_list[i].name +
+                    '<b id="f_' + i + '">' + i + '</b><span> (' + file_size + ') </span>' +
+                    '<a style="margin-left: 1%;" href="#this" onclick="f_new_del(' + i + ')">삭제</a></p>';
 
-            html += '<p id="file_name_' + i +'" style="font-size: small; margin-left: 13%;">' + file_list[i].name +
-                '<b id="file_'+i+'" >' + i +
-                '</b> <span>(' + file_size + ')</span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(\'' + i + '\')">삭제</a></p>';
         }
 
         $("#c_file_upload_form").append(html);
-
-        console.log(file_list);
     }
 
-    // 답글 작성 버튼
-    $(".insert_btn").click(function(){
-        // 익명 여부
+    // 기존 파일 삭제
+    function f_del(num){
+        $("#original_" + num).remove();
+
+        del_file.push(num); // 삭제할 파일 seq 넣어서, server 넘겨주기
+        console.log(del_file);
+    }
+
+    // 등록 버튼 클릭
+    $("#c_btn").click(function(){
+        // 익명 - 체크1, 빈칸undefined
         let anonymous = $("input[type=checkbox]:checked").val();
 
         if(anonymous == 1){
             anonymous = "true";
-            alert("익명의 경우, 수정이 불가능합니다.");
         }else{
             anonymous = "false";
         }
 
-        // formData
-        let formData = new FormData();
-
-        for(let i = 0; i < file_list.length; i++){
-            formData.append("file", file_list[i]);
-        }
-
-        formData.append("board_title" , $("#board_title").val());
-        formData.append("user_id" , $("#user_id").val());
-        formData.append("board_anonymous" , anonymous);
-        formData.append("board_content" , $("#board_content").val());
-        formData.append("root" , $("#root").val());
-        formData.append("step" , $("#step").val());
-        formData.append("indent" , $("#indent").val());
-
-        // formData 확인
-        for(let value of formData.values()) {
-            console.log(value);
-        }
-
+        // 제목, 내용 유효성 검사
         if ($("#board_title").val() == "") {
             alert("제목을 입력해주세요");
             $("#board_title").focus();
@@ -252,31 +239,58 @@
             return false;
         }
 
-        // ajax
+        // formData
+        let formData = new FormData();
+
+        // 삭제할 파일 유무에 따라 다르게 진행(오류)
+        if(del_file.length == 0){
+            formData.append("del_file", 0);
+        }else{
+            for(let i = 0; i < del_file.length; i++){
+                formData.append("del_file", del_file[i]);
+            }
+        }
+
+        // 추가할 파일
+        for(let i = 0; i < file_list.length; i++){
+            formData.append("file", file_list[i]);
+        }
+
+        formData.append("board_seq", $("#board_seq").val());
+        formData.append("board_title", $("#board_title").val());
+        formData.append("user_id", $("#user_id").val());
+        formData.append("board_content", $("#board_content").val());
+        formData.append("board_anonymous", anonymous);
+        formData.append("page", $("#page").val());
+        formData.append("listSize", $("#listSize").val());
+        formData.append("type", $("#type").val());
+        formData.append("searchKeyword", $("#searchKeyword").val());
+        formData.append("root", $("#root").val());
+        formData.append("step", $("#step").val());
+        formData.append("indent", $("#indent").val());
+
+        for(let value of formData.values()){
+            console.log(value);
+        }
+
         $.ajax({
-            url: '/comment/com_insertAction',
+            url: '/comment/com_updateAction',
+            type: 'post',
             processData: false,
             contentType: false,
             enctype: 'multipart/form-data',
             data: formData,
-            type: 'post',
             success: function(result){
-                // 답글 작성한 화면으로 이동할 수 있도록
-                location.href = '/board/board_list';
-
-                /*location.href = "/board/board_detail?board_seq=${board.board_seq}&page=${vo.page}" +
-                    "&listSize=${vo.listSize}" +
-                    "&type=${vo.type}" +
-                    "&searchKeyword=${vo.searchKeyword}";*/
+                location.href = "/board/board_detail?board_seq=${board.board_seq}&page=${page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}";
             },
             error: function (error) {
-                alert("실패!");
+                alert("수정 등록 실패");
                 return false;
             }
         });
-        return false;
 
     })
+
 
 
 

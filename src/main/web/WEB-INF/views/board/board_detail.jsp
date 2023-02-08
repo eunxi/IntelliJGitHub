@@ -191,7 +191,7 @@
 				</p>
 
 				<!-- 페이지 유지하는데 필요한 데이터 값들 -->
-				<input type="text" value="${searchVO.board_seq}" name="board_seq" id="board_seq"/>
+				<input type="hidden" value="${searchVO.board_seq}" name="board_seq" id="board_seq"/>
 				<input type="hidden" value="${searchVO.page}" name="page" id="page"/>
 				<input type="hidden" value="${searchVO.listSize}" name="listSize" id="listSize"/>
 				<input type="hidden" value="${searchVO.type}" name="type" id="type"/>
@@ -202,9 +202,9 @@
 				<input type="hidden" value="${r_amount}" id="r_amount" name="r_amount"/>
 				<input type="hidden" value="${endPage}" id="endPage"/>
 
-				<input type="text" value="${board.step}" id="step" name="step"/>
-				<input type="text" value="${board.indent}" id="indent" name="indent"/>
-				<input type="text" value="${board.root}" id="root" name="root"/>
+				<input type="hidden" value="${board.step}" id="step" name="step"/>
+				<input type="hidden" value="${board.indent}" id="indent" name="indent"/>
+				<input type="hidden" value="${board.root}" id="root" name="root"/>
 
 			</div>
 		</form>
@@ -346,12 +346,10 @@
 				for(let i = start_page; i <= end_page; i++){
 
 					if(page != i){
-						console.log("page != i : " + page + " " + i )
 						page_html += '<li class="page-item"><a class="page-link">' + i + '</a></li>';
 					}
 
 					if(page == i){
-						console.log("page == i : " + page + " " + i )
 						page_html += '<li class="page-item active"><a class="page-link">' + i + '</a></li>';
 					}
 				}
@@ -416,8 +414,6 @@
 
 	// 댓글 수정 form 변경만 진행
 	function reply_update_form(r_seq, r_date, r_content, user_id){
-		console.log("댓글 수정 데이터 값");
-
 		let html = '';
 
 		r_content = r_content.replaceAll("<br/>", "\n");
@@ -508,7 +504,32 @@
 
 	// 답글 수정
 	$(".c_update_btn").click(function(){
-		alert("답글 수정!");
+		let data_form = {
+			board_seq : $("#board_seq").val(),
+			page : $("#page").val(),
+			listSize : $("#listSize").val(),
+			type : $("#type").val(),
+			searchKeyword : $("#searchKeyword").val(),
+		}
+
+		$.ajax({
+			url: '/comment/com_update',
+			type: 'get',
+			data: data_form,
+			contentType: "application/json; charset=UTF-8",
+			success: function(result){
+				alert("성공!");
+				console.log(data_form);
+				location.href = "/comment/com_update?board_seq=" + data_form.board_seq + "&page=" + data_form.page + "&listSize=" + data_form.listSize + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
+			},
+			error: function(error){
+				alert("답글 수정 com_update 실패");
+				console.log(error);
+			}
+		})
+
+		<%--let url = "/comment/com_update?board_seq=${searchVO.board_seq}&page=${searchVO.page}&listSize=${searchVO.listSize}&type=${searchVO.type}&searchKeyword=${searchVO.searchKeyword}";--%>
+		<%--location.href = url;--%>
 	})
 
 	// 수정

@@ -8,6 +8,7 @@
 		 <typeAlias alias="board" type="com.eunxi.spring.board.service.BoardVO" />
 		 <typeAlias alias="file" type="com.eunxi.spring.file.service.FileVO" />
 		 <typeAlias alias="reply" type="com.eunxi.spring.reply.service.ReplyVO" />
+		 <typeAlias alias="user" type="com.eunxi.spring.user.service.UserVO" />
 
 	</typeAliases>
 
@@ -18,6 +19,7 @@
 		 <mapper resource="mappings/board-mapping.xml" />
 		 <mapper resource="mappings/file-mapping.xml" />
 		 <mapper resource="mappings/reply-mapping.xml" />
+		 <mapper resource="mappings/user-mapping.xml" />
 
 	
 	</mappers>

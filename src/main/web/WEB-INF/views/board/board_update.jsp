@@ -63,7 +63,7 @@
 
     </style>
 </head>
-<body onload="javascript:test();">
+<body onload="javascript:check_data();">
 <div class="row" id="inner_box">
     <form action="/board/board_updateAction" method="post" enctype="multipart/form-data">
         <input type="hidden" id="board_seq" name="board_seq" value="${board.board_seq}"/>
@@ -228,7 +228,7 @@
     }
 
     // 익명 체크 값 유지
-    function test() {
+    function check_data() {
         $("input[name='board_anonymous']").each(function () {
             let check_value = $(this).val();
 

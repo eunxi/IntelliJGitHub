@@ -69,7 +69,7 @@
 </head>
 <body>
 <div class="row" id="inner_box">
-    <form action="/board/board_insertAction" id="insert_form" method="post" enctype="multipart/form-data">
+    <form action="/board/board_insertAction" method="post" enctype="multipart/form-data">
         <div class="col-2"></div>
 
         <div class="col-8" style="height: 50%;">

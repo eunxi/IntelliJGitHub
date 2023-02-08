@@ -69,7 +69,7 @@
 </head>
 <body>
 <div class="row" id="inner_box">
-    <form action="/comment/com_insertAction" id="insert_form" method="post" enctype="multipart/form-data">
+    <form action="/comment/com_insertAction" method="post" enctype="multipart/form-data">
         <div class="col-2"></div>
 
         <div class="col-8" style="height: 50%;">
@@ -168,7 +168,7 @@
             let file_size = getByteSize(file_list[i].size); // 파일 사이즈
 
             html += '<p id="file_name_'+i+'" style="font-size: small; margin-left: 13%;">' + file_list[i].name +
-                    '<b id="file_'+i+'" >' + i +
+                    '<b id="file_'+i+'" style="display: none;">' + i +
                     '</b> <span>(' + file_size + ')</span><a style="margin-left: 1%;" href="#this" name="file-delete" onclick="file_delete(\'' + i + '\')">삭제</a></p>';
         }
 
@@ -182,8 +182,6 @@
         $("#file_name_" + num).remove();
 
         file_list.splice(num, 1);
-
-        console.log("num: " + num);
 
         let html = '';
 
