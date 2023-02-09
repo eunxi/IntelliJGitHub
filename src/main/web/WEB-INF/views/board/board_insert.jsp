@@ -69,7 +69,7 @@
 </head>
 <body>
 <div class="row" id="inner_box">
-    <form action="/board/board_insertAction" method="post" enctype="multipart/form-data">
+    <form action="/board/board_insertAction" method="post" enctype="multipart/form-data" onsubmit="return form_check();">
         <div class="col-2"></div>
 
         <div class="col-8" style="height: 50%;">
@@ -88,7 +88,7 @@
                 <hr>
                 <div>
                     작성자
-                    <input type="text" id="user_id" name="user_id" disabled style="width: 20%; margin-left: 9%;">
+                    <input type="text" id="user_id" name="user_id" readonly value="${login.user_id}" style="width: 20%; margin-left: 9%;">
                 </div>
                 <hr>
 
@@ -121,7 +121,7 @@
             <!-- 버튼 S -->
             <div style="float: right; margin-bottom: 5%;">
                 <button class="insert_btn" id="btn" type="submit">등록</button>
-                <a href="/board/board_list.do">
+                <a href="/board/board_list">
                     <button class="list_btn" type="button">목록</button>
                 </a>
             </div>
@@ -201,66 +201,77 @@
         $("#file_upload_list").append(file_html);
     }
 
+    $("#board_anonymous").change(function(){
+        if($("input[type=checkbox]:checked").val() == 1){
+            alert("익명의 경우, 게시글 수정이 불가합니다.");
+        }
+    })
+
     // 글 등록 버튼 클릭 시
     $("#btn").click(function(){
-        // FormData 새로운 객체 생성
-        let formData = new FormData();
+        if(confirm("게시글을 등록하시겠습니까?") == true){ // 예
+            // FormData 새로운 객체 생성
+            let formData = new FormData();
 
-        for(let i = 0; i < fileList.length; i++){
-            formData.append("file", fileList[i]);
-        }
+            for(let i = 0; i < fileList.length; i++){
+                formData.append("file", fileList[i]);
+            }
 
-        // 익명 여부 확인
-        let anonymous = $("input[type=checkbox]:checked").val();
+            // 익명 여부 확인
+            let anonymous = $("input[type=checkbox]:checked").val();
 
-        if(anonymous == 1){
-            anonymous = 1;
-        }else if(anonymous != 1){
-            anonymous = 0;
-        }
+            if(anonymous == 1){
+                anonymous = 1;
+            }else if(anonymous != 1){
+                anonymous = 0;
+            }
 
-        // formData 에 데이터 추가
-        formData.append("board_title" , $("#board_title").val());
-        formData.append("user_id" , $("#user_id").val());
-        formData.append("board_anonymous" , anonymous);
-        formData.append("board_content" , $("#board_content").val());
+            // formData 에 데이터 추가
+            formData.append("board_title" , $("#board_title").val());
+            formData.append("user_id" , $("#user_id").val());
+            formData.append("board_anonymous" , anonymous);
+            formData.append("board_content" , $("#board_content").val());
 
-        // formData 데이터 확인
-        for(let value of formData.values()){
-            console.log(value);
-        }
+            // formData 데이터 확인
+            for(let value of formData.values()){
+                console.log(value);
+            }
 
-        // 유효성 검사
-        let blank_pattern = /^\s+|\s+$/g; // 공백 검사
+            // 유효성 검사
+            let blank_pattern = /^\s+|\s+$/g; // 공백 검사
 
-        if ($("#board_title").val() == "") {
-            alert("제목을 입력해주세요");
-            $("#board_title").focus();
-            return false;
-        }
-
-        if ($("#board_content").val() == "") {
-            alert("내용을 입력해주세요");
-            $("#board_content").focus();
-            return false;
-        }
-
-        $.ajax({
-            url: "/board/board_insertAction",
-            processData: false,
-            contentType: false,
-            enctype: 'multipart/form-data',
-            data: formData,
-            type: 'POST',
-            success: function(result){
-                location.href = "/board/board_list";
-            },
-            error: function (error) {
-                alert("실패");
+            if ($("#board_title").val() == "" || $("#board_title").val() == null) {
+                alert("제목을 입력해주세요");
+                $("#board_title").focus();
                 return false;
             }
-        });
-        return false;
+
+            if ($("#board_content").val() == "" || $("#board_content").val() == null) {
+                alert("내용을 입력해주세요");
+                $("#board_content").focus();
+                return false;
+            }
+
+            $.ajax({
+                url: "/board/board_insertAction",
+                processData: false,
+                contentType: false,
+                enctype: 'multipart/form-data',
+                data: formData,
+                type: 'POST',
+                success: function(result){
+                    location.href = "/board/board_list";
+                },
+                error: function (error) {
+                    alert("게시글 작성, 서버 통신 실패");
+                    return false;
+                }
+            });
+            return false;
+
+        }else{ // 아니오
+            return false;
+        }
     })
 
 </script>

@@ -11,6 +11,7 @@
 	<result property="board_title" column="BOARD_TITLE" />
 	<result property="board_content" column="BOARD_CONTENT" />
 	<result property="board_anonymous" column="BOARD_ANONYMOUS" />
+	<result property="board_state" column="BOARD_STATE" />
 </resultMap>
 
 	<!-- 재사용 가능한 SQL 정의, include 로 불러오기 가능 | 검색 조건문 -->
@@ -19,13 +20,13 @@
 			<trim prefix="OR">
 				<choose>
 					<when test="type == 'T'.toString()">
-						board_title LIKE CONCAT('%', #{searchKeyword}, '%')
+						board_title LIKE CONCAT('%', #{searchKeyword}, '%') and board_state != 'Y'
 					</when>
 					<when test="type == 'U'.toString()">
-						user_id LIKE CONCAT('%', #{searchKeyword}, '%')
+						user_id LIKE CONCAT('%', #{searchKeyword}, '%') and board_state != 'Y' and user_id != '익명'
 					</when>
 					<when test="type == 'C'.toString()">
-						board_content LIKE CONCAT('%', #{searchKeyword}, '%')
+						board_content LIKE CONCAT('%', #{searchKeyword}, '%') and board_state != 'Y'
 					</when>
 				</choose>
 			</trim>
@@ -48,7 +49,7 @@
 			root,
 			step,
 			indent,
-		   board_state
+		   	board_state
         FROM
         (SELECT @rownum := @rownum + 1 AS no, A.* FROM
             (SELECT
@@ -66,7 +67,7 @@
             FROM BOARD, (SELECT @rownum := 0) A
         ]]>
                 <if test="searchKeyword != null and searchKeyword != ''">
-                    <include refid="boardSearch"></include>
+					<include refid="boardSearch"></include>
                 </if>
         <![CDATA[
                 ORDER BY root DESC, step ASC) A
@@ -107,7 +108,7 @@
 		"익명",
 		</if>
 		<if test="board_anonymous == 0">
-		"SYSTEM",
+		#{user_id},
 		</if>
 		#{board_cnt},
 		#{board_title},
@@ -122,17 +123,17 @@
 	<!-- 상세 화면 | 파라미터 int, 반환 BoardVO -->
 	<select id="getBoard" parameterType="int" resultType="board">
 		SELECT
-		board_seq,
-		user_id,
-		board_date,
-		board_cnt,
-		board_title,
-		board_content,
-		board_anonymous,
-		root,
-		step,
-		indent,
-		board_state
+			board_seq,
+			user_id,
+			board_date,
+			board_cnt,
+			board_title,
+			board_content,
+			board_anonymous,
+			root,
+			step,
+			indent,
+			board_state
 		FROM BOARD
 		WHERE board_seq = #{board_seq}
 	</select>
@@ -148,7 +149,7 @@
 		board_title = #{board_title},
 		board_content = #{board_content},
 		board_anonymous = #{board_anonymous},
-		user_id = if(board_anonymous = 1, "익명", "SYSTEM")
+		user_id = if(board_anonymous = 1, "익명", #{user_id})
 		WHERE board_seq = #{board_seq}
 	</update>
 
@@ -190,7 +191,7 @@
             "익명",
             </if>
             <if test="board_anonymous == 0">
-            "SYSTEM",
+            #{user_id},
             </if>
             #{board_cnt},
             #{board_title},

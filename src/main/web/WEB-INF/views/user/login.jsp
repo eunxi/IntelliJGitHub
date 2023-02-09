@@ -54,9 +54,12 @@
 <body>
 
     <div class="wrapper">
-        <form method="post" action="/login_check">
+        <form method="post" action="/user/login">
+            <div class="board-form">
+                <a href="/board/board_list"><h3>자유게시판</h3></a>
+            </div>
             <div class="register-form">
-                <a href="/register"><h3>회원가입하러 가기</h3></a>
+                <a href="/register/register"><h3>회원가입하러 가기</h3></a>
             </div>
             <div class="login-form">
                 <a href="/"><h3>로그인</h3></a>
@@ -73,14 +76,10 @@
                 </table>
                 <div>
                     <button type="submit" id="login_btn" style="float: right;">로그인 </button>
-
-                    <%--<c:if test="${message == 'ERROR'}">
-                        <div style="color:red; margin-left: 10%; margin-top: 3%;"> 아이디 또는 비밀번호가 일치하지 않습니다. </div>
-                    </c:if>--%>
                 </div>
             </div>
-        </form>
 
+        </form>
     </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

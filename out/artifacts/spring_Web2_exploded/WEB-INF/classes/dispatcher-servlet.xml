@@ -18,5 +18,29 @@
         <property name="maxInMemorySize" value="10485760" />
     </bean>
 
+    <!-- LoginInterceptor 를 스프링에서 인터셉터로 인식시키기 위해 작성 -->
+    <bean id="loginInterceptor" class="com.eunxi.spring.commons.interceptor.LoginInterceptor"/>
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/user/login"/>
+            <ref bean="loginInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!-- AuthInterceptor 인식하기 위해 작성 -->
+    <bean id="authInterceptor" class="com.eunxi.spring.commons.interceptor.AuthInterceptor"/>
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/board/board_insert"/>
+            <mvc:mapping path="/board/board_update"/>
+            <mvc:mapping path="/board/board_delete"/>
+            <mvc:mapping path="/comment/com_insert"/>
+            <mvc:mapping path="/comment/com_update"/>
+            <mvc:mapping path="/comment/com_delete"/>
+            <ref bean="authInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
 </beans>
 

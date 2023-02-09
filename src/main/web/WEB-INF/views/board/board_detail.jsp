@@ -81,10 +81,10 @@
 		}
 
 		.c_update_btn {
-			font-size: 18px;
+			font-size: 15px;
 			border: none;
 			background-color: blue;
-			width: 50px;
+			width: 80px;
 			height: 30px;
 			border-radius: 15px;
 			color: #fff;
@@ -157,16 +157,20 @@
 
 		<!-- 버튼 S -->
 		<div style="float: right; margin-bottom: 1%;">
-			<c:if test="${board.step >= 1}">
-				<a href="javascript:void(0)"><button class="c_update_btn" type="button">수정</button></a>
+			<c:if test="${board.step >= 1 && login.user_id == board.user_id}">
+				<a href="javascript:void(0)"><button class="c_update_btn" type="button">답글 수정</button></a>
 			</c:if>
 
-			<c:if test="${board.step == 0}">
+			<c:if test="${board.step == 0 && login.user_id == board.user_id}">
 				<a href="javascript:void(0)"><button class="update_btn" type="button">수정</button></a>
 			</c:if>
-			<a href="javascript:void(0)"><button class="del_btn" type="button">삭제</button></a>
-			<a href="javascript:void(0)"><button class="list_btn" type="button">목록</button></a>
+
+			<c:if test="${login.user_id == board.user_id}">
+				<a href="javascript:void(0)"><button class="del_btn" type="button">삭제</button></a>
+			</c:if>
+
 			<a href="javascript:void(0)"><button class="comment_btn" type="button">답글</button></a>
+			<a href="javascript:void(0)"><button class="list_btn" type="button">목록</button></a>
 		</div>
 		<!-- 버튼 E -->
 
@@ -180,15 +184,17 @@
 
 		<!-- 댓글 작성 구간 -->
 		<form method="post" action="/reply/reply_insertAction">
+			<c:if test="${login.user_id != null}">
 			<div style="margin-top: 2%;">
 				<p>
-					<label style="font-size: small;">댓글 작성자</label> <input type="text" disabled name="user_id" id="user_id" style="width: 200px; height: 30px;">
+					<label style="font-size: small;">댓글 작성자</label> <input type="text" readonly value="${login.user_id}" name="user_id" id="user_id" style="width: 200px; height: 30px;">
 					<button style="margin-left: 11%;" type="button" onclick="reply_insert_fn();">댓글 등록</button>
 					<button style="margin-left: 1%;" type="button" onclick="reply_reset_fn();">초기화</button>
 				</p>
 				<p id="text_form">
 					<textarea name="r_content" id="r_content" placeholder="댓글을 작성해주세요."></textarea>
 				</p>
+				</c:if>
 
 				<!-- 페이지 유지하는데 필요한 데이터 값들 -->
 				<input type="hidden" value="${searchVO.board_seq}" name="board_seq" id="board_seq"/>
@@ -206,8 +212,10 @@
 				<input type="hidden" value="${board.indent}" id="indent" name="indent"/>
 				<input type="hidden" value="${board.root}" id="root" name="root"/>
 
+				<input type="hidden" value="${login.user_id}" id="login_user"/>
 			</div>
 		</form>
+
 
 		<!-- 댓글 리스트 Ajax -->
 		<div id="reply_div">
@@ -256,7 +264,6 @@
 
 	// 댓글 페이징
 	$(document).on('click', '#pagination', function(e){
-
         if($(e.target).text().trim() == "Previous"){
             $("#r_page").val(Number($("#r_page").val()) - 1);
         }else if($(e.target).text().trim() == "Next"){
@@ -268,15 +275,16 @@
         let page = Number($("#r_page").val());
         let b_num = Number($("#board_seq").val());
 
-        console.log("page : " + page);
-        console.log("b_num : " + b_num);
-
         getReply_list();
 	})
 
 	// 스크롤 위
 	function up_btn(){
-		window.scrollTo(0, 0);
+		window.scroll({
+			top: 0,
+			letf: 0,
+			behavior: 'smooth'
+		});
 	}
 
 	// 댓글 리스트 불러오기
@@ -289,6 +297,7 @@
 		let r_amount = Number($("#r_amount").val());
 
 		let data_form = {
+			login_user: $("#login_user").val(),
 			b_num : $("#board_seq").val(),
 			r_page : $("#r_page").val(),
 			r_amount : $("#r_amount").val()
@@ -308,13 +317,18 @@
 					html = "<div style='font-size: small; color: darkgray;'>등록된 댓글이 없습니다.</div>";
 				}else{
 					$(result).each(function(){
-						html += '<div id="reply_seq_' + this.r_seq + '" style="border: 1px solid darkgray; margin-bottom: 2%;"><span>' +
-								'<p style="font-size: small; margin-left: 1%;"><pre style="margin-left: 1%;">' + this.r_content + '</pre></p>' +
+						html += '<div id="reply_seq_' + this.r_seq + '" style="border: 1px solid darkgray; margin-bottom: 2%;">' +
+								'<span><p style="font-size: small; margin-left: 1%;"><pre style="margin-left: 1%;">' + this.r_content + '</pre></p>' +
 								'<span style="margin-left: 1%; font-size: small; margin-bottom: 2%;"> <span>' + this.user_id + '</span>' +
-								'<span> (' + this.r_date + ') </span>' +
-								'<a href="#this" style="margin-left: 1%;" onclick="reply_update_form(' + this.r_seq + ',\'' + this.r_date + '\', \'' + this.r_content + '\', \'' + this.user_id + '\')">수정</a>' +
-								'<a href="#this" style="margin-left: 1%;" onclick="reply_delete_fn(' + this.r_seq + ')">삭제</a></p></span></div>'
-						;
+								'<span> (' + this.r_date + ') </span>';
+
+						if(this.user_id == data_form.login_user){
+							html += '<a href="#this" style="margin-left: 1%;" onclick="reply_update_form(' + this.r_seq + ',\'' + this.r_date + '\', \'' + this.r_content + '\', \'' + this.user_id + '\')">수정</a>' +
+									'<a href="#this" style="margin-left: 1%;" onclick="reply_delete_fn(' + this.r_seq + ')">삭제</a>';
+						}
+
+						html += '</p></span></span></div>';
+
 					})
 				};
 
@@ -323,8 +337,6 @@
 				// Pagination
 				let start_page = 0;
 				let end_page = 0
-				let amount = r_amount;
-
 
 				if(start_page < 3){
 					start_page = 1;
@@ -358,8 +370,6 @@
 					page_html += '<li class="page-item"><a class="page-link">Next</a></li>';
 				}
 
-				// html += '<div class="reply_pagination" style="margin-left: 45%;"><ul id="pagination"></ul></div>';
-
 				$("#reply_div").empty();
 				$("#reply_div").append(html);
 
@@ -380,36 +390,42 @@
 
 	// 댓글 작성
 	function reply_insert_fn(){
-		if($("#r_content").val() == ''){
-			alert("댓글을 입력해주세요");
-			$("#r_content").focus();
+
+		if(confirm("댓글을 등록하시겠습니까?") == true){
+			if($("#r_content").val() == ''){
+				alert("댓글을 입력해주세요");
+				$("#r_content").focus();
+				return false;
+			}
+
+			let content = $("#r_content").val().replaceAll("\n", "<br/>");
+
+			let data_form = {
+				b_num : $("#board_seq").val(),
+				page : $("#page").val(),
+				list_size : $("#listSize").val(),
+				type : $("#type").val(),
+				searchKeyword : $("#searchKeyword").val(),
+				tbl_type : $("#tbl_type").val(),
+				user_id : $("#user_id").val(),
+				r_content : content
+			}
+
+			$.ajax({
+				url : '/reply/reply_insertAction',
+				type : 'post',
+				data : data_form,
+				success : function(result){
+					location.href = "/board/board_detail?board_seq=" + data_form.b_num + "&page=" + data_form.page + "&listSize=" + data_form.list_size + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
+				},
+				error : function (error) {
+					alert("실패!");
+				}
+			});
+
+		}else{
 			return false;
 		}
-
-		let content = $("#r_content").val().replaceAll("\n", "<br/>");
-
-		let data_form = {
-			b_num : $("#board_seq").val(),
-			page : $("#page").val(),
-			list_size : $("#listSize").val(),
-			type : $("#type").val(),
-			searchKeyword : $("#searchKeyword").val(),
-			tbl_type : $("#tbl_type").val(),
-			user_id : $("#user_id").val(),
-			r_content : content
-		}
-
-		$.ajax({
-			url : '/reply/reply_insertAction',
-			type : 'post',
-			data : data_form,
-			success : function(result){
-				location.href = "/board/board_detail?board_seq=" + data_form.b_num + "&page=" + data_form.page + "&listSize=" + data_form.list_size + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
-			},
-			error : function (error) {
-				alert("실패!");
-			}
-		});
 	}
 
 	// 댓글 수정 form 변경만 진행
@@ -431,69 +447,75 @@
 
 	// 댓글 수정 ajax
 	function update_btn(r_seq){
-		if($("#update_content_" + r_seq).val() == ''){
-			alert("댓글을 입력해주세요");
-			$("#update_content_" + r_seq).focus();
+		if(confirm("댓글을 수정하시겠습니까?") == true){
+
+			if($("#update_content_" + r_seq).val() == ''){
+				alert("댓글을 입력해주세요");
+				$("#update_content_" + r_seq).focus();
+				return false;
+			}
+
+			let content = $("#update_content_" + r_seq).val().replaceAll("\n", "<br/>");
+
+			let data_form = {
+				r_seq : r_seq,
+				r_content : content,
+				b_num : $("#board_seq").val(),
+				page : $("#page").val(),
+				list_size : $("#listSize").val(),
+				type : $("#type").val(),
+				searchKeyword : $("#searchKeyword").val(),
+				tbl_type : $("#tbl_type").val(),
+				user_id : $("#user_id").val()
+			}
+
+			$.ajax({
+				url: '/reply/reply_updateAction',
+				type: 'post',
+				data: data_form,
+				success: function(result){
+					location.href = "/board/board_detail?board_seq=" + data_form.b_num + "&page=" + data_form.page + "&listSize=" + data_form.list_size + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
+				},
+				error: function (error) {
+					alert("댓글 수정, 서버 통신 실패");
+				}
+			});
+
+		}else{
 			return false;
 		}
-
-		let content = $("#update_content_" + r_seq).val().replaceAll("\n", "<br/>");
-
-		let data_form = {
-			r_seq : r_seq,
-			r_content : content,
-			b_num : $("#board_seq").val(),
-			page : $("#page").val(),
-			list_size : $("#listSize").val(),
-			type : $("#type").val(),
-			searchKeyword : $("#searchKeyword").val(),
-			tbl_type : $("#tbl_type").val(),
-			user_id : $("#user_id").val()
-		}
-
-		$.ajax({
-			url: '/reply/reply_updateAction',
-			type: 'post',
-			data: data_form,
-			success: function(result){
-				location.href = "/board/board_detail?board_seq=" + data_form.b_num + "&page=" + data_form.page + "&listSize=" + data_form.list_size + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
-			},
-			error: function (error) {
-				alert("댓글 수정 ajax 실패");
-			}
-		});
 	}
 
 	// 댓글 삭제
 	function reply_delete_fn(r_seq){
-		alert("댓글 삭제");
-
-		let data_form = {
-			r_seq : r_seq,
-			b_num : $("#board_seq").val(),
-			page : $("#page").val(),
-			list_size : $("#listSize").val(),
-			type : $("#type").val(),
-			searchKeyword : $("#searchKeyword").val(),
-			tbl_type : $("#tbl_type").val(),
-			user_id : $("#user_id").val()
-		}
-
-		console.log(data_form);
-
-		$.ajax({
-			url: '/reply/reply_delete',
-			type: 'post',
-			data: data_form,
-			success: function(result){
-				location.href = "/board/board_detail?board_seq=" + data_form.b_num + "&page=" + data_form.page + "&listSize=" + data_form.list_size + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
-
-			},
-			error: function (error) {
-				alert("댓글 삭제 실패!");
+		if(confirm("댓글을 삭제하시겠습니까?") == true){
+			let data_form = {
+				r_seq : r_seq,
+				b_num : $("#board_seq").val(),
+				page : $("#page").val(),
+				list_size : $("#listSize").val(),
+				type : $("#type").val(),
+				searchKeyword : $("#searchKeyword").val(),
+				tbl_type : $("#tbl_type").val(),
+				user_id : $("#user_id").val()
 			}
-		})
 
+			$.ajax({
+				url: '/reply/reply_delete',
+				type: 'post',
+				data: data_form,
+				success: function(result){
+					location.href = "/board/board_detail?board_seq=" + data_form.b_num + "&page=" + data_form.page + "&listSize=" + data_form.list_size + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
+
+				},
+				error: function (error) {
+					alert("댓글 삭제 실패!");
+				}
+			});
+
+		}else{
+			return false;
+		}
 	}
 
 	// 답글
@@ -518,7 +540,6 @@
 			data: data_form,
 			contentType: "application/json; charset=UTF-8",
 			success: function(result){
-				alert("성공!");
 				console.log(data_form);
 				location.href = "/comment/com_update?board_seq=" + data_form.board_seq + "&page=" + data_form.page + "&listSize=" + data_form.listSize + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
 			},
@@ -527,9 +548,6 @@
 				console.log(error);
 			}
 		})
-
-		<%--let url = "/comment/com_update?board_seq=${searchVO.board_seq}&page=${searchVO.page}&listSize=${searchVO.listSize}&type=${searchVO.type}&searchKeyword=${searchVO.searchKeyword}";--%>
-		<%--location.href = url;--%>
 	})
 
 	// 수정
@@ -542,23 +560,35 @@
 		location.href = url;
 	})
 
+	console.log($("#step").val());
+
 	// 삭제
 	$(".del_btn").click(function(){
-		if(!confirm("삭제하시겠습니까?")){
-			// 취소(아니오) 버튼 클릭 시 이벤트 발생
-			return false;
+		if($("#step").val() >= 1){ // 답글
+			if(confirm("답글을 삭제하시겠습니까?") == true) {
+				let url = "/board/board_delete?board_seq=${searchVO.board_seq}&page=${searchVO.page}" +
+						"&listSize=${searchVO.listSize}" +
+						"&type=${searchVO.type}" +
+						"&searchKeyword=${searchVO.searchKeyword}";
+
+				location.href = url;
+			}else{
+				return false;
+			}
+
 		}else{
-			// 확인(예) 버튼 클릭 시 이벤트 발생
-			alert("삭제 성공!");
+			if(confirm("게시글을 삭제하시겠습니까?") == true) {
+				let url = "/board/board_delete?board_seq=${searchVO.board_seq}&page=${searchVO.page}" +
+						"&listSize=${searchVO.listSize}" +
+						"&type=${searchVO.type}" +
+						"&searchKeyword=${searchVO.searchKeyword}";
 
-			let url = "/board/board_delete?board_seq=${searchVO.board_seq}&page=${searchVO.page}" +
-					"&listSize=${searchVO.listSize}" +
-					"&type=${searchVO.type}" +
-					"&searchKeyword=${searchVO.searchKeyword}";
-
-			location.href = url;
+				location.href = url;
+			}else{
+				return false;
+			}
 		}
-	})
+	});
 
 	// 목록
 	$(".list_btn").click(function(){

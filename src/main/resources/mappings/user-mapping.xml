@@ -14,31 +14,56 @@
 		<result property="user_login_day" column="USER_LOGIN_DAY" />
 	</resultMap>
 
-	<!-- 로그인 확인 -->
-	<select id="login_check" resultType="String">
-		SELECT user_name
-		FROM USER
-		WHERE user_id = #{user_id} and user_password = #{user_password}
-	</select>
-
 	<!-- 회원가입 -->
-	<insert id="register">
+	<insert id="user_register">
 		INSERT INTO USER
 		(
 			user_id,
 			user_password,
 			user_name,
 			user_email,
-			user_phone
+			user_phone,
+		 	user_role
 		)
 		VALUES (
 			#{user_id},
 			#{user_password},
 			#{user_name},
 			#{user_email},
-			#{user_phone}
+			#{user_phone},
+		    "M"
 		)
 	</insert>
+
+	<!-- 로그인 | 비밀번호 암호화를 처리했으므로 컨트롤러에서 비밀번호 검증처리가 들어가므로, 비밀번호 제외하고 아이디만 select -->
+	<select id="login" resultMap="userResult">
+		SELECT
+			user_id,
+		    user_password,
+		    user_name,
+		    user_phone,
+		    user_email,
+		    user_role,
+		    user_login_day,
+		    user_join_day,
+			user_state
+		FROM USER
+		WHERE user_id = #{user_id}
+	</select>
+
+	<!-- 로그인마다 최근 로그인 날짜 업데이트 -->
+	<update id="last_login_day">
+		UPDATE USER SET
+		user_login_day = NOW()
+		WHERE user_id = #{user_id}
+	</update>
+
+
+
+
+
+
+
 
 
 

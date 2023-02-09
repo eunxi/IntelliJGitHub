@@ -88,7 +88,7 @@
                 <hr>
                 <div>
                     작성자
-                    <input type="text" value="${board.user_id}" readonly id="user_id" name="user_id" disabled style="width: 20%; margin-left: 9%;">
+                    <input type="text" value="${login.user_id}" readonly id="user_id" name="user_id" disabled style="width: 20%; margin-left: 9%;">
                 </div>
                 <hr>
 
@@ -128,7 +128,7 @@
 
             <!-- 버튼 S -->
             <div class="buttons" style="float: right; margin-bottom: 5%;">
-                <button class="insert_btn" id="c_btn" type="button">등록</button>
+                <button class="insert_btn" id="c_btn" type="button">수정</button>
                 <button class="cancel_btn" type="button" onclick="javascript:history.back();">취소</button>
             </div>
             <!-- 버튼 E -->
@@ -215,79 +215,91 @@
         console.log(del_file);
     }
 
-    // 등록 버튼 클릭
+    // 익명 여부 확인
+    $("#board_anonymous").change(function(){
+        if($("input[type=checkbox]:checked").val() == 1){
+            alert("익명의 경우, 게시글 수정이 불가합니다.");
+        }
+    })
+
+    // 수정 버튼 클릭
     $("#c_btn").click(function(){
-        // 익명 - 체크1, 빈칸undefined
-        let anonymous = $("input[type=checkbox]:checked").val();
+        if(confirm("답글을 수정하시겠습니까?") == true){
+            // 익명 - 체크1, 빈칸undefined
+            let anonymous = $("input[type=checkbox]:checked").val();
 
-        if(anonymous == 1){
-            anonymous = "true";
-        }else{
-            anonymous = "false";
-        }
-
-        // 제목, 내용 유효성 검사
-        if ($("#board_title").val() == "") {
-            alert("제목을 입력해주세요");
-            $("#board_title").focus();
-            return false;
-        }
-
-        if ($("#board_content").val() == "") {
-            alert("내용을 입력해주세요");
-            $("#board_content").focus();
-            return false;
-        }
-
-        // formData
-        let formData = new FormData();
-
-        // 삭제할 파일 유무에 따라 다르게 진행(오류)
-        if(del_file.length == 0){
-            formData.append("del_file", 0);
-        }else{
-            for(let i = 0; i < del_file.length; i++){
-                formData.append("del_file", del_file[i]);
+            if(anonymous == 1){
+                anonymous = "true";
+            }else{
+                anonymous = "false";
             }
-        }
 
-        // 추가할 파일
-        for(let i = 0; i < file_list.length; i++){
-            formData.append("file", file_list[i]);
-        }
-
-        formData.append("board_seq", $("#board_seq").val());
-        formData.append("board_title", $("#board_title").val());
-        formData.append("user_id", $("#user_id").val());
-        formData.append("board_content", $("#board_content").val());
-        formData.append("board_anonymous", anonymous);
-        formData.append("page", $("#page").val());
-        formData.append("listSize", $("#listSize").val());
-        formData.append("type", $("#type").val());
-        formData.append("searchKeyword", $("#searchKeyword").val());
-        formData.append("root", $("#root").val());
-        formData.append("step", $("#step").val());
-        formData.append("indent", $("#indent").val());
-
-        for(let value of formData.values()){
-            console.log(value);
-        }
-
-        $.ajax({
-            url: '/comment/com_updateAction',
-            type: 'post',
-            processData: false,
-            contentType: false,
-            enctype: 'multipart/form-data',
-            data: formData,
-            success: function(result){
-                location.href = "/board/board_detail?board_seq=${board.board_seq}&page=${page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}";
-            },
-            error: function (error) {
-                alert("수정 등록 실패");
+            // 제목, 내용 유효성 검사
+            if ($("#board_title").val() == "") {
+                alert("제목을 입력해주세요");
+                $("#board_title").focus();
                 return false;
             }
-        });
+
+            if ($("#board_content").val() == "") {
+                alert("내용을 입력해주세요");
+                $("#board_content").focus();
+                return false;
+            }
+
+            // formData
+            let formData = new FormData();
+
+            // 삭제할 파일 유무에 따라 다르게 진행(오류)
+            if(del_file.length == 0){
+                formData.append("del_file", 0);
+            }else{
+                for(let i = 0; i < del_file.length; i++){
+                    formData.append("del_file", del_file[i]);
+                }
+            }
+
+            // 추가할 파일
+            for(let i = 0; i < file_list.length; i++){
+                formData.append("file", file_list[i]);
+            }
+
+            formData.append("board_seq", $("#board_seq").val());
+            formData.append("board_title", $("#board_title").val());
+            formData.append("user_id", $("#user_id").val());
+            formData.append("board_content", $("#board_content").val());
+            formData.append("board_anonymous", anonymous);
+            formData.append("page", $("#page").val());
+            formData.append("listSize", $("#listSize").val());
+            formData.append("type", $("#type").val());
+            formData.append("searchKeyword", $("#searchKeyword").val());
+            formData.append("root", $("#root").val());
+            formData.append("step", $("#step").val());
+            formData.append("indent", $("#indent").val());
+
+            for(let value of formData.values()){
+                console.log(value);
+            }
+
+            $.ajax({
+                url: '/comment/com_updateAction',
+                type: 'post',
+                processData: false,
+                contentType: false,
+                enctype: 'multipart/form-data',
+                data: formData,
+                success: function(result){
+                    location.href = "/board/board_detail?board_seq=${board.board_seq}&page=${page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}";
+                },
+                error: function (error) {
+                    alert("수정 등록 실패");
+                    return false;
+                }
+            });
+
+        }else{
+            return false;
+        }
 
     })
 

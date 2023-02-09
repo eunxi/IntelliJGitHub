@@ -40,7 +40,6 @@ public class CommentController {
 
         // 원글의 정보를 답글 쓰기 화면에서 알 수 있도록 하기
         model.addAttribute("board", board);
-        model.addAttribute("vo", vo);
 
         return "/comment/com_insert";
     }
@@ -48,7 +47,7 @@ public class CommentController {
     // 답글 작성 처리
     @PostMapping("/com_insertAction")
     @ResponseBody
-    public String com_insertAction(MultipartHttpServletRequest files, @RequestParam Map<String, Object> map, RedirectAttributes redirect, @RequestParam("file") List<MultipartFile> file) throws IOException {
+    public String com_insertAction(MultipartHttpServletRequest files, @RequestParam Map<String, Object> map, RedirectAttributes redirect, Model model) throws IOException {
         System.out.println("Comment Insert Post Controller");
 
         BoardVO vo = new BoardVO();
@@ -67,7 +66,6 @@ public class CommentController {
         boardService.board_com_insert(vo); // 답글 등록
 
         int seq = vo.getBoard_seq();
-        System.out.println("vo.getBoard_seq() : " + seq);
 
         FileUtils fileUtils = new FileUtils();
         List<FileVO> file_list = fileUtils.parseFileInfo(1, seq, "C", file_path, files);

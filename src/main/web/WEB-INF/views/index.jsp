@@ -1,7 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <html>
 <head>
-    <title>HOME</title>
+    <title>Home</title>
     <style>
       a {
         text-decoration: none;
@@ -23,29 +24,32 @@
         color: black;
       }
 
-        .wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 10vh;
-        }
+    .wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 10vh;
+    }
     </style>
 </head>
+
 <body>
 <div class="wrapper">
-    <a href="/">HOME</a>&nbsp;|&nbsp;
-    <a href="/board/board_list.do">자유게시판</a>&nbsp;|&nbsp;
-    <a href="#" id="logout">로그아웃</a>
+    <div class="user-info row">
+        <h3>어서오세요, ${login.user_name} 님</h3>
+        최근 로그인 시도 날짜 [<fmt:formatDate value="${login.user_login_day}" pattern="yyyy-MM-dd HH:mm"/>]
+
+        <div class="menu-info wrapper">
+            <a href="/index">HOME</a>&nbsp;|&nbsp;
+            <a href="/board/board_list">자유게시판</a>&nbsp;|&nbsp;
+            <a href="/logout" id="logout">로그아웃</a>
+        </div>
+
+    </div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
-
-  // 로그아웃
-  $("#logout").click(function(){
-    alert("로그아웃");
-    location.href = "/";
-  })
 
 
 

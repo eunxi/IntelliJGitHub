@@ -177,8 +177,9 @@ public class BoardController {
         model.addAttribute("searchVO", vo);
         model.addAttribute("cnt", total_cnt); // 보여질 내용 수
         model.addAttribute("allCount", cnt); // 전체 게시글 수
-
         model.addAttribute("fileList", fileList);
+
+        System.out.println("게시글 상세보기 화면 : " + getBoard);
 
         // reply pagination
         ReplyVO reply = new ReplyVO();

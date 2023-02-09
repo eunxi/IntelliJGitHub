@@ -128,6 +128,9 @@
 <body>
 <div class="table-wrap">
     <form method="get" id="listForm" action="/board/board_list">
+        <div>
+            <h3><a href="/index">HOME</a></h3>
+        </div>
 
         <h3><a href="/board/board_list">자유게시판</a></h3>
 
@@ -166,18 +169,18 @@
             <tbody class="listData">
             <c:forEach var="list" items="${boardList}">
                 <tr>
-                    <td class="b_no">${list.no}
+                    <td>${list.no}
                         <input type="hidden" name="board_seq" id="board_seq" value="${list.board_seq}"/>
                         <c:set var="allCount" value="${allCount - 1}"/>
                     </td>
-                    <td class="b_title">
+                    <td>
                         <c:if test="${list.board_state == 'Y'}">
                             <c:if test="${list.indent == 0}">
                                 <a style="float: left; color: darkgray; ">&nbsp;삭제된 게시글입니다.</a>
                             </c:if>
                             <c:if test="${list.indent >= 1}">
                             <c:forEach var="i" begin="1" end="${list.indent}">
-                                <a style="float: left; color: darkgray; ">&nbsp;&nbsp;${i eq list.indent ? "RE) " : "&nbsp;"}삭제된 게시글입니다.</a>
+                                <a style="float: left; color: darkgray; ">&nbsp;&nbsp;${i eq list.indent ? "↳ " : "&nbsp;"}삭제된 게시글입니다.</a>
                             </c:forEach>
                             </c:if>
                         </c:if>
@@ -185,19 +188,25 @@
                         <c:if test="${list.board_state != 'Y'}">
                             <a href="/board/board_detail?board_seq=${list.board_seq}&page=${allSearch.page}&listSize=${listSize}&type=${type}&searchKeyword=${searchKeyword}" style="float: left;">&nbsp;
                                 <c:forEach var="i" begin="1" end="${list.indent}">
-                                    ${i eq list.indent ? "RE)" : "&nbsp;"}
+                                    ${i eq list.indent ? "↳" : "&nbsp;"}
                                 </c:forEach>
                                 ${list.board_title}
                             </a>
                         </c:if>
                     </td>
-                    <td class="b_user">${list.user_id}</td>
-                    <td class="b_date">
+                    <td>${list.user_id}</td>
+                    <td >
                         <fmt:formatDate value="${list.board_date}" pattern="yyyy-MM-dd"/>
                     </td>
-                    <td class="b_cnt">${list.board_cnt}</td>
+                    <td>${list.board_cnt}</td>
                 </tr>
             </c:forEach>
+
+                <c:if test="${all_count == 0}">
+                    <tr>
+                        <td colspan="5">조회된 게시글이 없습니다.</td>
+                    </tr>
+                </c:if>
             </tbody>
 
         </table>
@@ -214,7 +223,7 @@
                 <option value="20" <c:if test="${allSearch.getListSize() == 20 }">selected="selected"</c:if>>20개씩 보기</option>
             </select>
 
-            <a href="/board/board_insert.do" class="top-btn">글 등록</a>
+            <a href="/board/board_insert" class="top-btn">글 등록</a>
         </div>
         <!-- 페이지 Inform E -->
 
@@ -231,7 +240,7 @@
                     </c:if>
 
                     <c:if test="${allPage eq i}">
-                        <li class="page-item active"><a class="page-link" href="/board/board_list.do?page=${i}"> ${i} </a></li>
+                        <li class="page-item active"><a class="page-link" href="/board/board_list?page=${i}"> ${i} </a></li>
                     </c:if>
                 </c:forEach>
 
@@ -241,6 +250,8 @@
             </ul>
         </div>
         <!-- pagination{e} -->
+
+        <button style="float: right" type="button" onclick="up_btn();">Up</button>
 
         <!-- 검색 및 Ajax -->
         <input type="hidden" value="${allSearch.page}" id="search_page"/> <!-- 현재 페이지 값 -->
@@ -254,16 +265,18 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
 
+    function up_btn(){
+        window.scroll({
+            top: 0,
+            letf: 0,
+            behavior: 'smooth'
+        });
+    }
+
     // 엔터키 검색
     function enterKey(){
-        history.replaceState({}, null, location.pathname);
-
         let searchType = $("#select_box").val();
         let searchKeyword = $("#searchKeyword").val();
-
-        let realType = $("#type").val(searchType);
-
-        console.log($("#type").val());
 
         if(!searchType){
             alert("검색 분류를 선택해주세요.");
@@ -281,8 +294,6 @@
         })
 
         let url = "/board/board_list?type=" + $("#type").val() + "&searchKeyword=" + $("#searchKeyword").val();
-
-
         location.href = url;
 
         make();
@@ -308,7 +319,7 @@
                 $(this).siblings().removeClass('asc');
                 $(this).siblings().removeClass('desc');
 
-                let rec = $('#sort_table').find('tbody>tr').get();
+                let rec = $('#sort_table').find('tbody > tr').get();
 
                 rec.sort(function (a, b) {
                     let val1 = $(a).children('td').eq(column).text().toUpperCase();
@@ -471,9 +482,9 @@
                         if(result[i].indent == 0){
                             content += '<a style="float: left; color: darkgray; ">&nbsp;삭제된 게시글입니다.</a>';
                         }else if(result[i].indent >= 1){
-                            content += '<a style="float: left; color: darkgray; ">&nbsp;&nbsp;';
+                            content += '<a style="float: left; color: darkgray; ">&nbsp;';
                                 for(let j = 1; j <= result[i].indent; j++){
-                                    content += (j == result[i].indent ? 'RE) ' : '&nbsp; ') + '삭제된 게시글입니다.</a>';
+                                    content += (j == result[i].indent ? ' ↳ ' : '&nbsp; ') + '삭제된 게시글입니다.</a>';
                                 }
                         }
 
@@ -481,7 +492,7 @@
                         content += '<a style="float: left;" href="/board/board_detail?board_seq=' + result[i].board_seq + '&page=' + now_page + '&listSize=' + listSize + '&type=' + type + '&searchKeyword=' + searchKeyword + '">&nbsp;&nbsp;';
 
                         for(let j = 1; j <= result[i].indent; j++){
-                            content += (j == result[i].indent ? 'RE) ' : '&nbsp;');
+                            content += (j == result[i].indent ? '↳ ' : '&nbsp; ');
                         }
                         content += result[i].board_title;
                     }

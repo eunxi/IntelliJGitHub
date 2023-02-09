@@ -1,8 +1,5 @@
 package com.eunxi.spring.reply.controller;
 
-import com.eunxi.spring.board.service.BoardService;
-import com.eunxi.spring.board.service.BoardVO;
-import com.eunxi.spring.common.Criteria;
 import com.eunxi.spring.reply.service.ReplyService;
 import com.eunxi.spring.reply.service.ReplyVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +46,7 @@ public class ReplyController {
     // 댓글 수정
     @PostMapping("/reply_updateAction")
     @ResponseBody
-    public void reply_update(ReplyVO vo, int r_seq, String r_content){
+    public void reply_update(ReplyVO vo){
         System.out.println("REPLY Update Controller");
 
         replyService.replyUpdate(vo);
