@@ -57,7 +57,7 @@
 			(
 			 #{b_num},
 			 #{tbl_type},
-			 "SYSTEM",
+			 #{user_id},
 			 #{r_content}
 			)
 		]]>
