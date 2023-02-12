@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="doDao">
+
+	<!-- 일정 추가 -->
+	<insert id="do_add" parameterType="java.util.Map">
+		INSERT INTO DoList
+		(
+			 user_id,
+			 d_content,
+			 d_start_date,
+			 d_end_date
+		 )
+		VALUES
+		(
+			 #{user_id},
+			 #{d_content},
+			 #{d_start_date},
+			 #{d_end_date}
+		 )
+	</insert>
+
+	<!-- 일정 조회 -->
+	<select id="do_list" parameterType="java.util.Map" resultType="java.util.Map">
+        <![CDATA[
+            SELECT
+                user_id,
+                d_content,
+                d_state,
+                d_start_date,
+                d_end_date
+            FROM DoList
+        ]]>
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>
