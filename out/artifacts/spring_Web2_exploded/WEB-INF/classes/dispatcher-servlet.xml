@@ -32,12 +32,15 @@
     <bean id="authInterceptor" class="com.eunxi.spring.commons.interceptor.AuthInterceptor"/>
     <mvc:interceptors>
         <mvc:interceptor>
+            <mvc:mapping path="/index"/>
             <mvc:mapping path="/board/board_insert"/>
             <mvc:mapping path="/board/board_update"/>
             <mvc:mapping path="/board/board_delete"/>
             <mvc:mapping path="/comment/com_insert"/>
             <mvc:mapping path="/comment/com_update"/>
             <mvc:mapping path="/comment/com_delete"/>
+            <mvc:mapping path="/do/doList_main"/>
+            <mvc:mapping path="/do/doList_detail"/>
             <ref bean="authInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>

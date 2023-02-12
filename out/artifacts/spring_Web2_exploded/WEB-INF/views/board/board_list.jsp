@@ -8,6 +8,13 @@
 <head>
     <title>자유게시판</title>
     <style>
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 10vh;
+        }
+
         a {
             text-decoration: none;
         }
@@ -94,6 +101,17 @@
             cursor: pointer;
         }
 
+        #up{
+            font-size: 18px;
+            border: none;
+            background-color: black;
+            width: 50px;
+            height: 30px;
+            border-radius: 15px;
+            color: #fff;
+            cursor: pointer;
+        }
+
         .reset_btn {
             font-size: 18px;
             border: none;
@@ -130,6 +148,7 @@
     <form method="get" id="listForm" action="/board/board_list">
         <div>
             <h3><a href="/index">HOME</a></h3>
+            <h3><a href="/do/doList">To Do List</a></h3>
         </div>
 
         <h3><a href="/board/board_list">자유게시판</a></h3>
@@ -251,7 +270,7 @@
         </div>
         <!-- pagination{e} -->
 
-        <button style="float: right" type="button" onclick="up_btn();">Up</button>
+        <button  type="button" onclick="up_btn();" id="up" style="cursor: pointer; float: right">Up</button>
 
         <!-- 검색 및 Ajax -->
         <input type="hidden" value="${allSearch.page}" id="search_page"/> <!-- 현재 페이지 값 -->

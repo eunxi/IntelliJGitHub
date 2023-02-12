@@ -37,6 +37,7 @@ public class LoginController {
 
         // 비밀번호 null 이거나 검증해서 맞지 않으면 메서드 종료
         if(user == null || !BCrypt.checkpw(login.getUser_password(), user.getUser_password())){
+            model.addAttribute("msg", "ERROR");
             return;
         }
 
