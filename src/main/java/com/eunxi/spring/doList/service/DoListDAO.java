@@ -20,4 +20,12 @@ public class DoListDAO {
     public List<Map<String, Object>> do_list(Map<String, Object> map){
         return session.selectList("doDao.do_list", map);
     }
+
+    public void do_delete(int d_seq){
+        session.update("doDao.do_delete", d_seq);
+    }
+
+    public void do_finish(int d_seq){
+        session.update("doDao.do_finish", d_seq);
+    }
 }

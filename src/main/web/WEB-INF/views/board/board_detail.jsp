@@ -509,7 +509,7 @@
 
 				},
 				error: function (error) {
-					alert("댓글 삭제 실패!");
+					alert("댓글 삭제, 서버 통신 실패");
 				}
 			});
 

@@ -111,7 +111,9 @@
     });
 
     $(function(){
-        $("#start_date, #end_date").datepicker();
+        $("#start_date, #end_date").datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
     });
 
     // 시작 ~ 끝 날짜 지정
@@ -162,8 +164,8 @@
                 type: "post",
                 data: data_form,
                 success: function(result){
+                    opener.location.reload();
                     window.close();
-                    location.href = "/do/doList";
                 },
                 error: function(error){
                     alert("일정 추가, 서버 연동 실패");

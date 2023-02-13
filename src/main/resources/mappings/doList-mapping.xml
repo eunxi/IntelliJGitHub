@@ -25,17 +25,26 @@
 	<select id="do_list" parameterType="java.util.Map" resultType="java.util.Map">
         <![CDATA[
             SELECT
-                user_id,
-                d_content,
-                d_state,
-                d_start_date,
-                d_end_date
-            FROM DoList
+                d_seq,
+				user_id,
+				d_content,
+				d_state,
+				DATE_FORMAT(d_start_date, "%Y-%m-%d") as d_start_date,
+				DATE_FORMAT(d_end_date, "%Y-%m-%d") as d_end_date
+				FROM DoList
+				ORDER BY d_seq DESC
         ]]>
 	</select>
 
+	<!-- 일정 제거 -->
+	<update id="do_delete" parameterType="int">
+		UPDATE DoList SET d_state = "D" WHERE d_seq = #{d_seq}
+	</update>
 
-
+	<!-- 일정 완료 -->
+	<update id="do_finish" parameterType="int">
+		UPDATE DoList SET d_state = "E" WHERE d_seq = #{d_seq}
+	</update>
 
 
 

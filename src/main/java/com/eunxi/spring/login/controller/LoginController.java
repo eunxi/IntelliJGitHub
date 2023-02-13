@@ -40,8 +40,10 @@ public class LoginController {
             model.addAttribute("msg", "ERROR");
             return;
         }
-
+        System.out.println("user : " + user);
+        System.out.println("user_id : " + user.getUser_id());
         model.addAttribute("user", user); // 비밀번호 일치할 경우 user 저장
+        model.addAttribute("user_id", user.getUser_id()); // 비밀번호 일치할 경우 user_id 저장
     }
 
     // 로그아웃

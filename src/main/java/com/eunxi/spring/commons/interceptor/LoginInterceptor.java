@@ -1,5 +1,6 @@
 package com.eunxi.spring.commons.interceptor;
 
+import com.eunxi.spring.user.service.UserVO;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -16,10 +17,11 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         HttpSession session = request.getSession();
         ModelMap modelMap = modelAndView.getModelMap();
-        Object user = modelMap.get("user");
+        UserVO userVO = (UserVO) modelMap.get("user");
 
-        if(user != null){
-            session.setAttribute(LOGIN, user);
+        if(userVO != null){
+            session.setAttribute(LOGIN, userVO);
+            session.setAttribute("user_id" , userVO.getUser_id());
             response.sendRedirect("/index");
         }
     }

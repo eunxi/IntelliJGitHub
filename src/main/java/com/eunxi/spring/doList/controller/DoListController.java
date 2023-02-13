@@ -1,12 +1,16 @@
 package com.eunxi.spring.doList.controller;
 
-import com.eunxi.spring.doList.service.DoDate;
 import com.eunxi.spring.doList.service.DoListService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Controller
@@ -17,11 +21,71 @@ public class DoListController {
     private DoListService doService;
 
     @GetMapping("/doList")
-    public String do_list(@RequestParam Map<String, Object> map, Model model){
+    public String do_list(@RequestParam Map<String, Object> map, Model model, @RequestParam(value="type", defaultValue = "", required = false)String type,
+                          @RequestParam(value="now", defaultValue = "", required = false)String now , HttpServletRequest request) throws ParseException {
+        try {
+            HttpSession session = request.getSession();
+            System.out.println("user_id : " + session.getAttribute("user_id"));
+            System.out.println("login : " + session.getAttribute("login"));
+        }catch (Exception e){
+            e.printStackTrace();
+
+        }
+
         System.out.println("To Do List Controller");
 
         Map<String, Object> d_map = new HashMap<>();
         System.out.println("Do List Controller : " + doService.do_list(d_map));
+
+        // 날짜 구하기
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String now_date = "";
+        String pre_date = "";
+        String next_date = "";
+
+        if(now.isEmpty()){
+            now_date = sdf.format(cal.getTime());
+
+            cal.add(cal.DATE, -1);
+            pre_date = sdf.format(cal.getTime());
+
+            cal.add(cal.DATE, +2);
+            next_date = sdf.format(cal.getTime());
+        }else{
+            if(type.equals("pre")){ // 이전
+                cal.setTime(sdf.parse(now));
+
+                cal.add(cal.DATE, -1);
+                now_date = sdf.format(cal.getTime());
+
+                cal.add(cal.DATE, -1);
+                pre_date = sdf.format(cal.getTime());
+
+                cal.add(cal.DATE, +2);
+                next_date = sdf.format(cal.getTime());
+            }else{
+                if(type.equals("next")){
+                    cal.setTime(sdf.parse(now));
+
+                    cal.add(cal.DATE, +1);
+                    now_date = sdf.format(cal.getTime());
+
+                    cal.add(cal.DATE, -1);
+                    pre_date = sdf.format(cal.getTime());
+
+                    cal.add(cal.DATE, +2);
+                    next_date = sdf.format(cal.getTime());
+                }
+            }
+        }
+
+        now = now_date;
+
+        model.addAttribute("type",type);
+        model.addAttribute("now", now);
+        model.addAttribute("next_date", next_date);
+        model.addAttribute("pre_date", pre_date);
         model.addAttribute("doList", doService.do_list(d_map));
 
         return "/doList/doList_main";
@@ -53,57 +117,21 @@ public class DoListController {
         return "redirect:/do/doList";
     }
 
-    // 달력
-    @GetMapping("/calendar")
-    public String calendar(DoDate doDate, Model model) {
-        Calendar cal = Calendar.getInstance();
-        DoDate calendarData;
+    @GetMapping("/doDel")
+    @ResponseBody
+    public void do_delete(@RequestParam Map<String, Object> map){
+        System.out.println("DELETE GET Controller");
 
-        // 검색 날짜
-        if (doDate.getDate().equals("") && doDate.getMonth().equals("")) {
-            doDate = new DoDate(String.valueOf(cal.get(Calendar.YEAR)), String.valueOf(cal.get(Calendar.MONTH)), String.valueOf(cal.get(Calendar.DATE)), null);
-        }
-
-        Map<String, Integer> today_info = doDate.today_info(doDate);
-        List<DoDate> date_list = new ArrayList<>();
-
-        // 실질적인 달력 데이터 리스트에 데이터 삽입
-        for(int i = 1; i < today_info.get("start"); i++){
-            calendarData = new DoDate(null, null, null, null);
-            date_list.add(calendarData);
-        }
-
-        // 날짜 삽입
-        for(int i = today_info.get("start_day"); i <= today_info.get("end_day"); i++){
-            if(i == today_info.get("today")){
-                calendarData = new DoDate(String.valueOf(doDate.getYear()), String.valueOf(doDate.getMonth()), String.valueOf(i), String.valueOf(doDate.getValue()));
-            }else{
-                calendarData = new DoDate(String.valueOf(doDate.getYear()), String.valueOf(doDate.getMonth()), String.valueOf(i), String.valueOf(doDate.getValue()));
-            }
-
-            date_list.add(calendarData);
-        }
-
-        // 달력 빈 곳에 빈 데이터 삽입
-        int index = 7 - date_list.size() % 7;
-
-        if(date_list.size() % 7 != 0){
-            for(int i = 0; i < index; i++){
-                calendarData = new DoDate(null, null, null, null);
-                date_list.add(calendarData);
-            }
-        }
-
-        System.out.println("date_list = " + date_list);
-
-        // 배열에 담기
-        model.addAttribute("date_list", date_list);
-        model.addAttribute("today_info", today_info);
-
-        return "/doList/doList_main";
+        doService.do_delete(Integer.parseInt(map.get("seq").toString()));
     }
 
+    @PostMapping("/doUpdate")
+    @ResponseBody
+    public void do_update(@RequestParam Map<String, Object> map){
+        System.out.println("Update Post Controller");
 
+        doService.do_finish(Integer.parseInt(map.get("seq").toString()));
+    }
 
 
 
