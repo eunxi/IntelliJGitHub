@@ -87,8 +87,7 @@
                 <hr>
                 <div>
                     작성자
-                    <input type="text" id="user_id" name="user_id" disabled value="${board.user_id}"
-                           style="width: 20%; margin-left: 9%;">
+                    <span style="width: 20%; margin-left: 9%;">${session}</span>
                 </div>
                 <hr>
 
@@ -142,6 +141,7 @@
         <input type="hidden" value="${searchVO.type}" name="type" id="type"/>
         <input type="hidden" value="${searchVO.searchKeyword}" name="searchKeyword" id="searchKeyword"/>
         <input type="hidden" value="${file_num}" id="file_num"/>
+        <input type="hidden" id="user_id" name="user_id" readonly value="${session}" >
 
     </form>
 </div>

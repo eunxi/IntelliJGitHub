@@ -28,8 +28,8 @@ public class ReplyDAO {
     }
 
     // 댓글 삭제
-    public void replyDelete(int r_seq){
-        session.delete("replyDao.replyDelete", r_seq);
+    public void replyDelete(ReplyVO vo){
+        session.delete("replyDao.replyDelete", vo);
     }
 
     // 댓글 개수

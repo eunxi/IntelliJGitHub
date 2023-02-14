@@ -36,8 +36,8 @@ public class BoardServiceImpl implements BoardService{
     }
 
     @Override
-    public void boardDelete(int board_seq) {
-        boardDao.boardDelete(board_seq);
+    public void boardDelete(BoardVO vo) {
+        boardDao.boardDelete(vo);
     }
 
     @Override

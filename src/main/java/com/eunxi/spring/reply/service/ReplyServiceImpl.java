@@ -27,8 +27,8 @@ public class ReplyServiceImpl implements ReplyService{
     }
 
     @Override
-    public void replyDelete(int r_seq) {
-        replyDao.replyDelete(r_seq);
+    public void replyDelete(ReplyVO vo) {
+        replyDao.replyDelete(vo);
     }
 
     @Override

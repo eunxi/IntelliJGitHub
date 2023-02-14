@@ -17,6 +17,7 @@ public class ReplyVO {
     private String tbl_type; // 게시판 타입 - 현재는 B
     private String user_id; // 사용자
     private String r_content; // 댓글 내용
+    private String r_state; // 댓글 상태
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")

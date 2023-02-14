@@ -187,7 +187,7 @@
 			<c:if test="${login.user_id != null}">
 			<div style="margin-top: 2%;">
 				<p>
-					<label style="font-size: small;">댓글 작성자</label> <input type="text" readonly value="${login.user_id}" name="user_id" id="user_id" style="width: 200px; height: 30px;">
+					<label style="font-size: small;">댓글 작성자</label> <input type="text" disabled value="${session}" name="user_id" id="user_id" style="width: 200px; height: 30px;">
 					<button style="margin-left: 11%;" type="button" onclick="reply_insert_fn();">댓글 등록</button>
 					<button style="margin-left: 1%;" type="button" onclick="reply_reset_fn();">초기화</button>
 				</p>
@@ -207,6 +207,7 @@
 				<input type="hidden" value="${r_page}" id="r_page" name="r_page"/>
 				<input type="hidden" value="${r_amount}" id="r_amount" name="r_amount"/>
 				<input type="hidden" value="${endPage}" id="endPage"/>
+				<input type="hidden" value="${state}" id="r_state"/>
 
 				<input type="hidden" value="${board.step}" id="step" name="step"/>
 				<input type="hidden" value="${board.indent}" id="indent" name="indent"/>
@@ -215,7 +216,6 @@
 				<input type="hidden" value="${login.user_id}" id="login_user"/>
 			</div>
 		</form>
-
 
 		<!-- 댓글 리스트 Ajax -->
 		<div id="reply_div">
@@ -272,9 +272,6 @@
         	$("#r_page").val(Number($(e.target).text()));
 		}
 
-        let page = Number($("#r_page").val());
-        let b_num = Number($("#board_seq").val());
-
         getReply_list();
 	})
 
@@ -294,13 +291,13 @@
 
 	function getReply_list(){
 		let page = Number($("#r_page").val());
-		let r_amount = Number($("#r_amount").val());
 
 		let data_form = {
 			login_user: $("#login_user").val(),
 			b_num : $("#board_seq").val(),
 			r_page : $("#r_page").val(),
-			r_amount : $("#r_amount").val()
+			r_amount : $("#r_amount").val(),
+			r_state : $("#r_state").val()
 		}
 
 		let html = '';
@@ -317,18 +314,23 @@
 					html = "<div style='font-size: small; color: darkgray;'>등록된 댓글이 없습니다.</div>";
 				}else{
 					$(result).each(function(){
-						html += '<div id="reply_seq_' + this.r_seq + '" style="border: 1px solid darkgray; margin-bottom: 2%;">' +
-								'<span><p style="font-size: small; margin-left: 1%;"><pre style="margin-left: 1%;">' + this.r_content + '</pre></p>' +
-								'<span style="margin-left: 1%; font-size: small; margin-bottom: 2%;"> <span>' + this.user_id + '</span>' +
+						html += '<div id="reply_seq_' + this.r_seq + '" style="border: 1px solid darkgray; margin-bottom: 2%;">';
+
+						if(this.r_state == "N"){
+							html += '<span><p style="font-size: small; margin-left: 1%;"><pre style="margin-left: 1%;">' + this.r_content + '</pre></p>';
+						}else if(this.r_state == "Y"){
+							html += '<span><p style="font-size: small; margin-left: 1%;"><pre style="margin-left: 1%; color: darkgray;">삭제된 댓글입니다.</pre></p>';
+						}
+
+						html += '<span style="margin-left: 1%; font-size: small; margin-bottom: 2%;"> <span>' + this.user_id + '</span>' +
 								'<span> (' + this.r_date + ') </span>';
 
-						if(this.user_id == data_form.login_user){
+						if(this.r_state == "N" && this.user_id == data_form.login_user){
 							html += '<a href="#this" style="margin-left: 1%;" onclick="reply_update_form(' + this.r_seq + ',\'' + this.r_date + '\', \'' + this.r_content + '\', \'' + this.user_id + '\')">수정</a>' +
 									'<a href="#this" style="margin-left: 1%;" onclick="reply_delete_fn(' + this.r_seq + ')">삭제</a>';
 						}
 
 						html += '</p></span></span></div>';
-
 					})
 				};
 
@@ -407,7 +409,7 @@
 				type : $("#type").val(),
 				searchKeyword : $("#searchKeyword").val(),
 				tbl_type : $("#tbl_type").val(),
-				user_id : $("#user_id").val(),
+				user_id : $("#login_user").val(),
 				r_content : content
 			}
 
@@ -419,7 +421,7 @@
 					location.href = "/board/board_detail?board_seq=" + data_form.b_num + "&page=" + data_form.page + "&listSize=" + data_form.list_size + "&type=" + data_form.type + "&searchKeyword=" + data_form.searchKeyword;
 				},
 				error : function (error) {
-					alert("실패!");
+					alert("댓글 작성, 서버 통신 실패");
 				}
 			});
 
@@ -466,7 +468,7 @@
 				type : $("#type").val(),
 				searchKeyword : $("#searchKeyword").val(),
 				tbl_type : $("#tbl_type").val(),
-				user_id : $("#user_id").val()
+				user_id : $("#login_user").val()
 			}
 
 			$.ajax({
@@ -497,7 +499,7 @@
 				type : $("#type").val(),
 				searchKeyword : $("#searchKeyword").val(),
 				tbl_type : $("#tbl_type").val(),
-				user_id : $("#user_id").val()
+				user_id : $("#login_user").val()
 			}
 
 			$.ajax({
@@ -509,7 +511,7 @@
 
 				},
 				error: function (error) {
-					alert("댓글 삭제 실패!");
+					alert("댓글 삭제, 서버 통신 실패");
 				}
 			});
 

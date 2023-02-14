@@ -88,7 +88,7 @@
                 <hr>
                 <div>
                     작성자
-                    <input type="text" value="${login.user_id}" readonly id="user_id" name="user_id" disabled style="width: 20%; margin-left: 9%;">
+                    <span style="width: 20%; margin-left: 9%;">${session}</span>
                 </div>
                 <hr>
 
@@ -144,6 +144,8 @@
             <input type="hidden" value="${listSize}" id="listSize" name="listSize" />
             <input type="hidden" value="${type}" id="type" name="type" />
             <input type="hidden" value="${searchKeyword}" id="searchKeyword" name="searchKeyword" />
+
+            <input type="hidden" id="user_id" name="user_id" value="${session}">
         </div>
 
     </form>

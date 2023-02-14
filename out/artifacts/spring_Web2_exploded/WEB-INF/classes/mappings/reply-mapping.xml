@@ -22,26 +22,13 @@
 					tbl_type,
 					r_content,
 					user_id,
-					r_date
+					r_date,
+			        r_state
 			 FROM REPLY,
 				  (SELECT @ROWNUM := 0) rnum WHERE b_num = #{b_num} and tbl_type = #{tbl_type})
 		as A WHERE no > (#{page} -1) * #{amount} and no <= #{amount} * #{page};
 		]]>
 	</select>
-
-<!--	<select id="replyList" parameterType="Map" resultType="reply">
-		<![CDATA[
-		SELECT
-			r_seq,
-			b_num,
-			tbl_type,
-			user_id,
-			r_content,
-			r_date
-		FROM REPLY
-		WHERE b_num = #{b_num} and tbl_type = #{tbl_type}
-		]]>
-	</select>-->
 
 	<!-- 댓글 작성 -->
 	<insert id="replyInsert" parameterType="reply">
@@ -68,15 +55,15 @@
 		<![CDATA[
 			UPDATE REPLY SET
 			r_content = #{r_content}
-			WHERE r_seq = #{r_seq}
+			WHERE r_seq = #{r_seq} and user_id = #{user_id}
 		]]>
 	</update>
 
 	<!-- 댓글 삭제 -->
-	<delete id="replyDelete" parameterType="int">
-		DELETE FROM REPLY
-		WHERE r_seq = #{r_seq}
-	</delete>
+	<update id="replyDelete" parameterType="reply">
+		UPDATE REPLY SET r_state = "Y"
+		WHERE r_seq = #{r_seq} and user_id = #{user_id}
+	</update>
 
 	<!-- 댓글 개수 -->
 	<select id="replyTotal" resultType="int">

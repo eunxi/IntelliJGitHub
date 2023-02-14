@@ -4,8 +4,10 @@ import com.eunxi.spring.reply.service.ReplyService;
 import com.eunxi.spring.reply.service.ReplyVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 
@@ -19,15 +21,16 @@ public class ReplyController {
     // 댓글 조회
     @PostMapping("/reply_list")
     @ResponseBody
-    public List<ReplyVO> reply_list(int b_num, Map<String, Object> map, int r_page, int r_amount){
+    public List<ReplyVO> reply_list(int b_num, Map<String, Object> map, int r_page, int r_amount, String r_state, HttpSession session, Model model){
         System.out.println("Reply List Controller");
 
-        int cnt = replyService.replyTotal(b_num);
+        model.addAttribute("session", session.getAttribute("user_id"));
 
         map.put("b_num", b_num);
         map.put("tbl_type", "B");
         map.put("page", r_page);
         map.put("amount", r_amount);
+        map.put("state", r_state);
 
         List<ReplyVO> reply_list = replyService.replyList(map);
 
@@ -58,7 +61,7 @@ public class ReplyController {
     public void reply_delete(ReplyVO vo){
         System.out.println("REPLY Delete Controller");
 
-        replyService.replyDelete(vo.getR_seq());
+        replyService.replyDelete(vo);
     }
 
 

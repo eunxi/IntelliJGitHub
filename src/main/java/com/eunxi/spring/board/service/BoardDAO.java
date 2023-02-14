@@ -41,8 +41,8 @@ public class BoardDAO {
     }
 
     // 삭제
-    public void boardDelete(int board_seq){
-        session.delete("boardDao.boardDelete", board_seq);
+    public void boardDelete(BoardVO vo){
+        session.delete("boardDao.boardDelete", vo);
     }
 
     // 글 개수

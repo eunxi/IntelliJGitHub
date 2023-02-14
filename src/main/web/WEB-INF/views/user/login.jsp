@@ -91,6 +91,8 @@
         alert("회원가입 완료! 로그인해주세요.");
     }else if(msg == "ERROR"){
         alert("아이디 또는 비밀번호가 일치하지 않습니다.");
+    }else if(msg == "LOGIN_FAILED"){
+        alert("로그인 사용자만 이용할 수 있습니다.");
     }
 
     // 로그인 버튼

@@ -36,7 +36,7 @@
 <body>
 <div class="wrapper">
     <div class="user-info row">
-        <h3>어서오세요, ${login.user_name} 님</h3>
+        <h3>어서오세요, ${session} 님</h3>
         최근 로그인 시도 날짜 -> <fmt:formatDate value="${login.user_login_day}" pattern="yyyy년MM월dd일 HH시mm분"/>
 
         <div class="menu-info wrapper">

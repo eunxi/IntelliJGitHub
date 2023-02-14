@@ -190,6 +190,8 @@
                 <tr>
                     <td>${list.no}
                         <input type="hidden" name="board_seq" id="board_seq" value="${list.board_seq}"/>
+                        <input type="hidden" name="start_date" id="start_date" value="${list.board_date}"/>
+                        <input type="hidden" name="end_date" id="end_date" value="${list.board_date}"/>
                         <c:set var="allCount" value="${allCount - 1}"/>
                     </td>
                     <td>
@@ -326,13 +328,12 @@
                 if($(this).is('.asc')) {		// 현재 오름차순인 경우
                     $(this).removeClass('asc');
                     $(this).addClass('desc');	// 내림차순으로 변경
-                    $(this).children().attr('src', "resources/img.png");	// 이미지 src 수정
                     sortdir=-1;
 
                 } else {	// 현재 오름차순 아닌 경우
                     $(this).addClass('asc');	// 오름차순으로 변경
-                    $(this).removeClass('desc'); sortdir=1;
-                    $(this).children().attr('src', "resources/img.png");	// 이미지 src 수정
+                    $(this).removeClass('desc');
+                    sortdir=1;
                 }
 
                 $(this).siblings().removeClass('asc');

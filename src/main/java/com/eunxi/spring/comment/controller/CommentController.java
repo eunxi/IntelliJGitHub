@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +30,9 @@ public class CommentController {
 
     // 답글 작성
     @GetMapping("/com_insert")
-    public String com_insert(BoardVO vo, Model model){
+    public String com_insert(BoardVO vo, Model model, HttpSession session){
         System.out.println("Comment Insert Get Controller");
+        model.addAttribute("session", session.getAttribute("user_id"));
 
         int b_num = vo.getBoard_seq();
         BoardVO board = boardService.getBoard(b_num);
@@ -47,7 +49,7 @@ public class CommentController {
     // 답글 작성 처리
     @PostMapping("/com_insertAction")
     @ResponseBody
-    public String com_insertAction(MultipartHttpServletRequest files, @RequestParam Map<String, Object> map, RedirectAttributes redirect, Model model) throws IOException {
+    public String com_insertAction(MultipartHttpServletRequest files, @RequestParam Map<String, Object> map, RedirectAttributes redirect) throws IOException {
         System.out.println("Comment Insert Post Controller");
 
         BoardVO vo = new BoardVO();
@@ -81,8 +83,10 @@ public class CommentController {
 
     // 답글 수정 화면 - 상세화면의 기존 데이터 뿌려주기
     @GetMapping("/com_update")
-    public String com_update(Model model, @RequestParam Map<String, Object> map){
+    public String com_update(Model model, @RequestParam Map<String, Object> map, HttpSession session){
         System.out.println("Comment Update Get Controller");
+
+        model.addAttribute("session", session.getAttribute("user_id"));
 
         int b_seq = Integer.parseInt(map.get("board_seq").toString());
 

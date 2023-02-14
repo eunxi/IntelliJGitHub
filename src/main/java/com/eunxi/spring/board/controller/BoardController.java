@@ -8,6 +8,7 @@ import com.eunxi.spring.file.service.FileVO;
 import com.eunxi.spring.reply.service.ReplyService;
 import com.eunxi.spring.reply.service.ReplyVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +37,23 @@ public class BoardController {
 
     @Autowired
     ReplyService replyService;
+
+    @PostMapping("/list")
+    public ResponseEntity<String> list(@RequestParam("start_date") String start_date, @RequestParam("end_date") String end_date){
+        Map<String, Object> map = new HashMap<>();
+        map.put("start", start_date);
+        map.put("end", end_date);
+
+        System.out.println(map);
+        for(int i = 0; i < map.size(); i++){
+            System.out.println(map);
+        }
+
+
+
+
+        return ResponseEntity.ok().body("connection successfully");
+    }
 
     @GetMapping("/board_list")
     public String getBoardList(BoardVO vo, Model model, String type, @RequestParam(value = "listSize", defaultValue = "10") int listSize) {
@@ -118,8 +140,13 @@ public class BoardController {
 
     // 등록 화면
     @GetMapping("/board_insert")
-    public String boardInsert(@ModelAttribute("searchVO") BoardVO vo, Model model){
+    public String boardInsert(@ModelAttribute("searchVO") BoardVO vo, Model model, HttpServletRequest request){
         System.out.println("Board Insert Get Controller");
+
+        HttpSession session = request.getSession();
+        System.out.println("게시글 등록 화면 넘어갈 때 - session : " + session.getAttribute("user_id"));
+
+        model.addAttribute("session", session.getAttribute("user_id"));
 
         return "/board/board_insert";
     }
@@ -161,8 +188,11 @@ public class BoardController {
 
     // 상세 화면 (게시글, 답글)
     @GetMapping("/board_detail")
-    public String getBoard(@RequestParam("board_seq") int board_seq, Model model, BoardVO vo) throws UnsupportedEncodingException {
+    public String getBoard(@RequestParam("board_seq") int board_seq, Model model, BoardVO vo, HttpSession session) throws UnsupportedEncodingException {
         System.out.println("Board Detail Controller");
+
+        System.out.println("게시글 상세 화면 넘어갈 때 - session : " + session.getAttribute("user_id"));
+        model.addAttribute("session", session.getAttribute("user_id"));
 
         int cnt = boardService.getBoardListCnt(vo); // 전체 개수
         int total_cnt = cnt - (vo.getPage() - 1) * vo.getListSize(); // 출력하는 개수
@@ -225,8 +255,11 @@ public class BoardController {
     // 수정 화면
     // 기존 글 불러오기
     @GetMapping("/board_update")
-    public String boardUpdate(@ModelAttribute("searchVO") BoardVO vo, @RequestParam("board_seq") int board_seq, Model model){
+    public String boardUpdate(@ModelAttribute("searchVO") BoardVO vo, @RequestParam("board_seq") int board_seq, Model model, HttpSession session){
         System.out.println("Board Update Get Controller");
+
+        System.out.println("게시글 수정 화면 넘어갈 때 - session : " + session.getAttribute("user_id"));
+        model.addAttribute("session", session.getAttribute("user_id"));
 
         List<FileVO> fileList = fileService.fileDetail(board_seq);
 
@@ -251,7 +284,7 @@ public class BoardController {
     // 수정 부분 처리
     @PostMapping("/board_updateAction")
     @ResponseBody
-    public String boardUpdate_action(@ModelAttribute("searchVO") BoardVO vo, @RequestParam("file") List<MultipartFile> file, @RequestParam("delete_file") List<Integer> delete_file, @RequestParam Map<String, Object> map, @RequestParam("board_anonymous") boolean board_anonymous,  @RequestParam("page") int page, @RequestParam("board_seq") int board_seq,  @RequestParam("listSize") int listSize,  MultipartHttpServletRequest files, RedirectAttributes redirect) throws IOException {
+    public String boardUpdate_action(@ModelAttribute("searchVO") BoardVO vo, @RequestParam("delete_file") List<Integer> delete_file, @RequestParam Map<String, Object> map, @RequestParam("board_anonymous") boolean board_anonymous,  @RequestParam("page") int page, @RequestParam("board_seq") int board_seq,  @RequestParam("listSize") int listSize,  MultipartHttpServletRequest files, RedirectAttributes redirect) throws IOException {
         System.out.println("Board Update Post Controller");
 
         // 삭제하는 파일의 order_seq 확인 후, 삭제 진행
@@ -311,10 +344,13 @@ public class BoardController {
 
     // 삭제
     @GetMapping("/board_delete")
-    public String boardDelete(@ModelAttribute("searchVO") BoardVO vo, @RequestParam("board_seq") int board_seq, Model model, RedirectAttributes redirect) throws UnsupportedEncodingException {
+    public String boardDelete(@ModelAttribute("searchVO") BoardVO vo, @RequestParam("board_seq") int board_seq, Model model, RedirectAttributes redirect, HttpSession session) throws UnsupportedEncodingException {
         System.out.println("Board Delete Controller");
 
-        boardService.boardDelete(board_seq);
+        System.out.println("게시글 삭제 경우 - session : " + session.getAttribute("user_id"));
+        model.addAttribute("session", session.getAttribute("user_id"));
+
+        boardService.boardDelete(vo);
         System.out.println("board_delete vo : " + vo.getBoard_state());
 
         redirect.addFlashAttribute("page", vo.getPage());

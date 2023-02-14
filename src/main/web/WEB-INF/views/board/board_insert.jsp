@@ -88,7 +88,7 @@
                 <hr>
                 <div>
                     작성자
-                    <input type="text" id="user_id" name="user_id" readonly value="${login.user_id}" style="width: 20%; margin-left: 9%;">
+                    <span style="width: 20%; margin-left: 9%;">${session}</span>
                 </div>
                 <hr>
 
@@ -127,6 +127,7 @@
             </div>
             <!-- 버튼 E -->
 
+            <input type="hidden" id="user_id" name="user_id" readonly value="${session}" >
         </div>
     </form>
 </div>

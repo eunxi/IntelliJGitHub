@@ -88,7 +88,7 @@
                 <hr>
                 <div>
                     작성자
-                    <input type="text" id="user_id" readonly value="${login.user_id}" name="user_id" disabled style="width: 20%; margin-left: 9%;">
+                    <span style="width: 20%; margin-left: 9%;">${session}</span>
                 </div>
                 <hr>
 
@@ -132,6 +132,7 @@
             <input type="hidden" value="${board.step}" id="step" name="step"/>
             <input type="hidden" value="${board.indent}" id="indent" name="indent"/>
             <input type="hidden" value="${board.board_seq}" id="board_seq" name="board_seq"/>
+            <input type="hidden" id="user_id" name="user_id" readonly value="${session}">
         </div>
 
     </form>

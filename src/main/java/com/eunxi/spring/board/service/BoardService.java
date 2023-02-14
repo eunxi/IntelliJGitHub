@@ -10,7 +10,7 @@ public interface BoardService {
 
     void boardInsert(BoardVO vo); // 등록
     void boardUpdate(BoardVO vo); // 수정
-    void boardDelete(int board_seq); // 삭제
+    void boardDelete(BoardVO vo); // 삭제
     void getBoardCnt(int board_seq); // 조회수
 
     void board_com_insert(BoardVO vo); // 답글 등록

@@ -150,17 +150,11 @@
 		board_content = #{board_content},
 		board_anonymous = #{board_anonymous},
 		user_id = if(board_anonymous = 1, "익명", #{user_id})
-		WHERE board_seq = #{board_seq}
+		WHERE board_seq = #{board_seq} and user_id = #{user_id}
 	</update>
 
-	<!-- 삭제 (게시글 & 답글) -->
-<!--	<delete id="boardDelete" parameterType="int">
-		DELETE FROM BOARD
-		WHERE board_seq = #{board_seq}
-	</delete>-->
-
-	<update id="boardDelete" parameterType="int">
-		UPDATE BOARD SET board_state = 'Y' WHERE board_seq = #{board_seq}
+	<update id="boardDelete" parameterType="board">
+		UPDATE BOARD SET board_state = 'Y' WHERE board_seq = #{board_seq} and user_id = #{user_id}
 	</update>
 
 	<!-- 게시글 번호만 가져오기 -->
