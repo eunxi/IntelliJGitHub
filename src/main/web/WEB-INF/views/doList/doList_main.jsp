@@ -76,8 +76,7 @@
 
         <div class="doList-content">
             <c:forEach items="${doList}" var="list">
-                <c:if test="${list.user_id == login.user_id}">
-                    <c:if test="${list.d_start_date == now || list.d_end_date == now}">
+                    <c:if test="${now == list.Date}">
                         <c:if test="${list.d_state != 'D'}">
                             <div class="row">
                                 <input type="hidden" value="${list.d_state}" id="d_state"/>
@@ -98,7 +97,6 @@
                             </div>
                         </c:if>
                     </c:if>
-                </c:if>
             </c:forEach>
         </div>
 

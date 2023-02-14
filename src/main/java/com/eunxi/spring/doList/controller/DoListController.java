@@ -2,7 +2,6 @@ package com.eunxi.spring.doList.controller;
 
 import com.eunxi.spring.doList.service.DoListService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,21 +20,14 @@ public class DoListController {
     private DoListService doService;
 
     @GetMapping("/doList")
-    public String do_list(@RequestParam Map<String, Object> map, Model model, @RequestParam(value="type", defaultValue = "", required = false)String type,
+    public String do_list(Model model, @RequestParam(value="type", defaultValue = "", required = false)String type,
                           @RequestParam(value="now", defaultValue = "", required = false)String now , HttpServletRequest request) throws ParseException {
-        try {
-            HttpSession session = request.getSession();
-            System.out.println("user_id : " + session.getAttribute("user_id"));
-            System.out.println("login : " + session.getAttribute("login"));
-        }catch (Exception e){
-            e.printStackTrace();
+        Map<String, Object> map =  new HashMap<>();
 
-        }
+        HttpSession session = request.getSession();
+        map.put("user_id", session.getAttribute("user_id").toString());
 
-        System.out.println("To Do List Controller");
-
-        Map<String, Object> d_map = new HashMap<>();
-        System.out.println("Do List Controller : " + doService.do_list(d_map));
+        List<Map<String, Object>> list = doService.do_list(map);
 
         // 날짜 구하기
         Calendar cal = Calendar.getInstance();
@@ -86,7 +78,7 @@ public class DoListController {
         model.addAttribute("now", now);
         model.addAttribute("next_date", next_date);
         model.addAttribute("pre_date", pre_date);
-        model.addAttribute("doList", doService.do_list(d_map));
+        model.addAttribute("doList", list);
 
         return "/doList/doList_main";
     }

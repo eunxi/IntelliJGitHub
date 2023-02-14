@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +23,7 @@ public class DoListServiceImpl implements  DoListService{
         List<Map<String, Object>> result = new ArrayList<>();
 
         result = doListDao.do_list(map);
+        System.out.println("result : " + result);
         return result;
     }
 

@@ -24,16 +24,25 @@
 	<!-- 일정 조회 -->
 	<select id="do_list" parameterType="java.util.Map" resultType="java.util.Map">
         <![CDATA[
-            SELECT
-                d_seq,
-				user_id,
-				d_content,
-				d_state,
-				DATE_FORMAT(d_start_date, "%Y-%m-%d") as d_start_date,
-				DATE_FORMAT(d_end_date, "%Y-%m-%d") as d_end_date
-				FROM DoList
-				ORDER BY d_seq DESC
-        ]]>
+		SELECT a.Date,  s.d_seq,
+			   user_id,
+			   d_content,
+			   d_state,
+			   DATE_FORMAT(d_start_date, "%Y-%m-%d") as d_start_date,
+			   DATE_FORMAT(d_end_date, "%Y-%m-%d") as d_end_date
+		FROM
+			(
+				SELECT curdate() + INTERVAL (a.a + (10 * b.a) + (100 * c.a)) DAY as Date
+				FROM (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as a
+						 cross join (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as b
+						 cross join (select 0 as a union all select 1 union all select 2 union all select 3 union all select 4 union all select 5 union all select 6 union all select 7 union all select 8 union all select 9) as c
+			) a
+				INNER JOIN DoList s
+					on a.Date >= s.d_start_date
+				   	and a.Date <= s.d_end_date
+				WHERE s.user_id = #{user_id}
+				ORDER BY s.d_seq DESC
+		]]>
 	</select>
 
 	<!-- 일정 제거 -->
