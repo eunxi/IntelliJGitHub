@@ -38,19 +38,53 @@ public class BoardController {
     @Autowired
     ReplyService replyService;
 
-    @PostMapping("/list")
-    public ResponseEntity<String> list(@RequestParam("start_date") String start_date, @RequestParam("end_date") String end_date){
+    @GetMapping("/list_get") // get 방식 test
+    public ResponseEntity<?> list_get(@RequestParam("user_id") String user){
         Map<String, Object> map = new HashMap<>();
-        map.put("start", start_date);
-        map.put("end", end_date);
+        map.put("user", user);
 
-        System.out.println(map);
-        for(int i = 0; i < map.size(); i++){
-            System.out.println(map);
+        System.out.println("map : " + map);
+
+        List<Map<String, Object>> list = boardService.list_user(map);
+
+        System.out.println("<< list_get 목록 출력 >>");
+        for(int i = 0; i < list.size(); i++){
+            System.out.println(list.get(i));
         }
 
+        return ResponseEntity.ok().body("connection successfully");
+    }
 
+    @PostMapping("/list_post") // form-data
+    public ResponseEntity<String> list_post(@RequestParam Map<String, Object> map){
+        for(String key : map.keySet()){
+            System.out.println("key : " +key + ", value : " + map.get(key));
+        }
 
+        List<Map<String, Object>> list = boardService.list_board(map);
+
+        System.out.println("<< list_post 목록 출력 >>");
+        for(int i = 0; i < list.size(); i++){
+            System.out.println(list.get(i));
+        }
+
+        return ResponseEntity.ok().body("connection successfully");
+    }
+
+    @PostMapping(value = "/list") // json
+    public ResponseEntity<String> list(@RequestBody Map<String, Object> map){
+        for(String key : map.keySet()){
+            System.out.println("key : " +key + ", value : " + map.get(key));
+        }
+
+        System.out.println(map);
+        List<Map<String, Object>> list = boardService.list_board(map); // 조건 : 시작날짜 - 마지막날짜
+//        List<Map<String, Object>> list = boardService.get_list(map); // 조건 없이 전체 목록 출력
+
+        System.out.println("<< list 목록 출력 >>");
+        for(int i = 0; i < list.size(); i++){
+            System.out.println(list.get(i));
+        }
 
         return ResponseEntity.ok().body("connection successfully");
     }

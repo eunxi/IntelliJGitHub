@@ -109,7 +109,7 @@ public class DoListController {
         return "redirect:/do/doList";
     }
 
-    @GetMapping("/doDel")
+    @PostMapping("/doDel")
     @ResponseBody
     public void do_delete(@RequestParam Map<String, Object> map){
         System.out.println("DELETE GET Controller");

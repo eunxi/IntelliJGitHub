@@ -289,7 +289,7 @@
     function up_btn(){
         window.scroll({
             top: 0,
-            letf: 0,
+            left: 0,
             behavior: 'smooth'
         });
     }

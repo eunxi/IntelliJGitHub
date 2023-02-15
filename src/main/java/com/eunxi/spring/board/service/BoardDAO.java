@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Repository
@@ -71,5 +72,18 @@ public class BoardDAO {
         session.update("boardDao.board_com_update", vo);
     }
 
+    // map list
+    public List<Map<String, Object>> list_board(Map<String, Object> map){
+        return session.selectList("boardDao.list_board", map);
+    }
+
+    // map list - user
+    public List<Map<String, Object>> list_user(Map<String, Object> map){
+        return session.selectList("boardDao.list_user", map);
+    }
+
+    public List<Map<String, Object>> get_list(Map<String, Object> map){
+        return session.selectList("boardDao.get_list", map);
+    }
 
 }

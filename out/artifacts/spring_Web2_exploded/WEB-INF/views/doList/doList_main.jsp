@@ -143,7 +143,7 @@
 
             $.ajax({
                 url: "/do/doDel",
-                type: "get",
+                type: "post",
                 data: data_form,
                 success: function(result){
 

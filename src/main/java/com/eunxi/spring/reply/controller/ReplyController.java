@@ -23,7 +23,6 @@ public class ReplyController {
     @ResponseBody
     public List<ReplyVO> reply_list(int b_num, Map<String, Object> map, int r_page, int r_amount, String r_state, HttpSession session, Model model){
         System.out.println("Reply List Controller");
-
         model.addAttribute("session", session.getAttribute("user_id"));
 
         map.put("b_num", b_num);

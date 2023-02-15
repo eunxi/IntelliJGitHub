@@ -205,9 +205,130 @@
 		]]>
 	</update>
 
+	<!-- map list -->
+	<select id="list_board" resultType="java.util.Map" parameterType="java.util.Map">
+		<![CDATA[
+        SELECT
+            no,
+            board_seq,
+			user_id,
+			board_date,
+			board_cnt,
+			board_title,
+			board_content,
+			board_anonymous,
+			root,
+			step,
+			indent,
+		   	board_state
+        FROM
+        (SELECT @rownum := @rownum + 1 AS no, A.* FROM
+            (SELECT
+				board_seq,
+				user_id,
+				board_date,
+				board_cnt,
+				board_title,
+				board_content,
+				board_anonymous,
+				root,
+				step,
+				indent,
+				board_state
+            FROM BOARD, (SELECT @rownum := 0) A
+        ]]>
+		<if test="searchKeyword != null and searchKeyword != ''">
+			<include refid="boardSearch"></include>
+		</if>
+		<![CDATA[
+            	WHERE board_date >= #{start_date} and board_date <= #{end_date}
+                ORDER BY root DESC, step ASC) A
+                ORDER BY no ASC) A;
+         ]]>
+	</select>
 
+	<!-- map list - user_id test -->
+	<select id="list_user" resultType="java.util.Map" parameterType="java.util.Map">
+		<![CDATA[
+        SELECT
+            no,
+            board_seq,
+			user_id,
+			board_date,
+			board_cnt,
+			board_title,
+			board_content,
+			board_anonymous,
+			root,
+			step,
+			indent,
+		   	board_state
+        FROM
+        (SELECT @rownum := @rownum + 1 AS no, A.* FROM
+            (SELECT
+				board_seq,
+				user_id,
+				board_date,
+				board_cnt,
+				board_title,
+				board_content,
+				board_anonymous,
+				root,
+				step,
+				indent,
+				board_state
+            FROM BOARD, (SELECT @rownum := 0) A
+        ]]>
+		<if test="searchKeyword != null and searchKeyword != ''">
+			<include refid="boardSearch"></include>
+		</if>
+		<![CDATA[
+            	WHERE user_id = #{user}
+                ORDER BY root DESC, step ASC) A
+                ORDER BY no ASC) A;
+         ]]>
+	</select>
 
-
+    <!-- 조건 없이 list -->
+    <select id="get_list" resultType="java.util.Map">
+        <![CDATA[
+        SELECT
+            no,
+            board_seq,
+			user_id,
+			board_date,
+			board_cnt,
+			board_title,
+			board_content,
+			board_anonymous,
+			root,
+			step,
+			indent,
+		   	board_state
+        FROM
+        (SELECT @rownum := @rownum + 1 AS no, A.* FROM
+            (SELECT
+				board_seq,
+				user_id,
+				board_date,
+				board_cnt,
+				board_title,
+				board_content,
+				board_anonymous,
+				root,
+				step,
+				indent,
+				board_state
+            FROM BOARD, (SELECT @rownum := 0) A
+        ]]>
+        <if test="searchKeyword != null and searchKeyword != ''">
+            <include refid="boardSearch"></include>
+        </if>
+        <![CDATA[
+                ORDER BY root DESC, step ASC) A
+                ORDER BY no ASC) A;
+         ]]>
+    </select>
 
 
 

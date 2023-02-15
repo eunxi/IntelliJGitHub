@@ -13,6 +13,7 @@
 		<result property="file_date" column="FILE_DATE" />
 		<result property="file_downCnt" column="FILE_DOWNCNT" />
 		<result property="file_size" column="FILE_SIZE" />
+		<result property="file_state" column="FILE_STATE" />
 	</resultMap>
 
 	<!-- 게시글 파일[] 등록 & 파일 수정 -->
@@ -68,6 +69,12 @@
 		DELETE FROM file
 		WHERE file_seq = #{file_seq}
 	</delete>
+
+<!--	<update id="fileListDelete" parameterType="int">
+		UPDATE file SET
+		file_state = "Y"
+		WHERE file_seq = #{file_seq}
+	</update>-->
 
     <!-- 파일 하나만 상세보기 (다운로드 사용) -->
     <select id="file_downDetail" parameterType="int" resultType="file">

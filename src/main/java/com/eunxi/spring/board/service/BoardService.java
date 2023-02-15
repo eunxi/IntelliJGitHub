@@ -1,6 +1,7 @@
 package com.eunxi.spring.board.service;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BoardService {
     List<BoardVO> getBoardList(BoardVO vo); // 목록
@@ -15,5 +16,9 @@ public interface BoardService {
 
     void board_com_insert(BoardVO vo); // 답글 등록
     void board_com_update(BoardVO vo); // 답글 step 업데이트
+
+    List<Map<String, Object>> list_board(Map<String, Object> map); // list - map
+    List<Map<String, Object>> list_user(Map<String, Object> map); // list - user
+    List<Map<String, Object>> get_list(Map<String, Object> map);
 
 }

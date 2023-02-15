@@ -25,6 +25,7 @@ public class FileVO {
     private Date file_date; // 파일 업로드 날짜
     private int file_downCnt; // 파일 다운로드 횟수
     private int file_size; // 파일 사이즈
+    private String file_state; // 파일 상태
 
 
 }
