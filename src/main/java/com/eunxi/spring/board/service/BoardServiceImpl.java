@@ -72,8 +72,8 @@ public class BoardServiceImpl implements BoardService{
     }
 
     @Override
-    public List<Map<String, Object>> list_user(Map<String, Object> map) {
-        return boardDao.list_user(map);
+    public List<Map<String, Object>> getDate(Map<String, Object> map) {
+        return boardDao.getDate(map);
     }
 
     @Override

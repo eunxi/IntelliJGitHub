@@ -78,8 +78,8 @@ public class BoardDAO {
     }
 
     // map list - user
-    public List<Map<String, Object>> list_user(Map<String, Object> map){
-        return session.selectList("boardDao.list_user", map);
+    public List<Map<String, Object>> getDate(Map<String, Object> map){
+        return session.selectList("boardDao.getDate", map);
     }
 
     public List<Map<String, Object>> get_list(Map<String, Object> map){

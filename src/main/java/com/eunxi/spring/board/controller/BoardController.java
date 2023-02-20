@@ -7,6 +7,7 @@ import com.eunxi.spring.file.service.FileUtils;
 import com.eunxi.spring.file.service.FileVO;
 import com.eunxi.spring.reply.service.ReplyService;
 import com.eunxi.spring.reply.service.ReplyVO;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -20,10 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Controller
 @RequestMapping("/board")
@@ -38,25 +37,40 @@ public class BoardController {
     @Autowired
     ReplyService replyService;
 
-    @GetMapping("/list_get") // get 방식 test
-    public ResponseEntity<?> list_get(@RequestParam("user_id") String user){
-        Map<String, Object> map = new HashMap<>();
-        map.put("user", user);
+    @GetMapping("/test")
+    public String test(HttpSession session, Model model){
+        System.out.println("Board Test Controller");
 
+        Date now = new Date(); // 현재 날짜 시간
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String format_now = format.format(now);
+
+        model.addAttribute("now", format_now);
+        model.addAttribute("session", session.getAttribute("user_id"));
+
+        return "/board/test";
+    }
+
+    @GetMapping("/list_get") // get 방식 test
+    public String list_get(@RequestParam Map<String, Object> map){
+        for(String key : map.keySet()){
+            System.out.println("key : " +key + ", value : " + map.get(key));
+        }
         System.out.println("map : " + map);
 
-        List<Map<String, Object>> list = boardService.list_user(map);
+        List<Map<String, Object>> list = boardService.getDate(map);
 
         System.out.println("<< list_get 목록 출력 >>");
         for(int i = 0; i < list.size(); i++){
             System.out.println(list.get(i));
         }
 
-        return ResponseEntity.ok().body("connection successfully");
+        return "/board/test";
+/*        return ResponseEntity.ok().body("GET connection successfully");*/
     }
 
     @PostMapping("/list_post") // form-data
-    public ResponseEntity<String> list_post(@RequestParam Map<String, Object> map){
+    public String list_post(@RequestParam Map<String, Object> map){
         for(String key : map.keySet()){
             System.out.println("key : " +key + ", value : " + map.get(key));
         }
@@ -68,11 +82,11 @@ public class BoardController {
             System.out.println(list.get(i));
         }
 
-        return ResponseEntity.ok().body("connection successfully");
+        return "redirect:/board/test";
     }
 
     @PostMapping(value = "/list") // json
-    public ResponseEntity<String> list(@RequestBody Map<String, Object> map){
+    public String list(@RequestBody Map<String, Object> map){
         for(String key : map.keySet()){
             System.out.println("key : " +key + ", value : " + map.get(key));
         }
@@ -86,7 +100,7 @@ public class BoardController {
             System.out.println(list.get(i));
         }
 
-        return ResponseEntity.ok().body("connection successfully");
+        return "/board/test";
     }
 
     @GetMapping("/board_list")

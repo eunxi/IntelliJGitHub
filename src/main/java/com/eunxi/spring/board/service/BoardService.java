@@ -18,7 +18,7 @@ public interface BoardService {
     void board_com_update(BoardVO vo); // 답글 step 업데이트
 
     List<Map<String, Object>> list_board(Map<String, Object> map); // list - map
-    List<Map<String, Object>> list_user(Map<String, Object> map); // list - user
+    List<Map<String, Object>> getDate(Map<String, Object> map); // list - user
     List<Map<String, Object>> get_list(Map<String, Object> map);
 
 }

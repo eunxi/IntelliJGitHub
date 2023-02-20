@@ -205,7 +205,7 @@
 		]]>
 	</update>
 
-	<!-- map list -->
+	<!-- map list - date -->
 	<select id="list_board" resultType="java.util.Map" parameterType="java.util.Map">
 		<![CDATA[
         SELECT
@@ -247,8 +247,8 @@
          ]]>
 	</select>
 
-	<!-- map list - user_id test -->
-	<select id="list_user" resultType="java.util.Map" parameterType="java.util.Map">
+	<!-- map list - get_date -->
+	<select id="getDate" resultType="java.util.Map" parameterType="java.util.Map">
 		<![CDATA[
         SELECT
             no,
@@ -283,7 +283,7 @@
 			<include refid="boardSearch"></include>
 		</if>
 		<![CDATA[
-            	WHERE user_id = #{user}
+            	WHERE board_date >= #{start_date} and board_date <= #{end_date}
                 ORDER BY root DESC, step ASC) A
                 ORDER BY no ASC) A;
          ]]>
