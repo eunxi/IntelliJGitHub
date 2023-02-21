@@ -10,11 +10,10 @@ import lombok.ToString;
 public class Criteria {
     // 현재페이지, 시작페이지, 끝페이지, 게시글 총 개수, 페이지당 글 개수, 마지막페이지, sql 쿼리에 사용할 start, end
     private int nowPage, startPage, endPage, total, cntPerPage, lastPage, start, end;
-    private int cntPage = 10;
+    private int cntPage = 5;
 
-    public Criteria(){
+    public Criteria() {
     }
-
     public Criteria(int total, int nowPage, int cntPerPage) {
         setNowPage(nowPage);
         setCntPerPage(cntPerPage);
@@ -43,7 +42,5 @@ public class Criteria {
         setEnd(nowPage * cntPerPage);
         setStart(getEnd() - cntPerPage + 1);
     }
-
-
 
 }

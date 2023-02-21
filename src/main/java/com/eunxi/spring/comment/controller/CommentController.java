@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -37,11 +36,7 @@ public class CommentController {
         int b_num = vo.getBoard_seq();
         BoardVO board = boardService.getBoard(b_num);
 
-        System.out.println("com_insert BoardVO vo : " + vo);
-        System.out.println("com_insert BoardVO board : " + board);
-
-        // 원글의 정보를 답글 쓰기 화면에서 알 수 있도록 하기
-        model.addAttribute("board", board);
+        model.addAttribute("board", board); // 원글의 정보를 답글 쓰기 화면에서 알 수 있도록 하기
 
         return "/comment/com_insert";
     }

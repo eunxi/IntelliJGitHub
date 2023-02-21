@@ -41,12 +41,122 @@
 		]]>
 	</select>
 
-	<!-- 대표 이미지만 불러오기 -->
-	<select id="get_image" resultType="java.util.Map">
-		SELECT
-		       p_image1
-		FROM PRO
+	<!-- 카테고리별 상품 리스트 1차 분류 -->
+	<select id="category1_product" resultType="java.util.Map">
+		<![CDATA[
+			SELECT
+				   pc.pc_name,
+				   p.pc_code,
+				   pc.pc_codeRef,
+				   p_seq,
+				   p_name,
+				   p_price,
+				   p_stock,
+				   p_image1,
+				   p_image2,
+				   p_regdate,
+				   p_option,
+				   if(p_cost = 0, '', p_cost) AS p_cost,
+				   p_group,
+				   p_state,
+				   p_deliveryType,
+				   CASE p_deliveryType
+					   WHEN "D" THEN "일반배송"
+					   WHEN "R" THEN "로켓배송"
+					   WHEN "RF" THEN "로켓프레시"
+					   END AS p_delivery
+			FROM PRO p
+				 INNER JOIN PRO_CATEGORY pc ON p.pc_code = pc.pc_code
+			WHERE pc_codeRef = #{pc_codeRef}
+		]]>
 	</select>
+
+	<!-- 카테고리별 상품 리스트 2차 분류 -->
+	<select id="category2_product" resultType="java.util.Map">
+		<![CDATA[
+			SELECT
+				pc.pc_name,
+				p.pc_code,
+				pc.pc_codeRef,
+				p_seq,
+				p_name,
+				p_price,
+				p_stock,
+				p_image1,
+				p_image2,
+				p_regdate,
+				p_option,
+				if(p_cost = 0, '', p_cost) AS p_cost,
+				p_group,
+				p_state,
+				p_deliveryType,
+				CASE p_deliveryType
+					WHEN "D" THEN "일반배송"
+					WHEN "R" THEN "로켓배송"
+					WHEN "RF" THEN "로켓프레시"
+					END AS p_delivery
+			FROM PRO p
+					 INNER JOIN PRO_CATEGORY pc ON p.pc_code = pc.pc_code
+			WHERE p.pc_code = #{pc_code}
+		]]>
+	</select>
+
+	<!-- 상품 개수 -->
+	<select id="product_cnt" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*) FROM PRO;
+		]]>
+	</select>
+
+	<!-- 페이징 처리 후 상품 조회 -->
+	<select id="select_product" resultType="java.util.Map">
+		<![CDATA[
+			SELECT
+				p_seq,
+				p_name,
+				p_price,
+				p_stock,
+				p_image1,
+				p_image2,
+				p_regdate,
+				pc_code,
+				p_state,
+				p_option,
+				if(p_cost = 0, '', p_cost) AS p_cost,
+				p_group,
+				p_deliveryType,
+				CASE p_deliveryType
+					WHEN "D" THEN "일반배송"
+					WHEN "R" THEN "로켓배송"
+					WHEN "RF" THEN "로켓프레시"
+					END AS p_delivery
+			FROM
+			     (SELECT @rownum := @rownum + 1 AS no, A.* FROM
+			        	(SELECT
+								p_seq,
+								p_name,
+								p_price,
+								p_stock,
+								p_image1,
+								p_image2,
+								p_regdate,
+								pc_code,
+								p_state,
+								p_option,
+								if(p_cost = 0, '', p_cost) AS p_cost,
+								p_group,
+								p_deliveryType,
+								CASE p_deliveryType
+									WHEN "D" THEN "일반배송"
+									WHEN "R" THEN "로켓배송"
+									WHEN "RF" THEN "로켓프레시"
+									END AS p_delivery
+			    	    FROM PRO, (SELECT @rownum := 0) A)
+			     A ORDER BY p_seq DESC )A
+			WHERE no BETWEEN #{start} AND #{end}
+		]]>
+	</select>
+
 
 
 

@@ -80,9 +80,9 @@
 
     <div class="dataPerPage">
         <span style="float: right">
-            <select id="select_data" name="dataPerPage" style="height: 30px; width: 100px; text-align: center;">
-                <option value="12" <c:if test="${allSearch.getListSize() == 10 }">selected="selected"</c:if>>12개씩 보기</option>
-                <option value="20" <c:if test="${allSearch.getListSize() == 15 }">selected="selected"</c:if>>20개씩 보기</option>
+            <select id="cntPerPage" name="sel" onchange="sel_change();" style="height: 30px; width: 100px; text-align: center;">
+                <option value="12" <c:if test="${paging.cntPerPage == 12}">selected="selected"</c:if>>12개씩 보기</option>
+                <option value="20" <c:if test="${paging.cntPerPage == 20}">selected="selected"</c:if>>20개씩 보기</option>
             </select>
         </span>
     </div>
@@ -94,40 +94,40 @@
     </div>
 
     <div id="menu">
-        <h3 style="margin: 2% 0 0 5%;">카테고리</h3>
+        <h3 style="margin: 2% 0 0 5%;"><a href="/eunpang/">카테고리</a></h3>
         <ul class="category-menu">
-            <li class="cate1"><a href="/eunpang/main?c=100&l=1">식품</a>
+            <li class="cate1"><a href="/eunpang/list?pc_codeRef=100">식품</a>
                 <ul class="cate1-sub row submenu">
-                    <li><a href="/eunpang/main?c=101&l=2">과일</a></li>
-                    <li><a href="/eunpang/main?c=102&l=2">채소</a></li>
-                    <li><a href="/eunpang/main?c=103&l=2">간식</a></li>
-                    <li><a href="/eunpang/main?c=104&l=2">음료</a></li>
+                    <li><a href="/eunpang/list?pc_code=101">과일</a></li>
+                    <li><a href="/eunpang/list?pc_code=102">채소</a></li>
+                    <li><a href="/eunpang/list?pc_code=103">간식</a></li>
+                    <li><a href="/eunpang/list?pc_code=104">음료</a></li>
                 </ul>
             </li>
-            <li class="cate2"><a href="">생활용품</a>
+            <li class="cate2"><a href="/eunpang/list?pc_codeRef=200">생활용품</a>
                 <ul class="cate2-sub row submenu">
-                    <li><a href="">방한용품</a></li>
-                    <li><a href="">헤어</a></li>
-                    <li><a href="">바디</a></li>
-                    <li><a href="">구강</a></li>
+                    <li><a href="/eunpang/list?pc_code=201">방한용품</a></li>
+                    <li><a href="/eunpang/list?pc_code=202">헤어</a></li>
+                    <li><a href=/eunpang/list?pc_code=203"">바디</a></li>
+                    <li><a href="/eunpang/list?pc_code=204">구강</a></li>
                 </ul>
             </li>
-            <li class="cate3"><a href="">뷰티</a>
+            <li class="cate3"><a href="/eunpang/list?pc_codeRef=300">뷰티</a>
                 <ul class="cate3-sub row submenu">
-                    <li><a href="">스킨케어</a></li>
-                    <li><a href="">클렌징</a></li>
-                    <li><a href="">메이크업</a></li>
-                    <li><a href="">향수</a></li>
+                    <li><a href="/eunpang/list?pc_code=301">스킨케어</a></li>
+                    <li><a href="/eunpang/list?pc_code=302">클렌징</a></li>
+                    <li><a href="/eunpang/list?pc_code=303">메이크업</a></li>
+                    <li><a href="/eunpang/list?pc_code=304">향수</a></li>
                 </ul>
             </li>
-            <li class="cate4"><a href="">취미</a></li>
+            <li class="cate4"><a href="/eunpang/list?pc_codeRef=400">취미</a></li>
         </ul>
     </div>
 
     <div id="content">
         <c:forEach var="pro" items="${pro_list}">
             <div class="product_box" style="margin: 2% 2% 1% 2%;">
-                <p><img src="${pro.p_image1}"/> </p>
+                <p><img src="${pro.p_image1}" width=250px, height=230px/> </p>
                 <p style="font-size: small">${pro.p_name}</p>
                 <p>
                     <span style="color: darkgray; text-decoration: black line-through;">${pro.p_cost}</span>
@@ -136,24 +136,55 @@
                 <p>내일(수) 새벽 도착 보장</p>
                 <p>★★★★☆&nbsp;(101)</p>
             </div>
+        </c:forEach>
 
+        <c:forEach var="pro" items="${viewAll}">
+            <div class="product_box" style="margin: 2% 2% 1% 2%;">
+                <p><img src="${pro.p_image1}" width=250px, height=230px/> </p>
+                <p style="font-size: small">${pro.p_name}</p>
+                <p>
+                    <span style="color: darkgray; text-decoration: black line-through;">${pro.p_cost}</span>
+                </p>
+                <p><span>${pro.p_price}원</span>&nbsp;&nbsp;<span style="font-weight: bolder;">${pro.p_delivery}</span></p>
+                <p>내일(수) 새벽 도착 보장</p>
+                <p>★★★★☆&nbsp;(101)</p>
+            </div>
         </c:forEach>
     </div>
 
     <div id="footer">
-        여기서 페이징
+        <div style="display: block; text-align: center;">
+            <c:if test="${paging.startPage != 1}">
+                <a href="/eunpang/list?nowPage=${paging.startPage - 1}&cntPerPage=${paging.cntPerPage}">&lt;</a>
+            </c:if>
+
+            <c:forEach begin="${paging.startPage}" end="${paging.endPage}" var="p">
+                <c:choose>
+                    <c:when test="${p == paging.nowPage}">
+                        <b>${p }</b>
+                    </c:when>
+                    <c:when test="${p != paging.nowPage}">
+                        <a href="/eunpang/list?nowPage=${p}&cntPerPage=${paging.cntPerPage}">${p }</a>
+                    </c:when>
+                </c:choose>
+            </c:forEach>
+
+            <c:if test="${paging.endPage != paging.lastPage}">
+                <a href="/eunpang/list?nowPage=${paging.endPage + 1}&cntPerPage=${paging.cntPerPage}">&gt;</a>
+            </c:if>
+        </div>
     </div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
 
-    // 카테고리명
-    // console.log($("#cate_name_}").val());
-
-    function cate_fn(num){
-        alert(num + "클릭!");
+    function sel_change(){
+        let sel = document.getElementById('cntPerPage').value;
+        location.href = "/eunpang/list?nowPage=${paging.nowPage}&cntPerPage=" + sel;
     }
+
+
 
 
 
