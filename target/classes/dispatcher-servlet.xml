@@ -21,6 +21,8 @@
     <!-- LoginInterceptor 를 스프링에서 인터셉터로 인식시키기 위해 작성 -->
     <bean id="loginInterceptor" class="com.eunxi.spring.commons.interceptor.LoginInterceptor"/>
 
+    <mvc:resources mapping="/resources/**" location="/resources/"/>
+
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/user/login"/>

@@ -21,6 +21,7 @@
 		 <mapper resource="mappings/reply-mapping.xml" />
 		 <mapper resource="mappings/user-mapping.xml" />
 		 <mapper resource="mappings/doList-mapping.xml" />
+		 <mapper resource="mappings/eunpang-mapping.xml" />
 
 	
 	</mappers>

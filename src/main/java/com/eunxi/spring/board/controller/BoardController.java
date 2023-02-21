@@ -66,7 +66,6 @@ public class BoardController {
         }
 
         return "/board/test";
-/*        return ResponseEntity.ok().body("GET connection successfully");*/
     }
 
     @PostMapping("/list_post") // form-data
@@ -93,7 +92,6 @@ public class BoardController {
 
         System.out.println(map);
         List<Map<String, Object>> list = boardService.list_board(map); // 조건 : 시작날짜 - 마지막날짜
-//        List<Map<String, Object>> list = boardService.get_list(map); // 조건 없이 전체 목록 출력
 
         System.out.println("<< list 목록 출력 >>");
         for(int i = 0; i < list.size(); i++){

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="eunpangDao">
+
+	<!-- 카테고리 -->
+	<select id="list_category" resultType="java.util.Map">
+		<![CDATA[
+			SELECT
+			       pc_name,
+			       pc_code,
+			       pc_codeRef,
+			       pc_state
+			FROM PRO_CATEGORY
+		]]>
+	</select>
+
+	<!-- 상품 list -->
+	<select id="list_product" resultType="java.util.Map">
+		<![CDATA[
+			SELECT
+			       p_seq,
+			       p_name,
+			       p_price,
+			       p_stock,
+			       p_image1,
+			       p_image2,
+			       p_regdate,
+			       pc_code,
+			       p_state,
+				   p_option,
+			       if(p_cost = 0, '', p_cost) AS p_cost,
+			       p_group,
+				   p_deliveryType,
+					CASE p_deliveryType
+						WHEN "D" THEN "일반배송"
+						WHEN "R" THEN "로켓배송"
+						WHEN "RF" THEN "로켓프레시"
+					END AS p_delivery
+			FROM PRO
+		]]>
+	</select>
+
+	<!-- 대표 이미지만 불러오기 -->
+	<select id="get_image" resultType="java.util.Map">
+		SELECT
+		       p_image1
+		FROM PRO
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

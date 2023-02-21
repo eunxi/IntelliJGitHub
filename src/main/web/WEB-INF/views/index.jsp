@@ -44,6 +44,7 @@
             <a href="/board/board_list">자유게시판</a>&nbsp;|&nbsp;
             <a href="/do/doList">To Do List</a>&nbsp;|&nbsp;
             <a href="/board/test">TEST</a>&nbsp;|&nbsp;
+            <a href="/eunpang/" style="font-weight: bolder;">은팡</a>&nbsp;|&nbsp;
             <a href="/logout" id="logout">로그아웃</a>
         </div>
 
