@@ -71,7 +71,7 @@
                 </if>
         <![CDATA[
                 ORDER BY root DESC, step ASC) A
-                ORDER BY no ASC) A;
+                ORDER BY no ASC) A
          ]]>
 	</select>
 

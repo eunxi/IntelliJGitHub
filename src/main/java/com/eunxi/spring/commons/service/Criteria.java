@@ -11,6 +11,7 @@ public class Criteria {
     // 현재페이지, 시작페이지, 끝페이지, 게시글 총 개수, 페이지당 글 개수, 마지막페이지, sql 쿼리에 사용할 start, end
     private int nowPage, startPage, endPage, total, cntPerPage, lastPage, start, end;
     private int cntPage = 5;
+    private String keyword, type; // 검색 키워드, 검색 타입
 
     public Criteria() {
     }

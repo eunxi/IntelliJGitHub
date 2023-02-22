@@ -22,26 +22,15 @@ public class EunpangController {
     @Autowired
     private EunpangService eunpang;
 
+    // 은팡 - 메인
     @GetMapping("/")
-    public String main(Model model, HttpServletRequest request, Criteria cri
-            , @RequestParam(value="nowPage", required=false)String nowPage
-            , @RequestParam(value="cntPerPage", required=false)String cntPerPage){
+    public String main(Model model, HttpServletRequest request
+            , @RequestParam(value = "nowPage", required = false) String nowPage
+            , @RequestParam(value = "cntPerPage", required = false) String cntPerPage, Criteria criteria) {
         System.out.println("EUN-PANG Main Controller");
         HttpSession session = request.getSession();
 
         Map<String, Object> p_map = new HashMap<>();
-
-        List<Map<String, Object>> cate_list = eunpang.list_category(p_map);
-        List<Map<String, Object>> product_list = eunpang.list_product(p_map);
-        List<Map<String, Object>> cri_list = eunpang.select_product(cri); // cri 인식 불가
-
-        System.out.println("cri_list 출력됨?");
-        for(int i = 0; i < cri_list.size(); i++){
-            System.out.println(cri_list.get(i));
-        }
-
-        int total = eunpang.product_cnt(p_map);
-        System.out.println("total =" +total);
 
         if (nowPage == null && cntPerPage == null) {
             nowPage = "1";
@@ -52,83 +41,60 @@ public class EunpangController {
             cntPerPage = "12";
         }
 
-        cri = new Criteria(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
-        System.out.println("cri : " + cri);
+        int total = eunpang.product_cnt(p_map);
+        criteria = new Criteria(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
 
-        model.addAttribute("cate_list", cate_list);
-        model.addAttribute("session", session.getAttribute("user_id"));
-        model.addAttribute("pro_list", product_list);
-        model.addAttribute("paging", cri);
-        model.addAttribute("viewAll", cri_list);
+        List<Map<String, Object>> cri_list = eunpang.select_product(criteria); // 상품 목록 + 페이징
 
+        model.addAttribute("pro_list", cri_list); // 목록 + 페이징
+        model.addAttribute("session", session.getAttribute("user_id")); // 세션
+        model.addAttribute("paging", criteria); // 페이징
+
+        // 검색할 때 데이터들
+        System.out.println("total total : " + total);
+        System.out.println("criteria keyword : " + criteria.getKeyword());
+        System.out.println("criteria type : " + criteria.getType());
 
         return "/eunpang/main";
     }
 
+    // 은팡 - 카테고리
     @GetMapping("/list")
-    public String list(@RequestParam Map<String, Object> map, Model model, HttpServletRequest request){
+    public String list(
+            @RequestParam(value = "nowPage", required = false) String nowPage
+            , @RequestParam(value = "cntPerPage", required = false) String cntPerPage
+            , @RequestParam Map<String, Object> map, Model model, HttpServletRequest request) {
         System.out.println("EuN-PANG List Controller");
         HttpSession session = request.getSession();
         model.addAttribute("session", session.getAttribute("user_id"));
 
-        for(String key : map.keySet()){
-            System.out.println("key : " + key + ", value : " + map.get(key));
+        if (nowPage == null && cntPerPage == null) {
+            nowPage = "1";
+            cntPerPage = "12";
+        } else if (nowPage == null) {
+            nowPage = "1";
+        } else if (cntPerPage == null) {
+            cntPerPage = "12";
         }
 
-        List<Map<String, Object>> category1_product = eunpang.category1_product(map);
-        List<Map<String, Object>> category2_product = eunpang.category2_product(map);
+        int cate1_cnt = eunpang.category1_cnt(map);
+        Criteria cri = new Criteria(cate1_cnt, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
+        List<Map<String, Object>> category1_product = eunpang.category1_product(map, cri);
 
-        if(!category1_product.isEmpty()){ // 1차
+        int cate2_cnt = eunpang.category2_cnt(map);
+        Criteria cri2 = new Criteria(cate2_cnt, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
+        List<Map<String, Object>> category2_product = eunpang.category2_product(map, cri2);
+
+        if (!category1_product.isEmpty()) { // 1차
             model.addAttribute("pro_list", category1_product);
-            return "/eunpang/main";
-        }else if(!category2_product.isEmpty()){ // 2차
+            model.addAttribute("paging", cri);
+        } else if (!category2_product.isEmpty()) { // 2차
             model.addAttribute("pro_list", category2_product);
-            return "/eunpang/main";
+            model.addAttribute("paging", cri2);
         }
 
         return "/eunpang/main";
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }

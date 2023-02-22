@@ -3,6 +3,28 @@
  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="eunpangDao">
 
+	<!-- 재사용 가능한 SQL 정의, include 로 불러오기 가능 | 검색 조건문 -->
+	<sql id="search">
+		<trim prefix="where (" suffix=")" prefixOverrides="OR">
+			<trim prefix="OR">
+				<choose>
+					<when test="type == 'food'.toString()">
+						p_name LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<when test="type == 'dailyGoods'.toString()">
+						p_name LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<when test="type == 'beauty'.toString()">
+						p_name LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+					<when test="type == 'hobby'.toString()">
+						p_name LIKE CONCAT('%', #{keyword}, '%')
+					</when>
+				</choose>
+			</trim>
+		</trim>
+	</sql>
+
 	<!-- 카테고리 -->
 	<select id="list_category" resultType="java.util.Map">
 		<![CDATA[
@@ -15,103 +37,142 @@
 		]]>
 	</select>
 
-	<!-- 상품 list -->
-	<select id="list_product" resultType="java.util.Map">
-		<![CDATA[
-			SELECT
-			       p_seq,
-			       p_name,
-			       p_price,
-			       p_stock,
-			       p_image1,
-			       p_image2,
-			       p_regdate,
-			       pc_code,
-			       p_state,
-				   p_option,
-			       if(p_cost = 0, '', p_cost) AS p_cost,
-			       p_group,
-				   p_deliveryType,
-					CASE p_deliveryType
-						WHEN "D" THEN "일반배송"
-						WHEN "R" THEN "로켓배송"
-						WHEN "RF" THEN "로켓프레시"
-					END AS p_delivery
-			FROM PRO
-		]]>
-	</select>
-
 	<!-- 카테고리별 상품 리스트 1차 분류 -->
 	<select id="category1_product" resultType="java.util.Map">
 		<![CDATA[
-			SELECT
-				   pc.pc_name,
-				   p.pc_code,
-				   pc.pc_codeRef,
-				   p_seq,
-				   p_name,
-				   p_price,
-				   p_stock,
-				   p_image1,
-				   p_image2,
-				   p_regdate,
-				   p_option,
-				   if(p_cost = 0, '', p_cost) AS p_cost,
-				   p_group,
-				   p_state,
-				   p_deliveryType,
-				   CASE p_deliveryType
-					   WHEN "D" THEN "일반배송"
-					   WHEN "R" THEN "로켓배송"
-					   WHEN "RF" THEN "로켓프레시"
-					   END AS p_delivery
-			FROM PRO p
-				 INNER JOIN PRO_CATEGORY pc ON p.pc_code = pc.pc_code
-			WHERE pc_codeRef = #{pc_codeRef}
+		SELECT
+			p_seq,
+			p_name,
+			p_price,
+			p_stock,
+			p_image1,
+			p_image2,
+			p_regdate,
+			pc_code,
+			p_state,
+			p_option,
+			if(p_cost = 0, '', p_cost) AS p_cost,
+			p_group,
+			p_deliveryType,
+			CASE p_deliveryType
+				WHEN "D" THEN "일반배송"
+				WHEN "R" THEN "로켓배송"
+				WHEN "RF" THEN "로켓프레시"
+				END AS p_delivery
+		FROM
+			(SELECT @rownum := @rownum + 1 AS no, A.* FROM
+				(SELECT
+				    pc.pc_codeRef,
+				    pc.pc_name,
+					 p_seq,
+					 p_name,
+					 p_price,
+					 p_stock,
+					 p_image1,
+					 p_image2,
+					 p_regdate,
+					 p.pc_code,
+					 p_state,
+					 p_option,
+					 if(p_cost = 0, '', p_cost) AS p_cost,
+					 p_group,
+					 p_deliveryType,
+					 CASE p_deliveryType
+						 WHEN "D" THEN "일반배송"
+						 WHEN "R" THEN "로켓배송"
+						 WHEN "RF" THEN "로켓프레시"
+						 END AS p_delivery
+				 FROM PRO p INNER JOIN PRO_CATEGORY pc
+				      ON p.pc_code = pc.pc_code,
+				      (SELECT @rownum := 0) A)
+					A WHERE pc_codeRef = #{pc_codeRef} ORDER BY p_seq DESC )A
 		]]>
 	</select>
 
 	<!-- 카테고리별 상품 리스트 2차 분류 -->
 	<select id="category2_product" resultType="java.util.Map">
 		<![CDATA[
-			SELECT
-				pc.pc_name,
-				p.pc_code,
-				pc.pc_codeRef,
-				p_seq,
-				p_name,
-				p_price,
-				p_stock,
-				p_image1,
-				p_image2,
-				p_regdate,
-				p_option,
-				if(p_cost = 0, '', p_cost) AS p_cost,
-				p_group,
-				p_state,
-				p_deliveryType,
-				CASE p_deliveryType
-					WHEN "D" THEN "일반배송"
-					WHEN "R" THEN "로켓배송"
-					WHEN "RF" THEN "로켓프레시"
-					END AS p_delivery
-			FROM PRO p
-					 INNER JOIN PRO_CATEGORY pc ON p.pc_code = pc.pc_code
+		SELECT
+			p_seq,
+			p_name,
+			p_price,
+			p_stock,
+			p_image1,
+			p_image2,
+			p_regdate,
+			pc_code,
+			p_state,
+			p_option,
+			if(p_cost = 0, '', p_cost) AS p_cost,
+			p_group,
+			p_deliveryType,
+			CASE p_deliveryType
+				WHEN "D" THEN "일반배송"
+				WHEN "R" THEN "로켓배송"
+				WHEN "RF" THEN "로켓프레시"
+				END AS p_delivery
+		FROM
+			(SELECT @rownum := @rownum + 1 AS no, A.* FROM
+				(SELECT
+					 pc.pc_codeRef,
+					 pc.pc_name,
+					 p_seq,
+					 p_name,
+					 p_price,
+					 p_stock,
+					 p_image1,
+					 p_image2,
+					 p_regdate,
+					 p.pc_code,
+					 p_state,
+					 p_option,
+					 if(p_cost = 0, '', p_cost) AS p_cost,
+					 p_group,
+					 p_deliveryType,
+					 CASE p_deliveryType
+						 WHEN "D" THEN "일반배송"
+						 WHEN "R" THEN "로켓배송"
+						 WHEN "RF" THEN "로켓프레시"
+						 END AS p_delivery
+				 FROM PRO p INNER JOIN PRO_CATEGORY pc
+									   ON p.pc_code = pc.pc_code,
+					  (SELECT @rownum := 0) A)
+					A WHERE pc_code = #{pc_code} ORDER BY p_seq DESC )A
+		]]>
+	</select>
+
+	<!-- 메인 상품 개수 -->
+	<select id="product_cnt" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*) FROM PRO
+		]]>
+		<if test="keyword != null and keyword != ''">
+			<include refid="search"></include>
+		</if>
+	</select>
+
+	<!-- 카테고리별 상품 개수 -->
+	<select id="category1_cnt" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*) FROM PRO_CATEGORY pc
+			INNER JOIN PRO p ON p.pc_code = pc.pc_code
+			WHERE pc_codeRef = #{pc_codeRef}
+		]]>
+	</select>
+
+	<select id="category2_cnt" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*) FROM PRO_CATEGORY pc
+			INNER JOIN PRO p ON p.pc_code = pc.pc_code
 			WHERE p.pc_code = #{pc_code}
 		]]>
 	</select>
 
-	<!-- 상품 개수 -->
-	<select id="product_cnt" resultType="int">
-		<![CDATA[
-			SELECT COUNT(*) FROM PRO;
-		]]>
-	</select>
-
-	<!-- 페이징 처리 후 상품 조회 -->
+	<!-- 상품 목록 + 페이징 (메인) -->
 	<select id="select_product" resultType="java.util.Map">
 		<![CDATA[
 			SELECT
+			    no,
 				p_seq,
 				p_name,
 				p_price,
@@ -151,7 +212,13 @@
 									WHEN "R" THEN "로켓배송"
 									WHEN "RF" THEN "로켓프레시"
 									END AS p_delivery
-			    	    FROM PRO, (SELECT @rownum := 0) A)
+			    	    FROM PRO, (SELECT @rownum := 0) A
+		]]>
+				<if test="keyword != null and keyword != ''">
+					<include refid="search"></include>
+				</if>
+		<![CDATA[
+			        	    )
 			     A ORDER BY p_seq DESC )A
 			WHERE no BETWEEN #{start} AND #{end}
 		]]>

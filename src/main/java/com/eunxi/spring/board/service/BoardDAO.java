@@ -27,7 +27,6 @@ public class BoardDAO {
 
     // 등록
     public void boardInsert(BoardVO vo){
-
         session.insert("boardDao.boardInsert", vo);
     }
 

@@ -18,18 +18,13 @@ public class EunpangServiceImpl implements EunpangService {
     }
 
     @Override
-    public List<Map<String, Object>> list_product(Map<String, Object> map) {
-        return eunpangDao.list_product(map);
+    public List<Map<String, Object>> category1_product(Map<String, Object> map, Criteria cri) {
+        return eunpangDao.category1_product(map, cri);
     }
 
     @Override
-    public List<Map<String, Object>> category1_product(Map<String, Object> map) {
-        return eunpangDao.category1_product(map);
-    }
-
-    @Override
-    public List<Map<String, Object>> category2_product(Map<String, Object> map) {
-        return eunpangDao.category2_product(map);
+    public List<Map<String, Object>> category2_product(Map<String, Object> map, Criteria cri) {
+        return eunpangDao.category2_product(map, cri);
     }
 
     @Override
@@ -39,7 +34,16 @@ public class EunpangServiceImpl implements EunpangService {
 
     @Override
     public List<Map<String, Object>> select_product(Criteria cri) {
-        System.out.println("serviceImpl --- " + eunpangDao.select_product(cri));
         return eunpangDao.select_product(cri);
+    }
+
+    @Override
+    public int category1_cnt(Map<String, Object> map) {
+        return eunpangDao.category1_cnt(map);
+    }
+
+    @Override
+    public int category2_cnt(Map<String, Object> map) {
+        return eunpangDao.category2_cnt(map);
     }
 }
