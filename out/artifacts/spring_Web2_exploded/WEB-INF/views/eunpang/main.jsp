@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
 <head>
-    <title>은팡</title>
+    <title>은팡!</title>
     <style>
         a {
             text-decoration: none;
@@ -80,6 +80,28 @@
             height: 40px;
         }
 
+        .pageInfo_area ul, li{
+            margin: 0 0 0 0;
+        }
+
+        .pageInfo{
+            list-style: none;
+            display: inline-block;
+            margin: 50px 0 0 100px;
+        }
+
+        .pageInfo li{
+            float: left;
+            font-size: 20px;
+            margin-left: 18px;
+            padding: 7px;
+            font-weight: 500;
+        }
+
+        .active{
+            background-color: #cdd5ec;
+        }
+
     </style>
 </head>
 <body>
@@ -89,29 +111,23 @@
     <div class="dataPerPage">
         <span style="float: right">
             <select id="cntPerPage" name="sel" onchange="sel_change();" style="height: 30px; width: 100px; text-align: center;">
-                <option value="12" <c:if test="${paging.cntPerPage == 12}">selected="selected"</c:if>>12개씩 보기</option>
-                <option value="20" <c:if test="${paging.cntPerPage == 20}">selected="selected"</c:if>>20개씩 보기</option>
+                <option value="12" <c:if test="${criteria.cntPerPage == 12}">selected="selected"</c:if>>12개씩 보기</option>
+                <option value="20" <c:if test="${criteria.cntPerPage == 20}">selected="selected"</c:if>>20개씩 보기</option>
             </select>
         </span>
     </div>
 
     <div class="search_area" style="align-items: center; margin-left: 15%;">
-            <select id="search_option" name="type">
-                <option value="" <c:out value="${paging.type == null ? 'selected' : ''}" />>전체</option>
-                <option value="food" <c:out value="${paging.type eq 'food' ? 'selected' : ''}" />>식품</option>
-                <option value="dailyGoods" <c:out value="${paging.type eq 'dailyGoods' ? 'selected' : ''}" />>생활용품</option>
-                <option value="beauty" <c:out value="${paging.type eq 'beauty' ? 'selected' : ''}" />>뷰티</option>
-                <option value="hobby" <c:out value="${paging.type eq 'hobby' ? 'selected' : ''}" />>취미</option>
-            </select>
-            <input type="text" name="keyword" value="${paging.keyword}" id="search_box"/>
-            <button id="search_btn" type="button">검색</button>
+        <select id="search_option" name="type">
+            <option value="" <c:out value="${criteria.type == null ? 'selected' : ''}" />>전체</option>
+            <option value="food" <c:out value="${criteria.type eq 'food' ? 'selected' : ''}" />>식품</option>
+            <option value="dailyGoods" <c:out value="${criteria.type eq 'dailyGoods' ? 'selected' : ''}" />>생활용품</option>
+            <option value="beauty" <c:out value="${criteria.type eq 'beauty' ? 'selected' : ''}" />>뷰티</option>
+            <option value="hobby" <c:out value="${criteria.type eq 'hobby' ? 'selected' : ''}" />>취미</option>
+        </select>
 
-        <form method="get" action="/eunpang/" id="actionForm">
-            <input type="hidden" name="nowPage" value="${paging.nowPage}"/>
-            <input type="hidden" name="cntPerPage" value="${paging.cntPerPage}"/>
-            <input type="hidden" name="keyword" value="${paging.keyword}"/>
-            <input type="hidden" name="type" value="${paging.type}"/>
-        </form>
+        <input type="text" name="keyword" value="${criteria.keyword}" id="search_box"/>
+        <button id="search_btn" type="button">검색</button>
     </div>
 
     <div id="header">
@@ -122,44 +138,48 @@
     <div id="menu">
         <h3 style="margin: 2% 0 0 5%;"><a href="/eunpang/">카테고리</a></h3>
         <ul>
-            <li class="cate_menu1">
-                <a href="/eunpang/list?pc_codeRef=100" id="1" onclick="typeChange(this);">식품</a>
-                <ul>
-                    <li><a href="/eunpang/list?pc_code=101">과일</a></li>
-                    <li><a href="/eunpang/list?pc_code=102">채소</a></li>
-                    <li><a href="/eunpang/list?pc_code=103">간식</a></li>
-                    <li><a href="/eunpang/list?pc_code=104">음료</a></li>
-                </ul>
+            <c:forEach var="c1" items="${list_cate1}">
+            <li>
+                <c:choose>
+                    <c:when test="${c1.pc_code % 100 == 0}">
+                        <c:choose>
+                            <c:when test="${c1.pc_code eq pc_codeRef}">
+                                <a href="/eunpang/?pc_codeRef=${c1.pc_code}" class="active">${c1.pc_name}</a>
+                            </c:when>
+                            <c:otherwise>
+                                <a href="/eunpang/?pc_codeRef=${c1.pc_code}">${c1.pc_name}</a>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:when>
+
+                    <c:otherwise>
+                        <ul>
+                            <c:choose>
+                                <c:when test="${c1.pc_code eq cate.pc_code}">
+                                    <li><a href="/eunpang/?pc_code=${c1.pc_code}" class="active">${c1.pc_name}</a></li>
+                                </c:when>
+                                <c:otherwise>
+                                    <li><a href="/eunpang/?pc_code=${c1.pc_code}">${c1.pc_name}</a></li>
+                                </c:otherwise>
+                            </c:choose>
+                        </ul>
+                    </c:otherwise>
+                </c:choose>
             </li>
-            <li class="cate_menu">
-                <a href="/eunpang/list?pc_codeRef=200">생활용품</a>
-                <ul>
-                    <li><a href="/eunpang/list?pc_code=201">방한용품</a></li>
-                    <li><a href="/eunpang/list?pc_code=202">헤어</a></li>
-                    <li><a href="/eunpang/list?pc_code=203">바디</a></li>
-                    <li><a href="/eunpang/list?pc_code=204">구강</a></li>
-                </ul>
-            </li>
-            <li class="cate_menu">
-                <a href="/eunpang/list?pc_codeRef=300">뷰티</a>
-                <ul>
-                    <li><a href="/eunpang/list?pc_code=301">스킨케어</a></li>
-                    <li><a href="/eunpang/list?pc_code=302">클렌징</a></li>
-                    <li><a href="/eunpang/list?pc_code=303">메이크업</a></li>
-                    <li><a href="/eunpang/list?pc_code=304">향수</a></li>
-                </ul>
-            </li>
-            <li class="cate_menu">
-                <a href="/eunpang/list?pc_codeRef=400">취미</a>
-            </li>
+            </c:forEach>
         </ul>
     </div>
 
     <div id="content">
+        <c:if test="${empty pro_list}">
+            <c:out value="${msg}"/>
+        </c:if>
         <c:forEach var="pro" items="${pro_list}">
             <div class="product_box" style="margin: 2% 2% 1% 2%;">
-                <p><img src="${pro.p_image1}" width=250px, height=230px/> </p>
-                <p style="font-size: small">${pro.p_name}</p>
+                <a href="/eunpang/detail?p_seq=${pro.p_seq}">
+                    <p><img src="${pro.p_image1}" width=250px, height=230px/></p>
+                    <p style="font-size: small">${pro.p_name}</p>
+                </a>
                 <p>
                     <span style="color: darkgray; text-decoration: black line-through;">${pro.p_cost}</span>
                 </p>
@@ -170,28 +190,40 @@
         </c:forEach>
     </div>
 
-    <div id="footer">
-        <div style="display: block; text-align: center;">
-            <c:if test="${paging.startPage != 1}">
-                <a href="/eunpang/?nowPage=${paging.startPage - 1}&cntPerPage=${paging.cntPerPage}">&lt;</a>
-            </c:if>
+    <div class="pageInfo_wrap" id="footer">
+        <div class="pageInfo_area" style="display: block; text-align: center;">
+            <ul id="pageInfo" class="pageInfo">
+                <!-- 이전 페이지 -->
+                <c:if test="${criteria.prev}">
+                    <li class="pageInfo_btn previous">
+                        <a href="/eunpang/?pc_codeRef=${pc_codeRef}&pc_code=${cate.pc_code}&nowPage=${criteria.startPage - 1}&cntPerPage=${criteria.cntPerPage}">&lt;</a>
+                    </li>
+                </c:if>
 
-            <c:forEach begin="${paging.startPage}" end="${paging.endPage}" var="p">
-                <c:choose>
-                    <c:when test="${p == paging.nowPage}">
-                        <b>${p }</b>
-                    </c:when>
-                    <c:when test="${p != paging.nowPage}">
-                        <a href="/eunpang/?nowPage=${p}&cntPerPage=${paging.cntPerPage}">${p }</a>
-                    </c:when>
-                </c:choose>
-            </c:forEach>
+                <!-- 각 페이지 번호 버튼 -->
+                <c:forEach var="i" begin="${criteria.startPage}" end="${criteria.endPage}">
+                    <li class="pageInfo_btn ${criteria.nowPage == i ? 'active' : ''}">
+                        <a href="/eunpang/?pc_codeRef=${pc_codeRef}&pc_code=${cate.pc_code}&nowPage=${i}&cntPerPage=${criteria.cntPerPage}">${i}</a>
+                    </li>
+                </c:forEach>
 
-            <c:if test="${paging.endPage != paging.lastPage}">
-                <a href="/eunpang/?nowPage=${paging.endPage + 1}&cntPerPage=${paging.cntPerPage}">&gt;</a>
-            </c:if>
+                <!-- 다음 페이지 -->
+                <c:if test="${criteria.next}">
+                    <li class="pageInfo_btn next">
+                        <a href="/eunpang/?pc_codeRef=${pc_codeRef}&pc_code=${cate.pc_code}&nowPage=${criteria.endPage + 1}&cntPerPage=${criteria.cntPerPage}">&gt;</a>
+                    </li>
+                </c:if>
+            </ul>
         </div>
     </div>
+
+    <form method="get" id="actionForm">
+        <input type="hidden" name="nowPage" value="${criteria.nowPage}"/>
+        <input type="hidden" name="cntPerPage" value="${criteria.cntPerPage}"/>
+        <input type="hidden" name="cate" value="${cate.pc_code}"/>
+        <input type="hidden" name="keyword" value="${criteria.keyword}"/>
+        <input type="hidden" name="type" value="${criteria.type}"/>
+    </form>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -200,15 +232,16 @@
     // 개수 보기
     function sel_change(){
         let sel = document.getElementById('cntPerPage').value;
-        location.href = "/eunpang/?nowPage=${paging.nowPage}&cntPerPage=" + sel;
+        // document.getElementById('menu').style.height = "2500px";
+        // document.getElementById('menu').style.backgroundColor = "red";
+
+        location.href = "/eunpang/?pc_code=${cate.pc_code}&nowPage=${criteria.nowPage}&cntPerPage=" + sel;
     }
 
     // 검색 버튼
     $("#search_btn").on('click', function(){
         let type = $(".search_area select").val();
         let keyword = $(".search_area input[name='keyword']").val();
-
-        console.log("현재 검색어 : " + keyword);
 
         if(!type){
             alert("분류를 선택하세요.");
@@ -224,6 +257,17 @@
         $("#actionForm").find("input[name='keyword']").val(keyword);
         $("#actionForm").submit();
     })
+
+    // 페이징
+    $(".pageInfo a").on('click', function(){
+        let cntPerPage = document.getElementById('cntPerPage').value;
+
+        $("#actionForm").find("input[name='nowPage']").val($(this).attr("href"));
+        $("#actionForm").find("input[name='cntPerPage']").val(cntPerPage);
+        $("#actionForm").attr("action", '/eunpang/');
+        $("#actionForm").submit();
+    });
+
 
 
 

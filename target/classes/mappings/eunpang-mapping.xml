@@ -25,15 +25,27 @@
 		</trim>
 	</sql>
 
-	<!-- 카테고리 -->
-	<select id="list_category" resultType="java.util.Map">
+	<!-- 카테고리 목록 -->
+	<select id="list_cate1" resultType="java.util.Map">
 		<![CDATA[
 			SELECT
 			       pc_name,
-			       pc_code,
 			       pc_codeRef,
+			       pc_code,
 			       pc_state
 			FROM PRO_CATEGORY
+		]]>
+	</select>
+
+	<select id="cate" resultType="java.util.Map">
+		<![CDATA[
+			SELECT
+				pc_name,
+				pc_codeRef,
+				pc_code,
+				pc_state
+			FROM PRO_CATEGORY
+			WHERE pc_code = #{pc_code}
 		]]>
 	</select>
 
@@ -41,6 +53,7 @@
 	<select id="category1_product" resultType="java.util.Map">
 		<![CDATA[
 		SELECT
+		    pc_codeRef,
 			p_seq,
 			p_name,
 			p_price,
@@ -135,7 +148,7 @@
 						 WHEN "RF" THEN "로켓프레시"
 						 END AS p_delivery
 				 FROM PRO p INNER JOIN PRO_CATEGORY pc
-									   ON p.pc_code = pc.pc_code,
+				   ON p.pc_code = pc.pc_code,
 					  (SELECT @rownum := 0) A)
 					A WHERE pc_code = #{pc_code} ORDER BY p_seq DESC )A
 		]]>
@@ -224,6 +237,32 @@
 		]]>
 	</select>
 
+	<!-- 상품 상세보기 -->
+	<select id="pro_detail" resultType="java.util.Map">
+		<![CDATA[
+			SELECT
+				p_seq,
+				p_name,
+				p_price,
+				p_stock,
+				p_image1,
+				p_image2,
+				p_regdate,
+				pc_code,
+				p_state,
+				p_option,
+				if(p_cost = 0, '', p_cost) AS p_cost,
+				p_group,
+				p_deliveryType,
+				CASE p_deliveryType
+					WHEN "D" THEN "일반배송"
+					WHEN "R" THEN "로켓배송"
+					WHEN "RF" THEN "로켓프레시"
+					END AS p_delivery
+			FROM PRO
+			WHERE p_seq = #{p_seq}
+		]]>
+	</select>
 
 
 

@@ -13,8 +13,13 @@ public class EunpangServiceImpl implements EunpangService {
     private EunpangDAO eunpangDao;
 
     @Override
-    public List<Map<String, Object>> list_category(Map<String, Object> map) {
-        return eunpangDao.list_category(map);
+    public List<Map<String, Object>> list_cate1(Map<String, Object> map) {
+        return eunpangDao.list_cate1(map);
+    }
+
+    @Override
+    public List<Map<String, Object>> list_cate2(Map<String, Object> map) {
+        return eunpangDao.list_cate1(map);
     }
 
     @Override
@@ -46,4 +51,15 @@ public class EunpangServiceImpl implements EunpangService {
     public int category2_cnt(Map<String, Object> map) {
         return eunpangDao.category2_cnt(map);
     }
+
+    @Override
+    public Map<String, Object> pro_detail(Map<String, Object> map) {
+        return eunpangDao.pro_detail(map);
+    }
+
+    @Override
+    public Map<String, Object> cate(Map<String, Object> map) {
+        return eunpangDao.cate(map);
+    }
+
 }
