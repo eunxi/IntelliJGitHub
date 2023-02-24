@@ -72,7 +72,7 @@
 
         #search_option{
             width: 100px;
-            height: 35px;
+            height: 40px;
         }
 
         #search_btn{
@@ -118,15 +118,16 @@
     </div>
 
     <div class="search_area" style="align-items: center; margin-left: 15%;">
-        <select id="search_option" name="type">
-            <option value="" <c:out value="${criteria.type == null ? 'selected' : ''}" />>전체</option>
-            <option value="food" <c:out value="${criteria.type eq 'food' ? 'selected' : ''}" />>식품</option>
-            <option value="dailyGoods" <c:out value="${criteria.type eq 'dailyGoods' ? 'selected' : ''}" />>생활용품</option>
-            <option value="beauty" <c:out value="${criteria.type eq 'beauty' ? 'selected' : ''}" />>뷰티</option>
-            <option value="hobby" <c:out value="${criteria.type eq 'hobby' ? 'selected' : ''}" />>취미</option>
+        <select id="search_option" name="s_type">
+            <option value="" <c:out value="${map.type == null ? 'selected' : ''}" />>전체</option>
+                <c:forEach var="c1" items="${list_cate1}">
+                    <c:if test="${c1.pc_code % 100 == 0}">
+                        <option value="${c1.pc_codeRef}" <c:out value="${map.type eq c1.pc_codeRef ? 'selected' : ''}" />>${c1.pc_name}</option>
+                    </c:if>
+                </c:forEach>
         </select>
 
-        <input type="text" name="keyword" value="${criteria.keyword}" id="search_box"/>
+        <input type="text" name="s_keyword" value="${map.keyword}" id="search_box"/>
         <button id="search_btn" type="button">검색</button>
     </div>
 
@@ -172,7 +173,7 @@
 
     <div id="content">
         <c:if test="${empty pro_list}">
-            <c:out value="${msg}"/>
+            <c:out value="${WAIT}"/>
         </c:if>
         <c:forEach var="pro" items="${pro_list}">
             <div class="product_box" style="margin: 2% 2% 1% 2%;">
@@ -196,34 +197,35 @@
                 <!-- 이전 페이지 -->
                 <c:if test="${criteria.prev}">
                     <li class="pageInfo_btn previous">
-                        <a href="/eunpang/?pc_codeRef=${pc_codeRef}&pc_code=${cate.pc_code}&nowPage=${criteria.startPage - 1}&cntPerPage=${criteria.cntPerPage}">&lt;</a>
+                        <a href="/eunpang/?pc_codeRef=${pc_codeRef}&pc_code=${cate.pc_code}&nowPage=${criteria.startPage - 1}&cntPerPage=${criteria.cntPerPage}&t=${map.type}&q=${map.keyword}">&lt;</a>
                     </li>
                 </c:if>
 
                 <!-- 각 페이지 번호 버튼 -->
                 <c:forEach var="i" begin="${criteria.startPage}" end="${criteria.endPage}">
                     <li class="pageInfo_btn ${criteria.nowPage == i ? 'active' : ''}">
-                        <a href="/eunpang/?pc_codeRef=${pc_codeRef}&pc_code=${cate.pc_code}&nowPage=${i}&cntPerPage=${criteria.cntPerPage}">${i}</a>
+                        <a href="/eunpang/?pc_codeRef=${pc_codeRef}&pc_code=${cate.pc_code}&nowPage=${i}&cntPerPage=${criteria.cntPerPage}&t=${map.type}&q=${map.keyword}">${i}</a>
                     </li>
                 </c:forEach>
 
                 <!-- 다음 페이지 -->
                 <c:if test="${criteria.next}">
                     <li class="pageInfo_btn next">
-                        <a href="/eunpang/?pc_codeRef=${pc_codeRef}&pc_code=${cate.pc_code}&nowPage=${criteria.endPage + 1}&cntPerPage=${criteria.cntPerPage}">&gt;</a>
+                        <a href="/eunpang/?pc_codeRef=${pc_codeRef}&pc_code=${cate.pc_code}&nowPage=${criteria.endPage + 1}&cntPerPage=${criteria.cntPerPage}&t=${map.type}&q=${map.keyword}">&gt;</a>
                     </li>
                 </c:if>
             </ul>
         </div>
     </div>
 
-    <form method="get" id="actionForm">
+    <form method="get" id="actionForm" action="/eunpang/">
+        <input type="hidden" name="pc_codeRef" value="${pc_codeRef}"/>
         <input type="hidden" name="nowPage" value="${criteria.nowPage}"/>
         <input type="hidden" name="cntPerPage" value="${criteria.cntPerPage}"/>
-        <input type="hidden" name="cate" value="${cate.pc_code}"/>
-        <input type="hidden" name="keyword" value="${criteria.keyword}"/>
-        <input type="hidden" name="type" value="${criteria.type}"/>
+        <input type="hidden" name="keyword" value="${map.keyword}"/>
+        <input type="hidden" name="type" value="${map.type}"/>
     </form>
+
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -241,7 +243,7 @@
     // 검색 버튼
     $("#search_btn").on('click', function(){
         let type = $(".search_area select").val();
-        let keyword = $(".search_area input[name='keyword']").val();
+        let keyword = $(".search_area input[name='s_keyword']").val();
 
         if(!type){
             alert("분류를 선택하세요.");
@@ -253,8 +255,10 @@
             return false;
         }
 
+        $("#actionForm").find("input[name='pc_codeRef']").val(type);
         $("#actionForm").find("input[name='type']").val(type);
         $("#actionForm").find("input[name='keyword']").val(keyword);
+        $("#actionForm").find("input[name='nowPage']").val(1);
         $("#actionForm").submit();
     })
 

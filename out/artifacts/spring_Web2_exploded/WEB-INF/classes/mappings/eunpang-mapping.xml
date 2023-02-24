@@ -8,19 +8,40 @@
 		<trim prefix="where (" suffix=")" prefixOverrides="OR">
 			<trim prefix="OR">
 				<choose>
-					<when test="type == 'food'.toString()">
+					<when test="type == '100'.toString()">
 						p_name LIKE CONCAT('%', #{keyword}, '%')
 					</when>
-					<when test="type == 'dailyGoods'.toString()">
+					<when test="type == '200'.toString()">
 						p_name LIKE CONCAT('%', #{keyword}, '%')
 					</when>
-					<when test="type == 'beauty'.toString()">
+					<when test="type == '300'.toString()">
 						p_name LIKE CONCAT('%', #{keyword}, '%')
 					</when>
-					<when test="type == 'hobby'.toString()">
+					<when test="type == '400'.toString()">
 						p_name LIKE CONCAT('%', #{keyword}, '%')
 					</when>
 				</choose>
+			</trim>
+		</trim>
+	</sql>
+
+	<sql id="keyword">
+		<trim prefixOverrides="OR">
+			<trim prefix="OR">
+			<choose>
+				<when test="type == '100'.toString()">
+					p_name LIKE CONCAT('%', #{keyword}, '%')
+				</when>
+				<when test="type == '200'.toString()">
+					p_name LIKE CONCAT('%', #{keyword}, '%')
+				</when>
+				<when test="type == '300'.toString()">
+					p_name LIKE CONCAT('%', #{keyword}, '%')
+				</when>
+				<when test="type == '400'.toString()">
+					p_name LIKE CONCAT('%', #{keyword}, '%')
+				</when>
+			</choose>
 			</trim>
 		</trim>
 	</sql>
@@ -97,8 +118,14 @@
 						 END AS p_delivery
 				 FROM PRO p INNER JOIN PRO_CATEGORY pc
 				      ON p.pc_code = pc.pc_code,
-				      (SELECT @rownum := 0) A)
-					A WHERE pc_codeRef = #{pc_codeRef} ORDER BY p_seq DESC )A
+				      (SELECT @rownum := 0) A
+		]]>
+			<if test="keyword != null and keyword != ''">
+				<include refid="search"></include>
+			</if>
+		<![CDATA[
+				) A
+				WHERE pc_codeRef = #{pc_codeRef} ORDER BY p_seq DESC )A
 		]]>
 	</select>
 
@@ -157,7 +184,9 @@
 	<!-- 메인 상품 개수 -->
 	<select id="product_cnt" resultType="int">
 		<![CDATA[
-			SELECT COUNT(*) FROM PRO
+			SELECT COUNT(*) FROM PRO p
+				INNER JOIN PRO_CATEGORY pc
+				ON p.pc_code = pc.pc_code
 		]]>
 		<if test="keyword != null and keyword != ''">
 			<include refid="search"></include>
@@ -168,9 +197,12 @@
 	<select id="category1_cnt" resultType="int">
 		<![CDATA[
 			SELECT COUNT(*) FROM PRO_CATEGORY pc
-			INNER JOIN PRO p ON p.pc_code = pc.pc_code
+				INNER JOIN PRO p ON p.pc_code = pc.pc_code
 			WHERE pc_codeRef = #{pc_codeRef}
 		]]>
+		<if test="keyword != null and keyword != ''">
+			<include refid="keyword"></include>
+		</if>
 	</select>
 
 	<select id="category2_cnt" resultType="int">
@@ -185,7 +217,7 @@
 	<select id="select_product" resultType="java.util.Map">
 		<![CDATA[
 			SELECT
-			    no,
+				pc_codeRef,
 				p_seq,
 				p_name,
 				p_price,
@@ -205,27 +237,31 @@
 					WHEN "RF" THEN "로켓프레시"
 					END AS p_delivery
 			FROM
-			     (SELECT @rownum := @rownum + 1 AS no, A.* FROM
-			        	(SELECT
-								p_seq,
-								p_name,
-								p_price,
-								p_stock,
-								p_image1,
-								p_image2,
-								p_regdate,
-								pc_code,
-								p_state,
-								p_option,
-								if(p_cost = 0, '', p_cost) AS p_cost,
-								p_group,
-								p_deliveryType,
-								CASE p_deliveryType
-									WHEN "D" THEN "일반배송"
-									WHEN "R" THEN "로켓배송"
-									WHEN "RF" THEN "로켓프레시"
-									END AS p_delivery
-			    	    FROM PRO, (SELECT @rownum := 0) A
+				(SELECT @rownum := @rownum + 1 AS no, A.* FROM
+					(SELECT
+						pc.pc_codeRef,
+						pc.pc_name,
+						 p_seq,
+						 p_name,
+						 p_price,
+						 p_stock,
+						 p_image1,
+						 p_image2,
+						 p_regdate,
+						 p.pc_code,
+						 p_state,
+						 p_option,
+						 if(p_cost = 0, '', p_cost) AS p_cost,
+						 p_group,
+						 p_deliveryType,
+						 CASE p_deliveryType
+							 WHEN "D" THEN "일반배송"
+							 WHEN "R" THEN "로켓배송"
+							 WHEN "RF" THEN "로켓프레시"
+							 END AS p_delivery
+					 FROM PRO p INNER JOIN PRO_CATEGORY pc
+						  ON p.pc_code = pc.pc_code,
+						  (SELECT @rownum := 0) A
 		]]>
 				<if test="keyword != null and keyword != ''">
 					<include refid="search"></include>

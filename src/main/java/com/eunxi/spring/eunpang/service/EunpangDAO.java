@@ -33,14 +33,6 @@ public class EunpangDAO {
         return session.selectList("eunpangDao.category1_product", map, rowBounds);
     }
 
-/*    public List<Map<String, Object>> category1_product(Map<String, Object> map, Criteria cri){
-        int limit = cri.getCntPerPage();
-        int offset = (cri.getNowPage() - 1) * limit;
-
-        RowBounds rowBounds = new RowBounds(offset, limit);
-        return session.selectList("eunpangDao.category1_product", map, rowBounds);
-    }*/
-
     // 카테고리별 상품 출력 2차 분류
     public List<Map<String, Object>> category2_product(Map<String, Object> map, Criteria cri){
         int limit = cri.getCntPerPage();

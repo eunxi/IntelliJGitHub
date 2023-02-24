@@ -12,7 +12,7 @@ public class Criteria {
     private int nowPage, startPage, endPage, total, cntPerPage, lastPage, start, end;
     private boolean prev, next;
     private int cntPage = 5;
-    private String keyword, type; // 검색 키워드, 검색 타입
+    private String keyword, type; // 검색 키워드, 검색 타입, 코드
 
     public Criteria() {
     }
@@ -69,4 +69,19 @@ public class Criteria {
         setStart(getEnd() - cntPerPage + 1);
     }
 
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

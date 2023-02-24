@@ -43,6 +43,11 @@ public class EunpangController {
         int total = eunpang.product_cnt(map);
         criteria = new Criteria(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
 
+        if(map.get("type") != null && map.get("keyword") != null){ // toString 으로 인식할 경우, 문자 없으면 아예 null 인식할 수 있음
+            criteria.setType(map.get("type").toString());
+            criteria.setKeyword(map.get("keyword").toString());
+        }
+
         List<Map<String, Object>> cri_list = eunpang.select_product(criteria); // 상품 목록 + 페이징
         List<Map<String, Object>> list_cate1 = eunpang.list_cate1(map); // 카테고리만 출력
 
@@ -56,31 +61,30 @@ public class EunpangController {
         Criteria cri2 = new Criteria(cate1_total2, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage));
         List<Map<String, Object>> category2_product = eunpang.category2_product(map, cri2);
 
+        System.out.println("cate1_total1 : " + cate1_total1);
+        System.out.println("cate1_total2 : " + cate1_total2);
+
         if (!category1_product.isEmpty()) { // 1차
             model.addAttribute("pro_list", category1_product);
             model.addAttribute("criteria", cri1);
         } else if (!category2_product.isEmpty()) { // 2차
             model.addAttribute("pro_list", category2_product);
             model.addAttribute("criteria", cri2);
-        }else{
+        }/*else if(cate1_total1 == 0 || cate1_total2 == 0){
+            System.out.println("여기로 들어와주세요.");
+            model.addAttribute("WAIT", "재고 입고 기다리는 중");
+            model.addAttribute("NO_SEARCH", "검색 결과가 없습니다.");
+        }*/else{
             model.addAttribute("pro_list", cri_list); // 목록 + 페이징
             model.addAttribute("criteria", criteria); // 페이징
         }
-
-        // 검색할 때 데이터들
-        System.out.println("total total : " + total);
-        System.out.println("total cate1_total : " + cate1_total1);
-        System.out.println("total cate1_total2 : " + cate1_total2);
-        System.out.println("criteria keyword : " + criteria.getKeyword());
-        System.out.println("criteria type : " + criteria.getType());
-        System.out.println("cate : " + eunpang.cate(map));
-//        System.out.println("criteria type : " + criteria.getType());
 
         // model
         model.addAttribute("list_cate1", list_cate1); // 카테고리
         model.addAttribute("cate", eunpang.cate(map)); // 2차 카테고리 상세
         model.addAttribute("pc_codeRef" , map.get("pc_codeRef")); // 현재 상위 카테고리
         model.addAttribute("session", session.getAttribute("user_id")); // 세션
+        model.addAttribute("map", map); // map
 
         return "/eunpang/main";
     }
